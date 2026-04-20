@@ -2,31 +2,115 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser, HasMedia, HasTenants
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, HasRoles, InteractsWithMedia, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'avatar_path',
+        'default_organization_id',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class)
+            ->withPivot(['role', 'invited_at', 'joined_at'])
+            ->withTimestamps();
+    }
+
+    public function defaultOrganization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'default_organization_id');
+    }
+
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class)
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function assignedTasks(): BelongsToMany
+    {
+        return $this->belongsToMany(Task::class)->withTimestamps();
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function initials(): string
+    {
+        return Str::upper(Str::substr(
+            Str::of($this->name)
+                ->explode(' ')
+                ->map(fn (string $name) => Str::substr($name, 0, 1))
+                ->implode(''),
+            0,
+            2
+        ));
+    }
+
+    public function avatarUrl(): string
+    {
+        if ($this->avatar_path) {
+            return Storage::disk('public')->url($this->avatar_path);
+        }
+
+        return route('avatars.default', ['initials' => $this->initials() ?: '?']);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return match ($panel->getId()) {
+            'admin' => $this->hasRole('site_admin'),
+            'app' => $this->organizations()->exists(),
+            default => false,
+        };
+    }
+
+    public function getTenants(Panel $panel): Collection
+    {
+        return $this->organizations()->get();
+    }
+
+    public function canAccessTenant(Model $tenant): bool
+    {
+        return $this->organizations()->whereKey($tenant->getKey())->exists();
     }
 }
