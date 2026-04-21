@@ -1,7 +1,11 @@
 <?php
 
 use App\Models\Organization;
+use App\Models\OrganizationInvite;
+use App\Models\SiteInvite;
+use App\Models\SiteSetting;
 use App\Models\User;
+use App\Support\RegistrationGate;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -9,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 
 new #[Layout('components.layouts.auth')] class extends Component {
@@ -20,29 +25,44 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public string $password = '';
     public string $password_confirmation = '';
 
-    /**
-     * Handle an incoming registration request.
-     */
+    #[Url(as: 'invite')]
+    public ?string $inviteToken = null;
+
+    public function mount(): void
+    {
+        if (! RegistrationGate::allowsRegistration($this->inviteToken)) {
+            abort(403, 'Registration is currently disabled.');
+        }
+
+        $orgInvite = $this->matchingOrgInvite();
+
+        if ($orgInvite) {
+            $this->redirectRoute('invite.show', ['token' => $this->inviteToken], navigate: true);
+        }
+    }
+
     public function register(): void
     {
-        $validated = $this->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'timezone' => ['required', 'timezone:all'],
-            'organization_name' => ['required', 'string', 'max:255'],
-            'organization_timezone' => ['required', 'timezone:all'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ];
 
+        $settings = SiteSetting::current();
+
+        if ($settings->org_creation_enabled) {
+            $rules['organization_name'] = ['required', 'string', 'max:255'];
+            $rules['organization_timezone'] = ['required', 'timezone:all'];
+        }
+
+        $validated = $this->validate($rules);
         $validated['password'] = Hash::make($validated['password']);
 
-        $user = DB::transaction(function () use ($validated): User {
-            $organization = Organization::create([
-                'name' => $validated['organization_name'],
-                'slug' => $this->makeUniqueOrganizationSlug($validated['organization_name']),
-                'timezone' => $validated['organization_timezone'],
-            ]);
+        $siteInvite = SiteInvite::findValidByToken($this->inviteToken);
 
+        $user = DB::transaction(function () use ($validated, $settings, $siteInvite): User {
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -50,14 +70,22 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 'password' => $validated['password'],
             ]);
 
-            $organization->users()->attach($user, [
-                'role' => 'org_admin',
-                'joined_at' => now(),
-            ]);
+            if ($settings->org_creation_enabled) {
+                $organization = Organization::create([
+                    'name' => $validated['organization_name'],
+                    'slug' => $this->makeUniqueOrganizationSlug($validated['organization_name']),
+                    'timezone' => $validated['organization_timezone'],
+                ]);
 
-            $user->update([
-                'default_organization_id' => $organization->id,
-            ]);
+                $organization->users()->attach($user, [
+                    'role' => 'org_admin',
+                    'joined_at' => now(),
+                ]);
+
+                $user->update(['default_organization_id' => $organization->id]);
+            }
+
+            $siteInvite?->consume();
 
             return $user;
         });
@@ -67,6 +95,17 @@ new #[Layout('components.layouts.auth')] class extends Component {
         Auth::login($user);
 
         $this->redirect(route('dashboard', absolute: false), navigate: true);
+    }
+
+    protected function matchingOrgInvite(): ?OrganizationInvite
+    {
+        if (! $this->inviteToken) {
+            return null;
+        }
+
+        $invite = OrganizationInvite::where('token', $this->inviteToken)->first();
+
+        return $invite && ! $invite->isExpired() && ! $invite->accepted_at ? $invite : null;
     }
 
     protected function makeUniqueOrganizationSlug(string $name): string
@@ -110,6 +149,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             </select>
         </div>
 
+        @if(\App\Models\SiteSetting::current()->org_creation_enabled)
         <div class="grid gap-2">
             <flux:input wire:model="organization_name" id="organization_name" label="{{ __('Organization name') }}" type="text" name="organization_name" required autocomplete="organization" placeholder="Nerdibear" />
         </div>
@@ -122,6 +162,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 @endforeach
             </select>
         </div>
+        @endif
 
         <!-- Password -->
         <div class="grid gap-2">

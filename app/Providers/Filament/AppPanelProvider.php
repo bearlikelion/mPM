@@ -32,7 +32,7 @@ class AppPanelProvider extends PanelProvider
             ->path('app')
             ->login()
             ->brandName('mPM')
-            ->brandLogo(fn () => Blade::render('<span class="fi-logo">mPM<span class="gv-panel-tag">org admin</span></span>'))
+            ->brandLogo(fn () => Blade::render('<span class="fi-logo"><x-app-logo-icon /><span class="fi-logo-wordmark">mPM</span><span class="gv-panel-tag">org admin</span></span>'))
             ->colors([
                 'primary' => Color::Amber,
             ])

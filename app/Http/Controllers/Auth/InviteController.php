@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\OrganizationInvite;
+use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,9 @@ class InviteController extends Controller
     {
         $invite = OrganizationInvite::where('token', $token)->firstOrFail();
         abort_if($invite->isExpired() || $invite->accepted_at, 410);
+
+        $limit = SiteSetting::current()->user_limit_per_org;
+        abort_if($invite->organization->users()->count() >= $limit, 403, 'Organization is at its user limit.');
 
         $data = $request->validate([
             'name' => ['required_without:_existing', 'string', 'max:255'],
