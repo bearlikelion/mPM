@@ -66,10 +66,7 @@ class DashboardTest extends TestCase
         $response
             ->assertOk()
             ->assertSee(route('tasks.show', $task->key), false)
-            ->assertSee(
-                route('kanban', ['project' => $project->id, 'assignee' => $user->id]),
-                false
-            )
+            ->assertSee(route('users.show', $user), false)
             ->assertSee($comment->body)
             ->assertSee($task->title);
     }
@@ -134,6 +131,7 @@ class DashboardTest extends TestCase
             ->assertSee('manager desk')
             ->assertSee('Everyone&#039;s workload', false)
             ->assertSee('Teammate One')
+            ->assertSee(route('users.show', $member), false)
             ->assertSee(route('kanban', ['assignee' => $member->id]), false)
             ->assertSee(route('kanban', ['project' => $project->id]), false);
     }

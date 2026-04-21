@@ -15,6 +15,8 @@ class TaskDetail extends Component
 
     public Task $task;
 
+    public bool $embedded = false;
+
     public string $newComment = '';
 
     public array $attachments = [];
@@ -25,8 +27,10 @@ class TaskDetail extends Component
 
     public ?int $storyPoints = null;
 
-    public function mount(string $taskKey): void
+    public function mount(string $taskKey, bool $embedded = false): void
     {
+        $this->embedded = $embedded;
+
         $orgIds = Auth::user()->organizations()->pluck('organizations.id');
         $projectIds = Project::whereIn('organization_id', $orgIds)->pluck('id');
 

@@ -32,9 +32,20 @@
                     </div>
                 </a>
 
+                <flux:modal.trigger name="create-task-modal">
+                    <button type="button" class="app-task-trigger mt-4 flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:border-amber-400/40 hover:bg-neutral-950/75">
+                        <div>
+                            <div class="app-eyebrow">Create</div>
+                            <div class="mt-1 text-base font-semibold text-neutral-50">New task</div>
+                        </div>
+                        <span class="text-2xl font-semibold text-amber-300">+</span>
+                    </button>
+                </flux:modal.trigger>
+
                 <flux:navlist variant="outline">
                     <flux:navlist.group heading="Platform" class="grid">
                         <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Dashboard</flux:navlist.item>
+                        <flux:navlist.item icon="squares-2x2" :href="route('projects.index')" :current="request()->routeIs('projects.index')" wire:navigate>Projects</flux:navlist.item>
                         @if($isOrgAdmin)
                             <flux:navlist.item icon="presentation-chart-line" :href="route('manager')" :current="request()->routeIs('manager')" wire:navigate>Manager</flux:navlist.item>
                         @endif
@@ -113,6 +124,12 @@
             <flux:header class="app-mobile-header lg:hidden">
                 <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
+                <flux:modal.trigger name="create-task-modal">
+                    <button type="button" class="rounded-full border border-neutral-700/70 bg-neutral-950/60 px-3 py-1.5 text-sm font-semibold text-neutral-50 transition hover:border-amber-400/50 hover:text-amber-200">
+                        + Task
+                    </button>
+                </flux:modal.trigger>
+
                 <flux:spacer />
 
                 <flux:dropdown position="top" align="end">
@@ -161,6 +178,8 @@
 
             {{ $slot }}
         </div>
+
+        <livewire:create-task-modal />
 
         @fluxScripts
     </body>

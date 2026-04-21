@@ -140,10 +140,12 @@
                             <div class="grid gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1.2fr)_repeat(4,minmax(0,0.5fr))] lg:items-center">
                                 <div class="min-w-0">
                                     <div class="flex items-center gap-3">
-                                        <img src="{{ $member->avatarUrl() }}" alt="" class="h-11 w-11 rounded-2xl border border-neutral-700/70 bg-neutral-900 object-cover" />
+                                        <a href="{{ route('users.show', $member) }}" wire:navigate class="shrink-0">
+                                            <img src="{{ $member->avatarUrl() }}" alt="{{ $member->name }}" class="h-11 w-11 rounded-2xl border border-neutral-700/70 bg-neutral-900 object-cover transition hover:border-amber-400/50" />
+                                        </a>
                                         <div class="min-w-0">
                                             <a
-                                                href="{{ route('kanban', ['assignee' => $member->id]) }}"
+                                                href="{{ route('users.show', $member) }}"
                                                 wire:navigate
                                                 class="block truncate font-semibold text-neutral-50 transition hover:text-amber-300"
                                             >{{ $member->name }}</a>
@@ -154,20 +156,20 @@
                                     </div>
                                 </div>
 
-                                <div>
+                                <a href="{{ route('kanban', ['assignee' => $member->id]) }}" wire:navigate class="block rounded-xl px-2 py-2 transition hover:bg-neutral-950/40">
                                     <div class="app-eyebrow">Open</div>
                                     <div class="mt-1 text-lg font-semibold text-neutral-50">{{ $member->open_tasks_count }}</div>
-                                </div>
+                                </a>
 
-                                <div>
+                                <a href="{{ route('kanban', ['assignee' => $member->id, 'status' => 'done']) }}" wire:navigate class="block rounded-xl px-2 py-2 transition hover:bg-neutral-950/40">
                                     <div class="app-eyebrow">Done 30d</div>
                                     <div class="mt-1 text-lg font-semibold text-neutral-50">{{ $member->completed_tasks_count }}</div>
-                                </div>
+                                </a>
 
-                                <div>
+                                <a href="{{ route('kanban', ['assignee' => $member->id]) }}" wire:navigate class="block rounded-xl px-2 py-2 transition hover:bg-neutral-950/40">
                                     <div class="app-eyebrow">Comments 7d</div>
                                     <div class="mt-1 text-lg font-semibold text-neutral-50">{{ $member->recent_comments_count }}</div>
-                                </div>
+                                </a>
 
                                 <div class="space-y-2">
                                     <div class="app-eyebrow">Delivery Mix</div>

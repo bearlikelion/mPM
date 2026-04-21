@@ -32,11 +32,21 @@ class KanbanBoard extends Component
     #[Url(as: 'highlight')]
     public ?int $highlightId = null;
 
+    #[Url(as: 'task')]
+    public ?string $taskKey = null;
+
+    #[Url(as: 'status')]
+    public ?string $statusFilter = null;
+
     public function mount(): void
     {
         $project = $this->availableProjects()->first();
         if ($project && ! $this->projectId) {
             $this->projectId = $project->id;
+        }
+
+        if ($this->statusFilter && ! in_array($this->statusFilter, Task::STATUSES, true)) {
+            $this->statusFilter = null;
         }
     }
 
@@ -89,7 +99,9 @@ class KanbanBoard extends Component
             ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)");
 
         $lanes = collect(Task::STATUSES)->mapWithKeys(fn ($s) => [
-            $s => (clone $tasksQuery)->where('status', $s)->get(),
+            $s => $this->statusFilter && $this->statusFilter !== $s
+                ? collect()
+                : (clone $tasksQuery)->where('status', $s)->get(),
         ]);
 
         return view('livewire.kanban-board', [

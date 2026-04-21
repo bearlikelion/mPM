@@ -13,7 +13,7 @@
         },
         open(key) {
             if (this.justDragged) return;
-            window.Livewire.navigate('/tasks/' + key);
+            $wire.set('taskKey', key);
         }
     }"
 >
@@ -43,7 +43,7 @@
                 <div class="mt-2 text-lg font-semibold text-neutral-50">Slice the board by project context</div>
             </div>
         </div>
-        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
             <select wire:model.live="projectId" class="app-select">
                 <option value="">All projects</option>
                 @foreach($projects as $project)
@@ -76,6 +76,13 @@
                 <option value="">All tags</option>
                 @foreach($tags as $tag)
                     <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                @endforeach
+            </select>
+
+            <select wire:model.live="statusFilter" class="app-select">
+                <option value="">All statuses</option>
+                @foreach(\App\Models\Task::STATUSES as $status)
+                    <option value="{{ $status }}">{{ str($status)->replace('_', ' ')->title() }}</option>
                 @endforeach
             </select>
         </div>
@@ -134,7 +141,9 @@
                                 @if($task->assignees->isNotEmpty())
                                     <div class="flex -space-x-2">
                                         @foreach($task->assignees->take(4) as $user)
-                                            <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" title="{{ $user->name }}" class="h-8 w-8 rounded-full border-2 border-neutral-950 object-cover" />
+                                            <a href="{{ route('users.show', $user) }}" wire:navigate x-on:click.stop title="{{ $user->name }}">
+                                                <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="h-8 w-8 rounded-full border-2 border-neutral-950 object-cover transition hover:border-amber-400/60" />
+                                            </a>
                                         @endforeach
                                     </div>
                                 @else
@@ -160,4 +169,27 @@
             </section>
         @endforeach
     </div>
+
+    @if($taskKey)
+        <div class="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm" x-on:click="$wire.set('taskKey', null)"></div>
+        <aside class="app-drawer fixed inset-y-0 right-0 z-50 w-full max-w-3xl border-l border-neutral-700/70">
+            <div class="flex h-full flex-col" x-on:click.stop>
+                <div class="flex items-center justify-between border-b border-neutral-700/70 px-5 py-4">
+                    <div>
+                        <div class="app-eyebrow">Task Detail</div>
+                        <div class="mt-1 text-lg font-semibold text-neutral-50">{{ $taskKey }}</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('tasks.show', $taskKey) }}" wire:navigate class="app-link text-sm">Open full view</a>
+                        <button type="button" x-on:click="$wire.set('taskKey', null)" class="rounded-full border border-neutral-700/70 bg-neutral-900/60 px-3 py-1.5 text-sm text-neutral-300 transition hover:border-amber-400/50 hover:text-neutral-50">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
+                    <livewire:task-detail :task-key="$taskKey" :embedded="true" :key="'drawer-task-'.$taskKey" />
+                </div>
+            </div>
+        </aside>
+    @endif
 </div>

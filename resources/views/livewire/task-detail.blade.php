@@ -1,17 +1,23 @@
 <div class="flex h-full w-full flex-col gap-4 p-1">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <div class="font-mono text-xs text-neutral-500">{{ $task->project->name }} · {{ $task->key }}</div>
+            <div class="font-mono text-xs text-neutral-500">
+                <a href="{{ route('kanban', ['project' => $task->project_id]) }}" wire:navigate class="transition hover:text-amber-300">{{ $task->project->name }}</a>
+                ·
+                <a href="{{ route('kanban', ['project' => $task->project_id, 'task' => $task->key]) }}" wire:navigate class="transition hover:text-amber-300">{{ $task->key }}</a>
+            </div>
             <h1 class="text-2xl font-semibold">{{ $task->title }}</h1>
             @if($task->creator)
                 <div class="mt-1 text-xs text-neutral-500">
-                    Created by {{ $task->creator->name }} · {{ auth()->user()->formatLocalTime($task->created_at) }} · {{ $task->created_at->diffForHumans() }}
+                    Created by <a href="{{ route('users.show', $task->creator) }}" wire:navigate class="transition hover:text-amber-300">{{ $task->creator->name }}</a> · {{ auth()->user()->formatLocalTime($task->created_at) }} · {{ $task->created_at->diffForHumans() }}
                 </div>
             @endif
         </div>
-        <a href="{{ route('kanban', ['project' => $task->project_id, 'highlight' => $task->id]) }}" wire:navigate class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800">
-            Open in kanban
-        </a>
+        @if(! $embedded)
+            <a href="{{ route('kanban', ['project' => $task->project_id, 'highlight' => $task->id, 'task' => $task->key]) }}" wire:navigate class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                Open in kanban
+            </a>
+        @endif
     </div>
 
     <div class="grid gap-6 lg:grid-cols-3">
@@ -31,10 +37,20 @@
                     <ul class="divide-y divide-neutral-200 dark:divide-neutral-700">
                         @foreach($task->comments as $comment)
                             <li class="flex gap-3 px-4 py-3 text-sm">
-                                <img src="{{ $comment->user?->avatarUrl() }}" alt="" class="h-8 w-8 rounded-full" />
+                                @if($comment->user)
+                                    <a href="{{ route('users.show', $comment->user) }}" wire:navigate class="shrink-0">
+                                        <img src="{{ $comment->user->avatarUrl() }}" alt="{{ $comment->user->name }}" class="h-8 w-8 rounded-full" />
+                                    </a>
+                                @else
+                                    <span class="h-8 w-8 rounded-full bg-neutral-800"></span>
+                                @endif
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
-                                        <span class="font-medium">{{ $comment->user?->name ?? 'Someone' }}</span>
+                                        @if($comment->user)
+                                            <a href="{{ route('users.show', $comment->user) }}" wire:navigate class="font-medium transition hover:text-amber-300">{{ $comment->user->name }}</a>
+                                        @else
+                                            <span class="font-medium">Someone</span>
+                                        @endif
                                         <span class="text-xs text-neutral-500">{{ auth()->user()->formatLocalTime($comment->created_at) }} · {{ $comment->created_at->diffForHumans() }}</span>
                                     </div>
                                     @if($comment->body)
@@ -119,14 +135,17 @@
                 @else
                     <ul class="flex flex-col gap-2">
                         @foreach($task->assignees as $user)
-                            <li>
+                            <li class="flex items-center justify-between gap-3">
                                 <a
-                                    href="{{ route('kanban', ['project' => $task->project_id, 'assignee' => $user->id]) }}"
+                                    href="{{ route('users.show', $user) }}"
                                     wire:navigate
                                     class="flex items-center gap-2 rounded-md px-1 py-0.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                 >
                                     <img src="{{ $user->avatarUrl() }}" alt="" class="h-6 w-6 rounded-full" />
                                     <span>{{ $user->name }}</span>
+                                </a>
+                                <a href="{{ route('kanban', ['project' => $task->project_id, 'assignee' => $user->id]) }}" wire:navigate class="text-xs text-neutral-500 transition hover:text-amber-300">
+                                    Filter board
                                 </a>
                             </li>
                         @endforeach

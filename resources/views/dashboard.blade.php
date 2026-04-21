@@ -160,7 +160,7 @@
                             <div class="text-neutral-200">
                                 @if($comment->user)
                                     <a
-                                        href="{{ route('kanban', ['project' => $comment->task->project_id, 'assignee' => $comment->user_id]) }}"
+                                        href="{{ route('users.show', $comment->user) }}"
                                         wire:navigate
                                         class="font-medium text-neutral-50 transition hover:text-amber-300"
                                     >{{ $comment->user->name }}</a>
