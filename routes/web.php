@@ -26,6 +26,10 @@ Route::view('sprints', 'sprints')
     ->middleware(['auth', 'verified'])
     ->name('sprints');
 
+Route::view('epics', 'epics')
+    ->middleware(['auth', 'verified'])
+    ->name('epics');
+
 Route::get('tasks/{key}', fn (string $key) => view('tasks.show', ['key' => $key]))
     ->middleware(['auth', 'verified'])
     ->where('key', '[A-Z]+-\d+')

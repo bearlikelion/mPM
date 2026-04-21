@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Project extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProjectFactory> */
+    /** @use HasFactory<ProjectFactory> */
     use HasFactory;
 
     public const VISIBILITY_ORG = 'org';
@@ -24,9 +27,21 @@ class Project extends Model
         'name',
         'key',
         'description',
+        'avatar_path',
         'visibility',
         'task_counter',
     ];
+
+    public function avatarUrl(): string
+    {
+        if ($this->avatar_path) {
+            return Storage::disk('public')->url($this->avatar_path);
+        }
+
+        $initials = Str::upper(Str::substr($this->key ?: $this->name, 0, 2));
+
+        return route('avatars.default', ['initials' => $initials ?: '?']);
+    }
 
     public function organization(): BelongsTo
     {

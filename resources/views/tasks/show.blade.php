@@ -1,3 +1,3 @@
 <x-layouts.app>
-    <livewire:task-detail :key="$key" />
+    <livewire:task-detail :task-key="$key" />
 </x-layouts.app>

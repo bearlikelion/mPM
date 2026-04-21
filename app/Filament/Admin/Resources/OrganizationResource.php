@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\OrganizationResource\Pages;
 use App\Models\Organization;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -25,6 +26,14 @@ class OrganizationResource extends Resource
             TextInput::make('name')->required()->live(onBlur: true)
                 ->afterStateUpdated(fn ($state, $set) => $set('slug', Str::slug($state))),
             TextInput::make('slug')->required()->unique(ignoreRecord: true),
+            FileUpload::make('logo_path')
+                ->label('Logo')
+                ->image()
+                ->avatar()
+                ->disk('public')
+                ->directory('org-logos')
+                ->visibility('public')
+                ->maxSize(2048),
             Toggle::make('registration_enabled')->label('Public registration allowed'),
         ]);
     }

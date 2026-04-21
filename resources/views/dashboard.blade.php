@@ -1,33 +1,36 @@
-@php
-    use Illuminate\Support\Facades\Auth;
-    use App\Models\Task;
-    use App\Models\Comment;
-    use App\Models\Project;
-@endphp
 <x-layouts.app>
     @php
-        $user = Auth::user();
+        $user = \Illuminate\Support\Facades\Auth::user();
         $orgIds = $user->organizations()->pluck('organizations.id');
+        $projectIds = \App\Models\Project::whereIn('organization_id', $orgIds)->pluck('id');
 
-        $myTasks = Task::with('project', 'sprint')
+        $myTasks = \App\Models\Task::with('project', 'sprint')
             ->whereHas('assignees', fn($q) => $q->whereKey($user->id))
-            ->whereIn('project_id', Project::whereIn('organization_id', $orgIds)->pluck('id'))
+            ->whereIn('project_id', $projectIds)
             ->where('status', '!=', 'done')
             ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)")
             ->limit(10)
             ->get();
 
-        $recentCompleted = Task::with('project')
-            ->whereIn('project_id', Project::whereIn('organization_id', $orgIds)->pluck('id'))
+        $recentCompleted = \App\Models\Task::with('project')
+            ->whereIn('project_id', $projectIds)
             ->where('status', 'done')
             ->latest('updated_at')
             ->limit(5)
             ->get();
 
-        $recentComments = Comment::with('user', 'task.project')
-            ->whereHas('task', fn($q) => $q->whereIn('project_id', Project::whereIn('organization_id', $orgIds)->pluck('id')))
+        $recentComments = \App\Models\Comment::with('user', 'task.project')
+            ->whereHas('task', fn($q) => $q->whereIn('project_id', $projectIds))
             ->latest()
             ->limit(5)
+            ->get();
+
+        $activeEpics = \App\Models\Epic::with('project')
+            ->withCount(['tasks', 'tasks as completed_tasks_count' => fn($q) => $q->where('status', 'done')])
+            ->whereIn('project_id', $projectIds)
+            ->whereNull('completed_at')
+            ->orderBy('due_date')
+            ->limit(6)
             ->get();
     @endphp
 
@@ -104,13 +107,50 @@
 
         <div class="rounded-xl border border-neutral-200 p-4 dark:border-neutral-700">
             <div class="mb-3 flex items-center justify-between">
+                <h2 class="text-lg font-medium">Active epics</h2>
+                <a href="{{ route('epics') }}" wire:navigate class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">View all</a>
+            </div>
+            @if($activeEpics->isEmpty())
+                <div class="py-6 text-center text-sm text-neutral-500">No active epics.</div>
+            @else
+                <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach($activeEpics as $epic)
+                        @php $pct = $epic->tasks_count > 0 ? round(($epic->completed_tasks_count / $epic->tasks_count) * 100) : 0; @endphp
+                        <a href="{{ route('kanban', ['project' => $epic->project_id, 'epic' => $epic->id]) }}" wire:navigate class="flex flex-col gap-2 rounded-lg border border-neutral-200 p-3 transition hover:border-indigo-500 dark:border-neutral-700">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="font-medium">{{ $epic->name }}</div>
+                                @if($epic->due_date)
+                                    <span class="text-[10px] text-neutral-500">{{ $epic->due_date->format('M j') }}</span>
+                                @endif
+                            </div>
+                            <div class="text-xs text-neutral-500">{{ $epic->project->name }}</div>
+                            <div>
+                                <div class="mb-1 flex justify-between text-[10px] text-neutral-500">
+                                    <span>{{ $epic->completed_tasks_count }}/{{ $epic->tasks_count }}</span>
+                                    <span>{{ $pct }}%</span>
+                                </div>
+                                <div class="h-1 overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
+                                    <div class="h-full bg-indigo-500" style="width: {{ $pct }}%"></div>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        <div class="rounded-xl border border-neutral-200 p-4 dark:border-neutral-700">
+            <div class="mb-3 flex items-center justify-between">
                 <h2 class="text-lg font-medium">Your organizations</h2>
             </div>
             <div class="grid gap-3 md:grid-cols-3">
                 @foreach($user->organizations as $org)
-                    <a href="/app/{{ $org->slug }}" class="rounded-lg border border-neutral-200 p-4 transition hover:border-indigo-500 dark:border-neutral-700">
-                        <div class="font-medium">{{ $org->name }}</div>
-                        <div class="text-sm text-neutral-500">{{ $org->projects()->count() }} projects</div>
+                    <a href="/app/{{ $org->slug }}" class="flex items-center gap-3 rounded-lg border border-neutral-200 p-4 transition hover:border-indigo-500 dark:border-neutral-700">
+                        <img src="{{ $org->logoUrl() }}" alt="" class="h-10 w-10 rounded-lg" />
+                        <div class="flex-1">
+                            <div class="font-medium">{{ $org->name }}</div>
+                            <div class="text-sm text-neutral-500">{{ $org->projects()->count() }} projects</div>
+                        </div>
                     </a>
                 @endforeach
             </div>

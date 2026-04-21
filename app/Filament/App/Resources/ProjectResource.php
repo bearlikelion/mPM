@@ -4,6 +4,7 @@ namespace App\Filament\App\Resources;
 
 use App\Filament\App\Resources\ProjectResource\Pages;
 use App\Models\Project;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -37,6 +38,14 @@ class ProjectResource extends Resource
                 ->default(Project::VISIBILITY_ORG)
                 ->required(),
             Textarea::make('description')->rows(4),
+            FileUpload::make('avatar_path')
+                ->label('Project avatar')
+                ->image()
+                ->avatar()
+                ->disk('public')
+                ->directory('project-avatars')
+                ->visibility('public')
+                ->maxSize(2048),
         ]);
     }
 

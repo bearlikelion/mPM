@@ -16,6 +16,7 @@
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Dashboard</flux:navlist.item>
                     <flux:navlist.item icon="view-columns" :href="route('kanban')" :current="request()->routeIs('kanban')" wire:navigate>Kanban</flux:navlist.item>
                     <flux:navlist.item icon="queue-list" :href="route('backlog')" :current="request()->routeIs('backlog')" wire:navigate>Backlog</flux:navlist.item>
+                    <flux:navlist.item icon="flag" :href="route('epics')" :current="request()->routeIs('epics')" wire:navigate>Epics</flux:navlist.item>
                     <flux:navlist.item icon="rocket-launch" :href="route('sprints')" :current="request()->routeIs('sprints')" wire:navigate>Sprints</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>

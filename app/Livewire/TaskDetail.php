@@ -7,12 +7,17 @@ use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class TaskDetail extends Component
 {
+    use WithFileUploads;
+
     public Task $task;
 
     public string $newComment = '';
+
+    public array $attachments = [];
 
     public string $status;
 
@@ -20,14 +25,14 @@ class TaskDetail extends Component
 
     public ?int $storyPoints = null;
 
-    public function mount(string $key): void
+    public function mount(string $taskKey): void
     {
         $orgIds = Auth::user()->organizations()->pluck('organizations.id');
         $projectIds = Project::whereIn('organization_id', $orgIds)->pluck('id');
 
-        $this->task = Task::with('project', 'epic', 'sprint', 'assignees', 'tags', 'comments.user', 'creator')
+        $this->task = Task::with('project', 'epic', 'sprint', 'assignees', 'tags', 'comments.user', 'comments.media', 'creator', 'media')
             ->whereIn('project_id', $projectIds)
-            ->where('key', $key)
+            ->where('key', $taskKey)
             ->firstOrFail();
 
         $this->status = $this->task->status;
@@ -58,16 +63,33 @@ class TaskDetail extends Component
 
     public function addComment(): void
     {
-        $this->validate(['newComment' => 'required|string|min:1']);
-
-        Comment::create([
-            'task_id' => $this->task->id,
-            'user_id' => Auth::id(),
-            'body' => $this->newComment,
+        $this->validate([
+            'newComment' => 'nullable|string',
+            'attachments.*' => 'file|max:10240',
         ]);
 
+        if (trim($this->newComment) === '' && empty($this->attachments)) {
+            $this->addError('newComment', 'Write something or attach a file.');
+
+            return;
+        }
+
+        $comment = Comment::create([
+            'task_id' => $this->task->id,
+            'user_id' => Auth::id(),
+            'body' => $this->newComment ?: '',
+        ]);
+
+        foreach ($this->attachments as $file) {
+            $comment->addMedia($file->getRealPath())
+                ->usingName($file->getClientOriginalName())
+                ->usingFileName($file->getClientOriginalName())
+                ->toMediaCollection('attachments');
+        }
+
         $this->newComment = '';
-        $this->task->load('comments.user');
+        $this->attachments = [];
+        $this->task->load('comments.user', 'comments.media');
     }
 
     public function render()

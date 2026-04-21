@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Database\Factories\OrganizationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Organization extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrganizationFactory> */
+    /** @use HasFactory<OrganizationFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -54,5 +57,16 @@ class Organization extends Model
     public function tasks(): HasManyThrough
     {
         return $this->hasManyThrough(Task::class, Project::class);
+    }
+
+    public function logoUrl(): string
+    {
+        if ($this->logo_path) {
+            return Storage::disk('public')->url($this->logo_path);
+        }
+
+        $initials = Str::upper(Str::substr($this->name, 0, 2));
+
+        return route('avatars.default', ['initials' => $initials ?: '?']);
     }
 }
