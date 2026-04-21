@@ -3,11 +3,13 @@
 namespace App\Livewire;
 
 use App\Models\Epic;
+use App\Models\Organization;
 use App\Models\Project;
 use App\Models\Sprint;
 use App\Models\Tag;
 use App\Models\Task;
 use App\Models\User;
+use App\Support\SiteTenant;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -49,14 +51,19 @@ class KanbanBoard extends Component
 
     public function mount(): void
     {
-        $project = $this->availableProjects()->first();
-        if ($project && ! $this->projectId) {
-            $this->projectId = $project->id;
-        }
+        $this->projectId = $this->validProjectId($this->projectId);
 
         if ($this->statusFilter && ! in_array($this->statusFilter, Task::STATUSES, true)) {
             $this->statusFilter = null;
         }
+    }
+
+    public function updatedProjectId(): void
+    {
+        $this->projectId = $this->validProjectId($this->projectId);
+        $this->sprintId = null;
+        $this->epicId = null;
+        $this->assigneeId = null;
     }
 
     public function updateStatus(int $taskId, string $status): void
@@ -73,9 +80,17 @@ class KanbanBoard extends Component
 
     protected function availableProjects()
     {
-        $orgIds = Auth::user()->organizations()->pluck('organizations.id');
+        return app(SiteTenant::class)->projectsQuery(Auth::user(), $this->currentOrganization());
+    }
 
-        return Project::whereIn('organization_id', $orgIds);
+    protected function currentOrganization(): ?Organization
+    {
+        return app(SiteTenant::class)->currentOrganization(Auth::user());
+    }
+
+    protected function validProjectId(?int $projectId): ?int
+    {
+        return app(SiteTenant::class)->validProjectId(Auth::user(), $projectId, $this->currentOrganization());
     }
 
     public function render()
@@ -95,8 +110,10 @@ class KanbanBoard extends Component
                 ->orderBy('name')->get()
             : collect();
 
-        $orgIds = Auth::user()->organizations()->pluck('organizations.id');
-        $tags = Tag::whereIn('organization_id', $orgIds)->orderBy('name')->get();
+        $tags = Tag::query()
+            ->when($this->currentOrganization(), fn ($query, $organization) => $query->whereBelongsTo($organization))
+            ->orderBy('name')
+            ->get();
 
         $tasksQuery = Task::with('assignees', 'project', 'tags')
             ->when($this->projectId, fn ($q) => $q->where('project_id', $this->projectId))

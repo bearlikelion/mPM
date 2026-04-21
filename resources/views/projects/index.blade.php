@@ -1,10 +1,8 @@
 <x-layouts.app>
     @php
-        $user = auth()->user();
-        $orgIds = $user->organizations()->pluck('organizations.id');
-
         $projects = \App\Models\Project::query()
-            ->whereIn('organization_id', $orgIds)
+            ->when($currentOrg, fn ($query) => $query->whereBelongsTo($currentOrg))
+            ->when(! $currentOrg, fn ($query) => $query->whereRaw('1 = 0'))
             ->withCount([
                 'tasks',
                 'tasks as open_tasks_count' => fn ($query) => $query->where('status', '!=', 'done'),
@@ -20,8 +18,14 @@
     @endphp
 
     <div class="flex flex-col gap-4">
-        <x-page-header title="Projects" subtitle="Scan workload and momentum across everything you can access.">
+        <x-page-header
+            title="Projects"
+            :subtitle="$currentOrg ? 'Scan workload and momentum across '.$currentOrg->name.'.' : 'Scan workload and momentum across everything you can access.'"
+        >
             <x-slot:actions>
+                @if($currentOrg)
+                    <span class="app-chip">{{ $currentOrg->name }}</span>
+                @endif
                 <span class="app-chip">{{ $projects->count() }} total</span>
                 <span class="app-chip">{{ $openTasks }} open</span>
                 <flux:modal.trigger name="create-task-modal">

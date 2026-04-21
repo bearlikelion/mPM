@@ -1,6 +1,14 @@
 <x-layouts.app>
     @php
-        $projectIds = $currentOrg->projects()->pluck('id');
+        $siteTenant = app(\App\Support\SiteTenant::class);
+        $projects = $siteTenant->projectsQuery(auth()->user(), $currentOrg)->get();
+        $selectedProjectId = request()->has('project')
+            ? $siteTenant->validProjectId(auth()->user(), request()->integer('project'), $currentOrg)
+            : null;
+        $selectedProject = $selectedProjectId ? $projects->firstWhere('id', $selectedProjectId) : null;
+        $projectIds = $selectedProject
+            ? collect([$selectedProjectId])
+            : $projects->pluck('id');
 
         $teamMembers = $currentOrg->users()
             ->select('users.*', 'organization_user.role', 'organization_user.joined_at')
@@ -38,6 +46,7 @@
 
         $projectAnalytics = \App\Models\Project::query()
             ->where('organization_id', $currentOrg->id)
+            ->when($selectedProjectId, fn ($query) => $query->whereKey($selectedProjectId))
             ->withCount([
                 'tasks',
                 'tasks as open_tasks_count' => fn ($query) => $query->where('status', '!=', 'done'),
@@ -54,9 +63,30 @@
     <div class="flex flex-col gap-4">
         <x-page-header :title="$currentOrg->name" subtitle="KPI tracking, delivery signals, and contributor load.">
             <x-slot:actions>
+                @if($projects->isNotEmpty())
+                    <form method="GET" action="{{ route('manager') }}">
+                        <label for="manager-project" class="sr-only">Project</label>
+                        <select
+                            id="manager-project"
+                            name="project"
+                            onchange="this.form.submit()"
+                            class="select select-sm min-w-52 bg-[color:var(--gv-bg1)] font-mono text-xs text-[color:var(--gv-fg1)]"
+                        >
+                            <option value="">All projects</option>
+                            @foreach($projects as $project)
+                                <option value="{{ $project->id }}" @selected($selectedProjectId === $project->id)>
+                                    {{ $project->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                @endif
                 <span class="app-chip">{{ $teamMembers->count() }} members</span>
+                @if($selectedProject)
+                    <span class="app-chip">{{ $selectedProject->name }}</span>
+                @endif
                 <span class="app-chip">{{ $currentOrg->preferredTimezone() }}</span>
-                <a href="{{ route('kanban') }}" wire:navigate class="btn btn-sm">open board</a>
+                <a href="{{ route('kanban', array_filter(['project' => $selectedProjectId])) }}" wire:navigate class="btn btn-sm">open board</a>
             </x-slot:actions>
         </x-page-header>
 
@@ -104,11 +134,11 @@
                                         <div class="text-xs text-[color:var(--gv-fg4)]">{{ $member->role === 'org_admin' ? 'admin' : 'member' }} · {{ $member->preferredTimezone() }}</div>
                                     </div>
                                 </div>
-                                <a href="{{ route('kanban', ['assignee' => $member->id]) }}" wire:navigate class="block font-mono">
+                                <a href="{{ route('kanban', array_filter(['project' => $selectedProjectId, 'assignee' => $member->id])) }}" wire:navigate class="block font-mono">
                                     <div class="app-kpi-label">open</div>
                                     <div class="text-base font-semibold text-[color:var(--gv-fg0)]">{{ $member->open_tasks_count }}</div>
                                 </a>
-                                <a href="{{ route('kanban', ['assignee' => $member->id, 'status' => 'done']) }}" wire:navigate class="block font-mono">
+                                <a href="{{ route('kanban', array_filter(['project' => $selectedProjectId, 'assignee' => $member->id, 'status' => 'done'])) }}" wire:navigate class="block font-mono">
                                     <div class="app-kpi-label">done 30d</div>
                                     <div class="text-base font-semibold text-[color:var(--gv-fg0)]">{{ $member->completed_tasks_count }}</div>
                                 </a>

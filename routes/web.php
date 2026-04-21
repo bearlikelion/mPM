@@ -3,10 +3,12 @@
 use App\Http\Controllers\Auth\InviteController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AvatarController;
+use App\Http\Controllers\SwitchOrganizationController;
 use App\Models\Comment;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use App\Support\SiteTenant;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -14,17 +16,23 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+Route::get('dashboard', function (SiteTenant $siteTenant) {
+    return view('dashboard', [
+        'currentOrg' => $siteTenant->currentOrganization(auth()->user()),
+    ]);
+})->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::view('projects', 'projects.index')
-    ->middleware(['auth', 'verified'])
+Route::get('projects', function (SiteTenant $siteTenant) {
+    return view('projects.index', [
+        'currentOrg' => $siteTenant->currentOrganization(auth()->user()),
+    ]);
+})->middleware(['auth', 'verified'])
     ->name('projects.index');
 
-Route::get('manager', function () {
+Route::get('manager', function (SiteTenant $siteTenant) {
     $user = auth()->user();
-    $currentOrg = $user->defaultOrganization ?? $user->organizations()->first();
+    $currentOrg = $siteTenant->currentOrganization($user);
 
     abort_unless($currentOrg && $user->can('update', $currentOrg), 403);
 
@@ -128,5 +136,8 @@ Route::get('invite/{token}', [InviteController::class, 'show'])->name('invite.sh
 Route::post('invite/{token}', [InviteController::class, 'accept'])->name('invite.accept');
 
 Route::get('avatars/{initials}.svg', [AvatarController::class, 'default'])->name('avatars.default');
+Route::post('organizations/{organization}/switch', SwitchOrganizationController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('organizations.switch');
 
 require __DIR__.'/auth.php';

@@ -94,4 +94,37 @@ class CreateTaskModalTest extends TestCase
             'user_id' => $assignee->id,
         ]);
     }
+
+    public function test_modal_only_offers_projects_from_the_active_organization(): void
+    {
+        $organizationA = Organization::factory()->create();
+        $organizationB = Organization::factory()->create();
+        $user = User::factory()->create([
+            'default_organization_id' => $organizationA->id,
+        ]);
+
+        $organizationA->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+        $organizationB->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+
+        Project::factory()->create([
+            'organization_id' => $organizationA->id,
+            'name' => 'Alpha Intake',
+        ]);
+        Project::factory()->create([
+            'organization_id' => $organizationB->id,
+            'name' => 'Beta Intake',
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(CreateTaskModal::class)
+            ->assertSee('Alpha Intake')
+            ->assertDontSee('Beta Intake');
+    }
 }

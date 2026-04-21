@@ -1,3 +1,11 @@
+@props([
+    'currentOrg' => null,
+    'organizations' => collect(),
+    'isSiteAdmin' => false,
+    'isOrgAdmin' => false,
+    'projectCount' => 0,
+])
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
@@ -7,13 +15,6 @@
         <div class="app-shell">
             <flux:sidebar sticky stashable class="app-sidebar">
                 <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
-
-                @php
-                    $currentOrg = auth()->user()->defaultOrganization ?? auth()->user()->organizations()->first();
-                    $isSiteAdmin = auth()->user()->hasRole('site_admin');
-                    $isOrgAdmin = $currentOrg && auth()->user()->can('update', $currentOrg);
-                    $projectCount = $currentOrg?->projects()->count() ?? 0;
-                @endphp
 
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 rounded-sm border border-transparent p-1 transition hover:border-[color:var(--gv-border)]" wire:navigate>
                     @if($currentOrg)
@@ -30,6 +31,31 @@
                         </div>
                     </div>
                 </a>
+
+                @if($organizations->count() > 1)
+                    <flux:dropdown position="bottom" align="start">
+                        <flux:button variant="subtle" icon:trailing="chevron-down" class="mt-2 w-full justify-between border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] text-[color:var(--gv-fg1)]">
+                            <span class="truncate">{{ $currentOrg?->name ?? 'Select organization' }}</span>
+                        </flux:button>
+
+                        <flux:menu class="w-72">
+                            @foreach($organizations as $organization)
+                                <form method="POST" action="{{ route('organizations.switch', $organization) }}" class="w-full">
+                                    @csrf
+
+                                    <flux:menu.item
+                                        as="button"
+                                        type="submit"
+                                        class="w-full justify-between"
+                                        :icon="$currentOrg?->is($organization) ? 'check' : 'building-office'"
+                                    >
+                                        <span class="truncate">{{ $organization->name }}</span>
+                                    </flux:menu.item>
+                                </form>
+                            @endforeach
+                        </flux:menu>
+                    </flux:dropdown>
+                @endif
 
                 <button
                     type="button"

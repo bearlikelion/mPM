@@ -2,8 +2,9 @@
 
 namespace App\Livewire;
 
-use App\Models\Project;
+use App\Models\Organization;
 use App\Models\Sprint;
+use App\Support\SiteTenant;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -21,10 +22,12 @@ class SprintPlanner extends Component
 
     public function mount(): void
     {
-        $project = $this->availableProjects()->first();
-        if ($project && ! $this->projectId) {
-            $this->projectId = $project->id;
-        }
+        $this->projectId = $this->resolvedProjectId($this->projectId);
+    }
+
+    public function updatedProjectId(): void
+    {
+        $this->projectId = $this->resolvedProjectId($this->projectId);
     }
 
     public function createSprint(): void
@@ -68,9 +71,19 @@ class SprintPlanner extends Component
 
     protected function availableProjects()
     {
-        $orgIds = Auth::user()->organizations()->pluck('organizations.id');
+        return app(SiteTenant::class)->projectsQuery(Auth::user(), $this->currentOrganization());
+    }
 
-        return Project::whereIn('organization_id', $orgIds);
+    protected function currentOrganization(): ?Organization
+    {
+        return app(SiteTenant::class)->currentOrganization(Auth::user());
+    }
+
+    protected function resolvedProjectId(?int $projectId): ?int
+    {
+        $validProjectId = app(SiteTenant::class)->validProjectId(Auth::user(), $projectId, $this->currentOrganization());
+
+        return $validProjectId ?? $this->availableProjects()->value('id');
     }
 
     public function render()

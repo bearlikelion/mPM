@@ -44,4 +44,54 @@ class ProjectsPageTest extends TestCase
             ->assertSee('Control Center')
             ->assertSee(route('kanban', ['project' => $project->id]), false);
     }
+
+    public function test_projects_page_only_lists_projects_from_the_active_organization(): void
+    {
+        $organizationA = Organization::factory()->create([
+            'name' => 'Alpha Org',
+        ]);
+        $organizationB = Organization::factory()->create([
+            'name' => 'Beta Org',
+        ]);
+        $user = User::factory()->create([
+            'default_organization_id' => $organizationA->id,
+        ]);
+
+        $organizationA->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+        $organizationB->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+
+        $projectA = Project::factory()->create([
+            'organization_id' => $organizationA->id,
+            'name' => 'Alpha Control',
+        ]);
+        $projectB = Project::factory()->create([
+            'organization_id' => $organizationB->id,
+            'name' => 'Beta Control',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('projects.index'))
+            ->assertOk()
+            ->assertSee('Alpha Control')
+            ->assertDontSee('Beta Control')
+            ->assertDontSee(route('kanban', ['project' => $projectB->id]), false);
+
+        $this->actingAs($user)
+            ->from(route('projects.index'))
+            ->post(route('organizations.switch', $organizationB))
+            ->assertRedirect(route('projects.index', absolute: false));
+
+        $this->actingAs($user)
+            ->get(route('projects.index'))
+            ->assertOk()
+            ->assertSee('Beta Control')
+            ->assertDontSee('Alpha Control')
+            ->assertDontSee(route('kanban', ['project' => $projectA->id]), false);
+    }
 }

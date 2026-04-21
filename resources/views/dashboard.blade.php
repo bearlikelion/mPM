@@ -1,10 +1,16 @@
 <x-layouts.app>
     @php
         $user = \Illuminate\Support\Facades\Auth::user();
-        $currentOrg = $user->defaultOrganization ?? $user->organizations->first();
+        $siteTenant = app(\App\Support\SiteTenant::class);
         $canManageOrg = $currentOrg && $user->can('update', $currentOrg);
-        $orgIds = $user->organizations()->pluck('organizations.id');
-        $projectIds = \App\Models\Project::whereIn('organization_id', $orgIds)->pluck('id');
+        $projects = $siteTenant->projectsQuery($user, $currentOrg)->get();
+        $selectedProjectId = request()->has('project')
+            ? $siteTenant->validProjectId($user, request()->integer('project'), $currentOrg)
+            : null;
+        $selectedProject = $selectedProjectId ? $projects->firstWhere('id', $selectedProjectId) : null;
+        $projectIds = $selectedProject
+            ? collect([$selectedProjectId])
+            : $projects->pluck('id');
 
         $myTasks = \App\Models\Task::with('project', 'sprint')
             ->whereHas('assignees', fn ($q) => $q->whereKey($user->id))
@@ -42,7 +48,28 @@
             subtitle="Project pulse, activity, and milestones."
         >
             <x-slot:actions>
+                @if($projects->isNotEmpty())
+                    <form method="GET" action="{{ route('dashboard') }}">
+                        <label for="dashboard-project" class="sr-only">Project</label>
+                        <select
+                            id="dashboard-project"
+                            name="project"
+                            onchange="this.form.submit()"
+                            class="select select-sm min-w-52 bg-[color:var(--gv-bg1)] font-mono text-xs text-[color:var(--gv-fg1)]"
+                        >
+                            <option value="">All projects</option>
+                            @foreach($projects as $project)
+                                <option value="{{ $project->id }}" @selected($selectedProjectId === $project->id)>
+                                    {{ $project->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                @endif
                 <span class="app-chip">{{ $projectIds->count() }} {{ \Illuminate\Support\Str::plural('project', $projectIds->count()) }}</span>
+                @if($selectedProject)
+                    <span class="app-chip">{{ $selectedProject->name }}</span>
+                @endif
                 <span class="app-chip">{{ $user->formatLocalTime(now(), 'g:i A T') }}</span>
             </x-slot:actions>
         </x-page-header>

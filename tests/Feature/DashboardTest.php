@@ -70,6 +70,77 @@ class DashboardTest extends TestCase
             ->assertSee($task->title);
     }
 
+    public function test_dashboard_scopes_metrics_to_the_active_organization_and_switching_orgs_updates_the_default(): void
+    {
+        $organizationA = Organization::factory()->create([
+            'name' => 'Alpha Org',
+        ]);
+        $organizationB = Organization::factory()->create([
+            'name' => 'Beta Org',
+        ]);
+        $user = User::factory()->create([
+            'default_organization_id' => $organizationA->id,
+        ]);
+
+        $organizationA->users()->attach($user, [
+            'role' => 'org_admin',
+            'joined_at' => now(),
+        ]);
+        $organizationB->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+
+        $projectA = Project::factory()->create([
+            'organization_id' => $organizationA->id,
+            'name' => 'Alpha Board',
+        ]);
+        $projectB = Project::factory()->create([
+            'organization_id' => $organizationB->id,
+            'name' => 'Beta Board',
+        ]);
+
+        $alphaTask = Task::factory()->create([
+            'project_id' => $projectA->id,
+            'title' => 'Alpha task',
+            'status' => 'in_progress',
+        ]);
+        $betaTask = Task::factory()->create([
+            'project_id' => $projectB->id,
+            'title' => 'Beta task',
+            'status' => 'in_progress',
+        ]);
+
+        $alphaTask->assignees()->attach($user);
+        $betaTask->assignees()->attach($user);
+
+        $this->actingAs($user)
+            ->get(route('dashboard', ['project' => $projectA->id]))
+            ->assertOk()
+            ->assertSee('Alpha Org')
+            ->assertSee('Alpha task')
+            ->assertDontSee('Beta task')
+            ->assertDontSee('Beta Board');
+
+        $this->actingAs($user)
+            ->from(route('dashboard', ['project' => $projectA->id]))
+            ->post(route('organizations.switch', $organizationB))
+            ->assertRedirect('/dashboard');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'default_organization_id' => $organizationB->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Beta Org')
+            ->assertSee('Beta task')
+            ->assertDontSee('Alpha task')
+            ->assertDontSee('Alpha Board');
+    }
+
     public function test_org_admin_can_visit_manager_page_and_see_analytics(): void
     {
         $organization = Organization::factory()->create([

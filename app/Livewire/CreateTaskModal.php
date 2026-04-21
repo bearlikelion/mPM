@@ -3,10 +3,12 @@
 namespace App\Livewire;
 
 use App\Models\Epic;
+use App\Models\Organization;
 use App\Models\Project;
 use App\Models\Sprint;
 use App\Models\Task;
 use App\Models\User;
+use App\Support\SiteTenant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -65,11 +67,12 @@ class CreateTaskModal extends Component
 
     public function mount(): void
     {
-        $this->projectId = $this->availableProjects()->value('id');
+        $this->projectId = $this->resolvedProjectId($this->projectId);
     }
 
     public function updatedProjectId(): void
     {
+        $this->projectId = $this->resolvedProjectId($this->projectId);
         $this->epicId = null;
         $this->sprintId = null;
         $this->assigneeIds = [];
@@ -181,10 +184,19 @@ class CreateTaskModal extends Component
 
     protected function availableProjects()
     {
-        return Project::query()->whereIn(
-            'organization_id',
-            Auth::user()->organizations()->pluck('organizations.id')
-        );
+        return app(SiteTenant::class)->projectsQuery(Auth::user(), $this->currentOrganization());
+    }
+
+    protected function currentOrganization(): ?Organization
+    {
+        return app(SiteTenant::class)->currentOrganization(Auth::user());
+    }
+
+    protected function resolvedProjectId(?int $projectId): ?int
+    {
+        $validProjectId = app(SiteTenant::class)->validProjectId(Auth::user(), $projectId, $this->currentOrganization());
+
+        return $validProjectId ?? $this->availableProjects()->value('id');
     }
 
     protected function assignableUsers(Project $project)
@@ -208,6 +220,6 @@ class CreateTaskModal extends Component
 
         $this->priority = 'med';
         $this->status = 'todo';
-        $this->projectId = $this->availableProjects()->value('id');
+        $this->projectId = $this->resolvedProjectId(null);
     }
 }

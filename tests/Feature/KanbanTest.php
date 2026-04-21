@@ -74,4 +74,66 @@ class KanbanTest extends TestCase
             ->assertOk()
             ->assertSee('sprint schedule');
     }
+
+    public function test_planning_pages_only_show_projects_from_the_active_organization(): void
+    {
+        $organizationA = Organization::factory()->create();
+        $organizationB = Organization::factory()->create();
+        $user = User::factory()->create([
+            'default_organization_id' => $organizationA->id,
+        ]);
+
+        $organizationA->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+        $organizationB->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+
+        $projectA = Project::factory()->create([
+            'organization_id' => $organizationA->id,
+            'name' => 'Alpha Roadmap',
+        ]);
+        $projectB = Project::factory()->create([
+            'organization_id' => $organizationB->id,
+            'name' => 'Beta Roadmap',
+        ]);
+
+        Task::factory()->create([
+            'project_id' => $projectA->id,
+            'title' => 'Alpha planning task',
+        ]);
+        Task::factory()->create([
+            'project_id' => $projectB->id,
+            'title' => 'Beta planning task',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('kanban', ['project' => $projectB->id]))
+            ->assertOk()
+            ->assertSee('Alpha Roadmap')
+            ->assertDontSee('Beta Roadmap')
+            ->assertSee('Alpha planning task')
+            ->assertDontSee('Beta planning task');
+
+        $this->actingAs($user)
+            ->get(route('epics'))
+            ->assertOk()
+            ->assertSee('Alpha Roadmap')
+            ->assertDontSee('Beta Roadmap');
+
+        $this->actingAs($user)
+            ->get(route('backlog'))
+            ->assertOk()
+            ->assertSee('Alpha Roadmap')
+            ->assertDontSee('Beta Roadmap');
+
+        $this->actingAs($user)
+            ->get(route('sprints'))
+            ->assertOk()
+            ->assertSee('Alpha Roadmap')
+            ->assertDontSee('Beta Roadmap');
+    }
 }
