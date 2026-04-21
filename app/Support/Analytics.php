@@ -179,4 +179,29 @@ class Analytics
     {
         return Comment::where('created_at', '>=', now()->subDays($days))->count();
     }
+
+    public static function userStorageBytes(int $userId): int
+    {
+        return (int) DB::table('media')
+            ->where(function ($q) use ($userId) {
+                $q->where(function ($q) use ($userId) {
+                    $q->where('model_type', User::class)->where('model_id', $userId);
+                })->orWhere(function ($q) use ($userId) {
+                    $q->where('model_type', Comment::class)
+                        ->whereIn('model_id', Comment::where('user_id', $userId)->pluck('id'));
+                })->orWhere(function ($q) use ($userId) {
+                    $q->where('model_type', Task::class)
+                        ->whereIn('model_id', Task::where('created_by', $userId)->pluck('id'));
+                });
+            })
+            ->sum('size');
+    }
+
+    public static function userLastActivityAt(int $userId): ?string
+    {
+        $lastComment = Comment::where('user_id', $userId)->max('created_at');
+        $lastTaskCreated = Task::where('created_by', $userId)->max('updated_at');
+
+        return collect([$lastComment, $lastTaskCreated])->filter()->max();
+    }
 }
