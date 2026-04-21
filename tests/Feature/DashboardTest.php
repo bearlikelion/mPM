@@ -28,9 +28,8 @@ class DashboardTest extends TestCase
         $response = $this->get('/dashboard');
         $response
             ->assertOk()
-            ->assertSee('Execution Cockpit')
-            ->assertSee('My open tasks')
-            ->assertSee('Active epics');
+            ->assertSee('my open tasks')
+            ->assertSee('active epics');
     }
 
     public function test_recent_activity_includes_task_and_user_links(): void
@@ -128,8 +127,7 @@ class DashboardTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('manager desk')
-            ->assertSee('Everyone&#039;s workload', false)
+            ->assertSee("everyone's workload", false)
             ->assertSee('Teammate One')
             ->assertSee(route('users.show', $member), false)
             ->assertSee(route('kanban', ['assignee' => $member->id]), false)

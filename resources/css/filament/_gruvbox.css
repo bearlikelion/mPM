@@ -1,0 +1,237 @@
+/* Shared gruvbox theme for Filament panels.
+   Panel-specific accents are set via --fi-accent-* in the entry files. */
+
+:root {
+    --gv-bg0-h: #1d2021;
+    --gv-bg0: #282828;
+    --gv-bg0-s: #32302f;
+    --gv-bg1: #3c3836;
+    --gv-bg2: #504945;
+    --gv-bg3: #665c54;
+    --gv-fg0: #fbf1c7;
+    --gv-fg1: #ebdbb2;
+    --gv-fg2: #d5c4a1;
+    --gv-fg3: #bdae93;
+    --gv-fg4: #a89984;
+    --gv-amber: #d79921;
+    --gv-yellow: #fabd2f;
+    --gv-aqua: #8ec07c;
+    --gv-blue: #83a598;
+    --gv-purple: #d3869b;
+    --gv-orange: #fe8019;
+    --gv-red: #fb4934;
+    --gv-green: #b8bb26;
+    --gv-border: #504945;
+}
+
+html,
+body,
+.fi-body,
+.fi-layout,
+.fi-main-ctn,
+.fi-main,
+.fi-sidebar,
+.fi-topbar {
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.fi-body {
+    background-color: var(--gv-bg0-h);
+    color: var(--gv-fg1);
+}
+
+/* Topbar */
+.fi-topbar > div {
+    background-color: var(--gv-bg0);
+    border-bottom: 1px solid var(--gv-border);
+}
+
+.fi-topbar .fi-logo {
+    color: var(--gv-fg0);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Sidebar */
+.fi-sidebar {
+    background-color: var(--gv-bg0-s) !important;
+    border-right: 1px solid var(--gv-border);
+}
+
+.fi-sidebar-nav {
+    background-color: transparent !important;
+}
+
+.fi-sidebar-item-button {
+    color: var(--gv-fg2) !important;
+    border-radius: 2px !important;
+}
+
+.fi-sidebar-item-button:hover {
+    background-color: var(--gv-bg1) !important;
+    color: var(--gv-fg0) !important;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-button {
+    background-color: var(--gv-bg1) !important;
+    color: var(--fi-accent, var(--gv-amber)) !important;
+    border-left: 2px solid var(--fi-accent, var(--gv-amber));
+}
+
+.fi-sidebar-group-label {
+    color: var(--gv-fg4) !important;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Cards / sections */
+.fi-section,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-modal-window,
+.fi-dropdown-panel {
+    background-color: var(--gv-bg0) !important;
+    border: 1px solid var(--gv-border) !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+}
+
+.fi-section-header,
+.fi-ta-header-ctn {
+    border-bottom: 1px solid var(--gv-border);
+}
+
+.fi-section-header-heading,
+.fi-header-heading {
+    color: var(--gv-fg0) !important;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Tables */
+.fi-ta-table {
+    background-color: transparent !important;
+}
+
+.fi-ta-header-cell {
+    background-color: var(--gv-bg0-s) !important;
+    color: var(--gv-fg4) !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--gv-border);
+}
+
+.fi-ta-row {
+    border-bottom: 1px solid var(--gv-border) !important;
+}
+
+.fi-ta-row:hover {
+    background-color: var(--gv-bg1) !important;
+}
+
+.fi-ta-cell {
+    color: var(--gv-fg1) !important;
+}
+
+/* Inputs */
+.fi-input,
+.fi-select-input,
+.fi-fo-textarea {
+    background-color: var(--gv-bg0-s) !important;
+    border: 1px solid var(--gv-border) !important;
+    color: var(--gv-fg0) !important;
+    border-radius: 2px !important;
+}
+
+.fi-input:focus,
+.fi-select-input:focus,
+.fi-fo-textarea:focus {
+    border-color: var(--fi-accent, var(--gv-amber)) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 1px var(--fi-accent, var(--gv-amber)) !important;
+}
+
+.fi-fo-field-wrp-label,
+.fi-input-label {
+    color: var(--gv-fg2) !important;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+/* Buttons */
+.fi-btn {
+    border-radius: 2px !important;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.fi-btn-color-primary,
+.fi-btn.fi-color-primary {
+    background-color: var(--fi-accent, var(--gv-amber)) !important;
+    color: var(--gv-bg0-h) !important;
+    border-color: transparent !important;
+}
+
+.fi-btn-color-primary:hover,
+.fi-btn.fi-color-primary:hover {
+    background-color: var(--fi-accent-hover, var(--gv-yellow)) !important;
+}
+
+/* Badges */
+.fi-badge {
+    border-radius: 2px !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.04em;
+}
+
+/* Back-to-site pill shown in the topbar */
+.gv-back-to-site {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.65rem;
+    border: 1px solid var(--gv-border);
+    border-radius: 2px;
+    background-color: var(--gv-bg0-s);
+    color: var(--gv-fg1);
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.gv-back-to-site:hover {
+    background-color: var(--gv-bg1);
+    color: var(--fi-accent, var(--gv-amber));
+}
+
+.gv-back-to-site::before {
+    content: '«';
+    color: var(--fi-accent, var(--gv-amber));
+    font-weight: 600;
+}
+
+/* Identifying stripe strip across the very top */
+.gv-panel-stripe {
+    height: 2px;
+    background-color: var(--fi-accent, var(--gv-amber));
+}
+
+/* Panel tag next to logo */
+.gv-panel-tag {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5rem;
+    padding: 0.1rem 0.4rem;
+    border: 1px solid var(--fi-accent, var(--gv-amber));
+    border-radius: 2px;
+    color: var(--fi-accent, var(--gv-amber));
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}

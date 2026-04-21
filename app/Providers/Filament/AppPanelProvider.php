@@ -13,11 +13,13 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AppPanelProvider extends PanelProvider
@@ -29,9 +31,20 @@ class AppPanelProvider extends PanelProvider
             ->id('app')
             ->path('app')
             ->login()
+            ->brandName('mPM')
+            ->brandLogo(fn () => Blade::render('<span class="fi-logo">mPM<span class="gv-panel-tag">org admin</span></span>'))
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => Color::Amber,
             ])
+            ->viteTheme('resources/css/filament/app/theme.css')
+            ->renderHook(
+                PanelsRenderHook::BODY_START,
+                fn (): string => '<div class="gv-panel-stripe"></div>',
+            )
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_END,
+                fn (): string => '<a href="'.route('dashboard').'" class="gv-back-to-site">back to site</a>',
+            )
             ->tenant(Organization::class, slugAttribute: 'slug')
             ->tenantProfile(EditOrganizationProfile::class)
             ->tenantMiddleware([

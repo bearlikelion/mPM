@@ -15,19 +15,18 @@
                     $projectCount = $currentOrg?->projects()->count() ?? 0;
                 @endphp
 
-                <a href="{{ route('dashboard') }}" class="mr-5 flex items-center gap-3 rounded-2xl border border-transparent p-1 transition hover:border-neutral-700/70" wire:navigate>
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 rounded-sm border border-transparent p-1 transition hover:border-[color:var(--gv-border)]" wire:navigate>
                     @if($currentOrg)
-                        <img src="{{ $currentOrg->logoUrl() }}" alt="" class="size-11 rounded-2xl border border-neutral-700/60 bg-neutral-900 object-cover shadow-lg shadow-black/20" />
+                        <img src="{{ $currentOrg->logoUrl() }}" alt="" class="h-9 w-9 rounded-sm border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] object-cover" />
                     @else
                         <span class="app-brand-mark">mPM</span>
                     @endif
                     <div class="min-w-0">
-                        <div class="app-eyebrow">Workspace</div>
-                        <div class="truncate text-xl font-semibold tracking-tight text-neutral-50">
+                        <div class="truncate font-mono text-sm font-semibold text-[color:var(--gv-fg0)]">
                             {{ $currentOrg?->name ?? config('app.name', 'mPM') }}
                         </div>
-                        <div class="mt-1 text-sm text-neutral-400">
-                            {{ $projectCount }} {{ \Illuminate\Support\Str::plural('project', $projectCount) }} in motion
+                        <div class="text-xs text-[color:var(--gv-fg4)]">
+                            {{ $projectCount }} {{ \Illuminate\Support\Str::plural('project', $projectCount) }}
                         </div>
                     </div>
                 </a>
@@ -36,13 +35,10 @@
                     type="button"
                     x-data
                     x-on:click="$dispatch('open-create-task-modal')"
-                    class="app-task-trigger mt-4 flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:border-amber-400/40 hover:bg-neutral-950/75"
+                    class="app-task-trigger mt-3 flex w-full items-center justify-between rounded-sm px-3 py-2 text-left"
                 >
-                    <div>
-                        <div class="app-eyebrow">Create</div>
-                        <div class="mt-1 text-base font-semibold text-neutral-50">New task</div>
-                    </div>
-                    <span class="text-2xl font-semibold text-amber-300">+</span>
+                    <span class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-fg1)]">new task</span>
+                    <span class="font-mono text-base font-semibold text-[color:var(--gv-amber)]">+</span>
                 </button>
 
                 <flux:navlist variant="outline">

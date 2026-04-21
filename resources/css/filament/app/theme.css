@@ -1,0 +1,12 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/App';
+@source '../../../../resources/views/filament/app';
+
+@import '../_gruvbox.css';
+
+/* Org admin = amber accent (matches main site) */
+:root {
+    --fi-accent: #d79921;
+    --fi-accent-hover: #fabd2f;
+}

@@ -1,5 +1,5 @@
 <div
-    class="flex h-full w-full flex-col gap-5"
+    class="flex h-full w-full flex-col gap-4"
     x-data="{
         dragging: null,
         justDragged: false,
@@ -17,108 +17,46 @@
         }
     }"
 >
-    <section class="app-panel app-hero px-5 py-6 sm:px-7">
-        <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-            <div class="space-y-4">
-                <div class="app-eyebrow">Delivery Flow</div>
-                <div>
-                    <h1 class="text-4xl font-semibold tracking-tight text-neutral-50 sm:text-5xl">Kanban</h1>
-                    <p class="mt-3 max-w-3xl text-base leading-7 text-neutral-300">
-                        Review active work by project, sprint, assignee, epic, or tag. Drag cards across lanes to reflect what is actually moving.
-                    </p>
-                </div>
-            </div>
+    <x-page-header title="Kanban" subtitle="Drag cards across lanes to reflect what's moving.">
+        <x-slot:actions>
+            <span class="app-chip">{{ $projects->count() }} {{ \Illuminate\Support\Str::plural('project', $projects->count()) }}</span>
+            <span class="app-chip">{{ $lanes->sum(fn ($lane) => $lane->count()) }} tasks</span>
+        </x-slot:actions>
+    </x-page-header>
 
-            <div class="flex flex-wrap gap-2">
-                <span class="app-chip">{{ $projects->count() }} {{ \Illuminate\Support\Str::plural('project', $projects->count()) }}</span>
-                <span class="app-chip">{{ $lanes->sum(fn ($lane) => $lane->count()) }} visible tasks</span>
-            </div>
-        </div>
-    </section>
+    <div class="app-filter-panel grid gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+        <x-mary-choices-offline wire:model.live="projectId" :options="$projectOptions" single searchable clearable placeholder="All projects" />
+        <x-mary-choices-offline wire:model.live="sprintId" :options="$sprintOptions" single searchable clearable placeholder="All sprints" />
+        <x-mary-choices-offline wire:model.live="assigneeId" :options="$assigneeOptions" single searchable clearable placeholder="Anyone" option-sub-label="email" option-avatar="avatar" />
+        <x-mary-choices-offline wire:model.live="epicId" :options="$epicOptions" single searchable clearable placeholder="All epics" />
+        <x-mary-choices-offline wire:model.live="tagId" :options="$tagOptions" single searchable clearable placeholder="All tags" />
+        <x-mary-select wire:model.live="statusFilter" placeholder="All statuses" placeholder-value="" icon-right="o-chevron-up-down">
+            @foreach(\App\Models\Task::STATUSES as $status)
+                <option value="{{ $status }}">{{ str($status)->replace('_', ' ')->title() }}</option>
+            @endforeach
+        </x-mary-select>
+    </div>
 
-    <section class="app-panel app-filter-panel px-4 py-4 sm:px-5">
-        <div class="mb-4 flex items-center justify-between">
-            <div>
-                <div class="app-eyebrow">Filters</div>
-                <div class="mt-2 text-lg font-semibold text-neutral-50">Slice the board by project context</div>
-            </div>
-        </div>
-        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-            <x-mary-choices-offline
-                wire:model.live="projectId"
-                :options="$projectOptions"
-                single
-                searchable
-                clearable
-                placeholder="All projects"
-            />
-
-            <x-mary-choices-offline
-                wire:model.live="sprintId"
-                :options="$sprintOptions"
-                single
-                searchable
-                clearable
-                placeholder="All sprints"
-            />
-
-            <x-mary-choices-offline
-                wire:model.live="assigneeId"
-                :options="$assigneeOptions"
-                single
-                searchable
-                clearable
-                placeholder="Anyone"
-                option-sub-label="email"
-                option-avatar="avatar"
-            />
-
-            <x-mary-choices-offline
-                wire:model.live="epicId"
-                :options="$epicOptions"
-                single
-                searchable
-                clearable
-                placeholder="All epics"
-            />
-
-            <x-mary-choices-offline
-                wire:model.live="tagId"
-                :options="$tagOptions"
-                single
-                searchable
-                clearable
-                placeholder="All tags"
-            />
-
-            <x-mary-select wire:model.live="statusFilter" placeholder="All statuses" placeholder-value="" icon-right="o-chevron-up-down">
-                @foreach(\App\Models\Task::STATUSES as $status)
-                    <option value="{{ $status }}">{{ str($status)->replace('_', ' ')->title() }}</option>
-                @endforeach
-            </x-mary-select>
-        </div>
-    </section>
-
-    <div class="grid flex-1 gap-4 2xl:grid-cols-4 xl:grid-cols-2">
+    <div class="grid flex-1 gap-3 2xl:grid-cols-4 xl:grid-cols-2">
         @foreach(\App\Models\Task::STATUSES as $status)
             @php
                 $label = ['todo' => 'To do', 'in_progress' => 'In progress', 'review' => 'Review', 'done' => 'Done'][$status];
                 $tasks = $lanes[$status];
             @endphp
             <section
-                class="app-panel flex min-h-[32rem] flex-col overflow-hidden"
+                class="gv-card flex min-h-[28rem] flex-col overflow-hidden"
                 x-on:dragover.prevent
                 x-on:drop="drop('{{ $status }}')"
             >
-                <header class="flex items-center justify-between border-b border-neutral-700/60 px-4 py-4">
-                    <div>
-                        <div class="app-eyebrow">{{ strtoupper(str_replace('_', ' ', $status)) }}</div>
-                        <div class="mt-2 text-2xl font-semibold text-neutral-50">{{ $label }}</div>
+                <header class="flex items-center justify-between border-b border-[color:var(--gv-border)] px-3 py-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--gv-amber)]">{{ strtoupper(str_replace('_', ' ', $status)) }}</span>
+                        <span class="text-sm font-medium text-[color:var(--gv-fg1)]">{{ $label }}</span>
                     </div>
                     <span class="app-chip">{{ $tasks->count() }}</span>
                 </header>
 
-                <div class="flex flex-1 flex-col gap-3 p-3">
+                <div class="flex flex-1 flex-col gap-2 p-2">
                     @forelse($tasks as $task)
                         @php($projectColor = $projectColors[$task->project_id] ?? null)
                         <article
@@ -128,17 +66,17 @@
                             wire:key="task-{{ $task->id }}"
                             x-on:click="open('{{ $task->key }}')"
                             @if($highlightId === $task->id)
-                                x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'center' }); $el.classList.add('ring-2','ring-amber-300','ring-offset-2','ring-offset-neutral-950'); setTimeout(() => $el.classList.remove('ring-2','ring-amber-300','ring-offset-2','ring-offset-neutral-950'), 2500)"
+                                x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'center' }); $el.classList.add('ring-1','ring-amber-400'); setTimeout(() => $el.classList.remove('ring-1','ring-amber-400'), 2500)"
                             @endif
                             @if($projectColor)
-                                style="border-left: 3px solid {{ $projectColor['stripe'] }};"
+                                style="border-left: 2px solid {{ $projectColor['stripe'] }};"
                             @endif
-                            class="app-panel-muted cursor-pointer rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-amber-400/40 hover:bg-neutral-950/70"
+                            class="gv-card-muted gv-hover cursor-pointer p-3"
                         >
-                            <div class="flex items-start justify-between gap-3">
-                                <span class="app-chip">{{ $task->key }}</span>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="font-mono text-[0.68rem] font-semibold tracking-wide text-[color:var(--gv-fg4)]">{{ $task->key }}</span>
                                 <span @class([
-                                    'rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]',
+                                    'rounded-sm px-1.5 py-0.5 text-xs font-semibold uppercase tracking-[0.14em]',
                                     'priority-crit' => $task->priority === 'crit',
                                     'priority-high' => $task->priority === 'high',
                                     'priority-med' => $task->priority === 'med',
@@ -146,45 +84,42 @@
                                 ])>{{ $task->priority }}</span>
                             </div>
 
-                            <div class="mt-4 text-xl font-semibold leading-tight text-neutral-50">{{ $task->title }}</div>
+                            <div class="mt-2 text-[0.95rem] font-medium leading-snug text-[color:var(--gv-fg0)]">{{ $task->title }}</div>
 
                             @if($task->description)
-                                <div class="mt-3 line-clamp-3 text-sm leading-7 text-neutral-400">{{ $task->description }}</div>
+                                <div class="mt-1 line-clamp-2 text-xs leading-relaxed text-[color:var(--gv-fg4)]">{{ $task->description }}</div>
                             @endif
 
-                            <div class="mt-5 flex items-end justify-between gap-3">
+                            <div class="mt-3 flex items-center justify-between gap-2">
                                 @if($task->assignees->isNotEmpty())
-                                    <div class="flex -space-x-2">
+                                    <div class="flex -space-x-1.5">
                                         @foreach($task->assignees->take(4) as $user)
                                             <a href="{{ route('users.show', $user) }}" wire:navigate x-on:click.stop title="{{ $user->name }}">
-                                                <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="h-8 w-8 rounded-full border-2 border-neutral-950 object-cover transition hover:border-amber-400/60" />
+                                                <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="h-6 w-6 rounded-full border border-[color:var(--gv-bg0-h)] object-cover" />
                                             </a>
                                         @endforeach
                                     </div>
                                 @else
-                                    <span class="text-xs italic text-neutral-500">Unassigned</span>
+                                    <span class="text-xs text-[color:var(--gv-fg4)]">unassigned</span>
                                 @endif
 
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1.5">
                                     @if($task->project)
                                         @if($projectColor)
-                                            <span
-                                                class="rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide"
-                                                style="background: {{ $projectColor['chip_bg'] }}; color: {{ $projectColor['chip_fg'] }};"
-                                            >{{ $task->project->name }}</span>
+                                            <span class="rounded-sm px-1.5 py-0.5 font-mono text-[0.6rem] font-semibold" style="color: {{ $projectColor['chip_fg'] }};">{{ $task->project->name }}</span>
                                         @else
-                                            <span class="text-xs text-neutral-500">{{ $task->project->name }}</span>
+                                            <span class="text-xs text-[color:var(--gv-fg4)]">{{ $task->project->name }}</span>
                                         @endif
                                     @endif
                                     @if($task->story_points)
-                                        <span class="rounded-full bg-neutral-800 px-2.5 py-1 font-mono text-xs text-neutral-200">{{ $task->story_points }}</span>
+                                        <span class="rounded-sm border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] px-1.5 py-0.5 text-xs text-[color:var(--gv-fg2)]">{{ $task->story_points }}</span>
                                     @endif
                                 </div>
                             </div>
                         </article>
                     @empty
-                        <div class="flex flex-1 items-center justify-center rounded-2xl border border-dashed border-neutral-700/70 bg-neutral-950/35 px-4 py-10 text-center text-sm text-neutral-500">
-                            No tasks in this lane.
+                        <div class="flex flex-1 items-center justify-center border border-dashed border-[color:var(--gv-border)] p-6 text-center text-sm text-[color:var(--gv-fg4)]">
+                            empty
                         </div>
                     @endforelse
                 </div>
@@ -193,22 +128,20 @@
     </div>
 
     @if($taskKey)
-        <div class="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm" x-on:click="$wire.set('taskKey', null)"></div>
-        <aside class="app-drawer fixed inset-y-0 right-0 z-50 w-full max-w-3xl border-l border-neutral-700/70">
+        <div class="fixed inset-0 z-40 bg-black/70" x-on:click="$wire.set('taskKey', null)"></div>
+        <aside class="app-drawer fixed inset-y-0 right-0 z-50 w-full max-w-3xl">
             <div class="flex h-full flex-col" x-on:click.stop>
-                <div class="flex items-center justify-between border-b border-neutral-700/70 px-5 py-4">
-                    <div>
-                        <div class="app-eyebrow">Task Detail</div>
-                        <div class="mt-1 text-lg font-semibold text-neutral-50">{{ $taskKey }}</div>
+                <div class="flex items-center justify-between border-b border-[color:var(--gv-border)] px-4 py-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[color:var(--gv-amber)]">»</span>
+                        <span class="font-mono text-sm font-semibold text-[color:var(--gv-fg0)]">{{ $taskKey }}</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('tasks.show', $taskKey) }}" wire:navigate class="app-link text-sm">Open full view</a>
-                        <button type="button" x-on:click="$wire.set('taskKey', null)" class="rounded-full border border-neutral-700/70 bg-neutral-900/60 px-3 py-1.5 text-sm text-neutral-300 transition hover:border-amber-400/50 hover:text-neutral-50">
-                            Close
-                        </button>
+                        <a href="{{ route('tasks.show', $taskKey) }}" wire:navigate class="app-link text-sm">open full view</a>
+                        <button type="button" x-on:click="$wire.set('taskKey', null)" class="btn btn-ghost btn-sm">close</button>
                     </div>
                 </div>
-                <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
+                <div class="min-h-0 flex-1 overflow-y-auto px-4 py-4">
                     <livewire:task-detail :task-key="$taskKey" :embedded="true" :key="'drawer-task-'.$taskKey" />
                 </div>
             </div>

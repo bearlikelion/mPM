@@ -38,7 +38,7 @@ class KanbanTest extends TestCase
         $this->actingAs($user)
             ->get(route('kanban', ['project' => $project->id, 'task' => $task->key]))
             ->assertOk()
-            ->assertSee('Open full view')
+            ->assertSee('open full view')
             ->assertSee(route('tasks.show', $task->key), false)
             ->assertSee($task->title);
     }
@@ -62,16 +62,16 @@ class KanbanTest extends TestCase
         $this->actingAs($user)
             ->get(route('backlog', ['project' => $project->id]))
             ->assertOk()
-            ->assertSee('Tasks waiting for a sprint');
+            ->assertSee('tasks waiting for a sprint');
 
         $this->actingAs($user)
             ->get(route('epics', ['project' => $project->id]))
             ->assertOk()
-            ->assertSee('Milestone Map');
+            ->assertSee('Epics');
 
         $this->actingAs($user)
             ->get(route('sprints', ['project' => $project->id]))
             ->assertOk()
-            ->assertSee('Sprint schedule');
+            ->assertSee('sprint schedule');
     }
 }

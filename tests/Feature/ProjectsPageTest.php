@@ -41,7 +41,6 @@ class ProjectsPageTest extends TestCase
         $this->actingAs($user)
             ->get(route('projects.index'))
             ->assertOk()
-            ->assertSee('Projects overview')
             ->assertSee('Control Center')
             ->assertSee(route('kanban', ['project' => $project->id]), false);
     }

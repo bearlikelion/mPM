@@ -1,0 +1,12 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/Admin';
+@source '../../../../resources/views/filament/admin';
+
+@import '../_gruvbox.css';
+
+/* Site admin = red accent (danger/global scope) */
+:root {
+    --fi-accent: #fb4934;
+    --fi-accent-hover: #cc241d;
+}

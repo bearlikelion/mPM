@@ -36,101 +36,53 @@
             ->get();
     @endphp
 
-    <div class="grid gap-4 xl:min-h-[calc(100vh-5.5rem)] xl:grid-cols-[1.15fr_0.85fr] xl:grid-rows-[auto_auto_1fr]">
-        <section class="app-panel app-hero overflow-hidden px-5 py-5 sm:px-6 xl:row-span-2">
-            <div class="flex h-full flex-col justify-between gap-5">
-                <div class="space-y-3">
-                    <div class="app-eyebrow">Execution Cockpit</div>
-                    <div>
-                        <h1 class="app-title">
-                            {{ $currentOrg?->name ?? config('app.name', 'mPM') }}
-                        </h1>
-                        <p class="mt-2 max-w-3xl text-base leading-7 text-neutral-300">
-                            Project pulse, activity, and milestones in one view.
-                        </p>
-                    </div>
-                </div>
+    <div class="flex flex-col gap-4">
+        <x-page-header
+            :title="$currentOrg?->name ?? config('app.name', 'mPM')"
+            subtitle="Project pulse, activity, and milestones."
+        >
+            <x-slot:actions>
+                <span class="app-chip">{{ $projectIds->count() }} {{ \Illuminate\Support\Str::plural('project', $projectIds->count()) }}</span>
+                <span class="app-chip">{{ $user->formatLocalTime(now(), 'g:i A T') }}</span>
+            </x-slot:actions>
+        </x-page-header>
 
-                <div class="grid gap-3 xl:grid-cols-[auto_1fr]">
-                    <div class="flex flex-wrap gap-2">
-                        <span class="app-chip">{{ $user->formatLocalTime(now(), 'M d, Y g:i A T') }}</span>
-                        <span class="app-chip">{{ $user->organizations->count() }} {{ \Illuminate\Support\Str::plural('org', $user->organizations->count()) }}</span>
-                        <span class="app-chip">{{ $projectIds->count() }} {{ \Illuminate\Support\Str::plural('project', $projectIds->count()) }}</span>
-                    </div>
+        <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+            <div class="gv-card p-3">
+                <div class="app-kpi-label">assigned</div>
+                <div class="mt-1 app-kpi-value">{{ $myTasks->count() }}</div>
+                <p class="mt-0.5 text-xs text-[color:var(--gv-fg4)]">open work</p>
+            </div>
+            <div class="gv-card p-3">
+                <div class="app-kpi-label">completed</div>
+                <div class="mt-1 app-kpi-value">{{ $recentCompleted->count() }}</div>
+                <p class="mt-0.5 text-xs text-[color:var(--gv-fg4)]">recently closed</p>
+            </div>
+            <div class="gv-card p-3">
+                <div class="app-kpi-label">comments</div>
+                <div class="mt-1 app-kpi-value">{{ $recentComments->count() }}</div>
+                <p class="mt-0.5 text-xs text-[color:var(--gv-fg4)]">fresh discussion</p>
+            </div>
+        </div>
 
-                    <div @class([
-                        'grid gap-2',
-                        'sm:grid-cols-4' => $canManageOrg,
-                        'sm:grid-cols-3' => ! $canManageOrg,
-                    ])>
-                        @if($canManageOrg)
-                            <a href="{{ route('manager') }}" wire:navigate class="app-panel-muted rounded-2xl px-3 py-3 transition hover:border-amber-400/40 hover:bg-neutral-950/60">
-                                <div class="app-eyebrow">Manage</div>
-                                <div class="mt-1 text-base font-semibold text-neutral-50">Analytics</div>
-                            </a>
-                        @endif
-                        <a href="{{ route('kanban') }}" wire:navigate class="app-panel-muted rounded-2xl px-3 py-3 transition hover:border-amber-400/40 hover:bg-neutral-950/60">
-                            <div class="app-eyebrow">Flow</div>
-                            <div class="mt-1 text-base font-semibold text-neutral-50">Kanban</div>
-                        </a>
-                        <a href="{{ route('backlog') }}" wire:navigate class="app-panel-muted rounded-2xl px-3 py-3 transition hover:border-amber-400/40 hover:bg-neutral-950/60">
-                            <div class="app-eyebrow">Plan</div>
-                            <div class="mt-1 text-base font-semibold text-neutral-50">Backlog</div>
-                        </a>
-                        <a href="{{ route('epics') }}" wire:navigate class="app-panel-muted rounded-2xl px-3 py-3 transition hover:border-amber-400/40 hover:bg-neutral-950/60">
-                            <div class="app-eyebrow">Milestones</div>
-                            <div class="mt-1 text-base font-semibold text-neutral-50">Epics</div>
-                        </a>
-                    </div>
+        <div class="grid gap-3 xl:grid-cols-[1.1fr_1fr_0.9fr]">
+            <section class="gv-card overflow-hidden">
+                <div class="flex items-center justify-between border-b border-[color:var(--gv-border)] px-3 py-2">
+                    <span class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» my open tasks</span>
+                    <span class="app-chip">{{ $myTasks->count() }}</span>
                 </div>
-            </div>
-        </section>
-
-        <section class="grid gap-4 md:grid-cols-3 xl:col-start-2">
-            <div class="app-panel app-kpi">
-                <div class="relative space-y-2">
-                    <div class="app-kpi-label">Assigned</div>
-                    <div class="app-kpi-value">{{ $myTasks->count() }}</div>
-                    <p class="text-sm text-neutral-400">Open work.</p>
-                </div>
-            </div>
-            <div class="app-panel app-kpi">
-                <div class="relative space-y-2">
-                    <div class="app-kpi-label">Completed</div>
-                    <div class="app-kpi-value">{{ $recentCompleted->count() }}</div>
-                    <p class="text-sm text-neutral-400">Recently closed.</p>
-                </div>
-            </div>
-            <div class="app-panel app-kpi">
-                <div class="relative space-y-2">
-                    <div class="app-kpi-label">Comments</div>
-                    <div class="app-kpi-value">{{ $recentComments->count() }}</div>
-                    <p class="text-sm text-neutral-400">Fresh discussion.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="grid gap-4 xl:col-span-2 xl:grid-cols-[1.05fr_1fr_0.85fr]">
-            <div class="app-panel overflow-hidden xl:min-h-0">
-                <div class="flex items-center justify-between border-b border-neutral-700/60 px-4 py-3">
-                    <div>
-                        <div class="app-eyebrow">Your Queue</div>
-                        <h2 class="mt-1 text-xl font-semibold tracking-tight text-neutral-50">My open tasks</h2>
-                    </div>
-                    <span class="app-chip">{{ $myTasks->count() }} open</span>
-                </div>
-                <ul class="divide-y divide-neutral-700/60">
+                <ul class="divide-y divide-[color:var(--gv-border)]">
                     @forelse($myTasks as $task)
-                        <li class="flex flex-col gap-2 px-4 py-3">
-                            <div class="flex items-center justify-between gap-3">
+                        <li class="flex flex-col gap-1 px-3 py-2.5">
+                            <div class="flex items-center justify-between gap-2">
                                 <div class="flex min-w-0 items-center gap-2">
-                                    <span class="app-chip">{{ $task->key }}</span>
+                                    <span class="font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">{{ $task->key }}</span>
                                     @if($task->sprint)
-                                        <span class="truncate text-xs text-neutral-500">{{ $task->sprint->name }}</span>
+                                        <span class="truncate font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">· {{ $task->sprint->name }}</span>
                                     @endif
                                 </div>
                                 <span @class([
-                                    'rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]',
+                                    'rounded-sm px-1.5 py-0.5 text-xs font-semibold uppercase tracking-[0.12em]',
                                     'priority-crit' => $task->priority === 'crit',
                                     'priority-high' => $task->priority === 'high',
                                     'priority-med' => $task->priority === 'med',
@@ -138,129 +90,78 @@
                                 ])>{{ $task->priority }}</span>
                             </div>
                             <div class="flex items-center justify-between gap-3">
-                                <div class="min-w-0 truncate text-base font-medium text-neutral-50">{{ $task->title }}</div>
-                                <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="app-link shrink-0 text-sm">Open</a>
+                                <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="min-w-0 truncate text-sm text-[color:var(--gv-fg1)] hover:text-[color:var(--gv-amber)]">{{ $task->title }}</a>
+                                <span class="shrink-0 font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">{{ $task->project->name }}</span>
                             </div>
-                            <div class="text-sm text-neutral-400">{{ $task->project->name }}</div>
                         </li>
                     @empty
-                        <li class="px-4 py-8 text-center text-sm text-neutral-500">Nothing assigned. Nice.</li>
+                        <li class="px-3 py-6 text-center text-sm text-[color:var(--gv-fg4)]">nothing assigned</li>
                     @endforelse
                 </ul>
-            </div>
+            </section>
 
-            <div class="app-panel overflow-hidden xl:min-h-0">
-                <div class="border-b border-neutral-700/60 px-4 py-3">
-                    <div class="app-eyebrow">Pulse</div>
-                    <h2 class="mt-1 text-xl font-semibold tracking-tight text-neutral-50">Recent activity</h2>
+            <section class="gv-card overflow-hidden">
+                <div class="border-b border-[color:var(--gv-border)] px-3 py-2">
+                    <span class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» recent activity</span>
                 </div>
-                <ul class="divide-y divide-neutral-700/60">
+                <ul class="divide-y divide-[color:var(--gv-border)]">
                     @foreach($recentComments as $comment)
-                        <li class="px-4 py-3 text-sm">
-                            <div class="text-neutral-200">
+                        <li class="px-3 py-2.5 text-sm">
+                            <div class="text-[color:var(--gv-fg2)]">
                                 @if($comment->user)
-                                    <a
-                                        href="{{ route('users.show', $comment->user) }}"
-                                        wire:navigate
-                                        class="font-medium text-neutral-50 transition hover:text-amber-300"
-                                    >{{ $comment->user->name }}</a>
+                                    <a href="{{ route('users.show', $comment->user) }}" wire:navigate class="font-medium text-[color:var(--gv-fg0)] hover:text-[color:var(--gv-amber)]">{{ $comment->user->name }}</a>
                                 @else
-                                    <span class="font-medium text-neutral-50">Someone</span>
+                                    <span class="font-medium text-[color:var(--gv-fg0)]">Someone</span>
                                 @endif
-                                commented on
-                                <a
-                                    href="{{ route('tasks.show', $comment->task->key) }}"
-                                    wire:navigate
-                                    class="font-mono text-xs text-neutral-400 transition hover:text-amber-300"
-                                >{{ $comment->task->key }}</a>
+                                <span class="text-[color:var(--gv-fg4)]">→</span>
+                                <a href="{{ route('tasks.show', $comment->task->key) }}" wire:navigate class="font-mono text-xs text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $comment->task->key }}</a>
                             </div>
-                            <div class="mt-1 line-clamp-2 text-sm text-neutral-500">{{ $comment->body }}</div>
+                            <div class="mt-0.5 line-clamp-2 text-xs text-[color:var(--gv-fg4)]">{{ $comment->body }}</div>
                         </li>
                     @endforeach
                     @foreach($recentCompleted as $task)
-                        <li class="px-4 py-3 text-sm">
-                            <div class="flex items-center gap-2 text-neutral-200">
-                                <span class="rounded-full status-active px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]">Done</span>
-                                <a
-                                    href="{{ route('tasks.show', $task->key) }}"
-                                    wire:navigate
-                                    class="font-mono text-xs text-neutral-400 transition hover:text-amber-300"
-                                >{{ $task->key }}</a>
-                                <a
-                                    href="{{ route('tasks.show', $task->key) }}"
-                                    wire:navigate
-                                    class="truncate transition hover:text-amber-300"
-                                >{{ $task->title }}</a>
-                            </div>
+                        <li class="flex items-center gap-2 px-3 py-2.5 text-sm">
+                            <span class="rounded-sm px-1.5 py-0.5 font-mono text-[0.6rem] font-semibold uppercase tracking-[0.12em] status-active">done</span>
+                            <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="font-mono text-xs text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $task->key }}</a>
+                            <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="truncate text-[color:var(--gv-fg2)] hover:text-[color:var(--gv-amber)]">{{ $task->title }}</a>
                         </li>
                     @endforeach
                     @if($recentComments->isEmpty() && $recentCompleted->isEmpty())
-                        <li class="px-4 py-8 text-center text-sm text-neutral-500">No recent activity.</li>
+                        <li class="px-3 py-6 text-center text-sm text-[color:var(--gv-fg4)]">no activity</li>
                     @endif
                 </ul>
-            </div>
+            </section>
 
-            <div class="flex flex-col gap-4 xl:min-h-0">
-                <section class="app-panel px-4 py-4">
-                    <div class="mb-4 flex items-center justify-between gap-3">
-                        <div>
-                            <div class="app-eyebrow">Milestones</div>
-                            <h2 class="mt-1 text-xl font-semibold tracking-tight text-neutral-50">Active epics</h2>
-                        </div>
-                        <a href="{{ route('epics') }}" wire:navigate class="app-link text-sm">View all</a>
-                    </div>
-                    @if($activeEpics->isEmpty())
-                        <div class="rounded-2xl border border-dashed border-neutral-700/80 px-4 py-8 text-center text-sm text-neutral-500">No active epics.</div>
-                    @else
-                        <div class="grid gap-3">
-                            @foreach($activeEpics as $epic)
-                                @php $pct = $epic->tasks_count > 0 ? round(($epic->completed_tasks_count / $epic->tasks_count) * 100) : 0; @endphp
-                                <a href="{{ route('kanban', ['project' => $epic->project_id, 'epic' => $epic->id]) }}" wire:navigate class="app-panel-muted flex flex-col gap-3 rounded-2xl p-3 transition hover:border-amber-400/40 hover:bg-neutral-950/60">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <div class="flex min-w-0 items-center gap-3">
-                                            <img src="{{ $epic->avatarUrl() }}" alt="" class="h-10 w-10 rounded-2xl border border-neutral-700/70 bg-neutral-900 object-cover" />
-                                            <div class="min-w-0">
-                                                <div class="truncate font-semibold text-neutral-50">{{ $epic->name }}</div>
-                                                <div class="text-sm text-neutral-400">{{ $epic->project->name }}</div>
-                                            </div>
-                                        </div>
+            <section class="gv-card overflow-hidden">
+                <div class="flex items-center justify-between border-b border-[color:var(--gv-border)] px-3 py-2">
+                    <span class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» active epics</span>
+                    <a href="{{ route('epics') }}" wire:navigate class="app-link text-sm">all →</a>
+                </div>
+                @if($activeEpics->isEmpty())
+                    <div class="px-3 py-6 text-center text-sm text-[color:var(--gv-fg4)]">no active epics</div>
+                @else
+                    <ul class="divide-y divide-[color:var(--gv-border)]">
+                        @foreach($activeEpics as $epic)
+                            @php $pct = $epic->tasks_count > 0 ? round(($epic->completed_tasks_count / $epic->tasks_count) * 100) : 0; @endphp
+                            <li>
+                                <a href="{{ route('kanban', ['project' => $epic->project_id, 'epic' => $epic->id]) }}" wire:navigate class="flex flex-col gap-1.5 px-3 py-2.5 transition hover:bg-[color:var(--gv-bg1)]">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="truncate text-sm font-medium text-[color:var(--gv-fg0)]">{{ $epic->name }}</span>
                                         @if($epic->due_date)
-                                            <span class="app-chip">{{ $epic->due_date->format('M j') }}</span>
+                                            <span class="shrink-0 text-xs text-[color:var(--gv-fg4)]">{{ $epic->due_date->format('M j') }}</span>
                                         @endif
                                     </div>
-                                    <div class="space-y-2">
-                                        <div class="flex items-center justify-between text-xs text-neutral-500">
-                                            <span>{{ $epic->completed_tasks_count }}/{{ $epic->tasks_count }} tasks</span>
-                                            <span>{{ $pct }}%</span>
-                                        </div>
-                                        <div class="progress-track">
-                                            <div class="progress-bar" style="width: {{ $pct }}%"></div>
-                                        </div>
+                                    <div class="flex items-center justify-between text-xs text-[color:var(--gv-fg4)]">
+                                        <span>{{ $epic->project->name }}</span>
+                                        <span>{{ $epic->completed_tasks_count }}/{{ $epic->tasks_count }} · {{ $pct }}%</span>
                                     </div>
+                                    <div class="progress-track"><div class="progress-bar" style="width: {{ $pct }}%"></div></div>
                                 </a>
-                            @endforeach
-                        </div>
-                    @endif
-                </section>
-
-                <section class="app-panel px-4 py-4">
-                    <div class="mb-4">
-                        <div class="app-eyebrow">Organizations</div>
-                        <h2 class="mt-1 text-xl font-semibold tracking-tight text-neutral-50">Your organizations</h2>
-                    </div>
-                    <div class="grid gap-3">
-                        @foreach($user->organizations->take(3) as $org)
-                            <a href="/app/{{ $org->slug }}" class="app-panel-muted flex items-center gap-3 rounded-2xl p-3 transition hover:border-amber-400/40 hover:bg-neutral-950/60">
-                                <img src="{{ $org->logoUrl() }}" alt="" class="h-11 w-11 rounded-2xl border border-neutral-700/70 bg-neutral-900 object-cover" />
-                                <div class="min-w-0 flex-1">
-                                    <div class="truncate font-semibold text-neutral-50">{{ $org->name }}</div>
-                                    <div class="text-sm text-neutral-400">{{ $org->projects()->count() }} {{ \Illuminate\Support\Str::plural('project', $org->projects()->count()) }}</div>
-                                </div>
-                            </a>
+                            </li>
                         @endforeach
-                    </div>
-                </section>
-            </div>
-        </section>
+                    </ul>
+                @endif
+            </section>
+        </div>
     </div>
 </x-layouts.app>
