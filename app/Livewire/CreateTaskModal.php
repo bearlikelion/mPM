@@ -34,6 +34,21 @@ class CreateTaskModal extends Component
 
     public ?string $dueDate = null;
 
+    public function toggleAssignee(int $userId): void
+    {
+        if (in_array($userId, $this->assigneeIds, true)) {
+            $this->assigneeIds = array_values(array_filter(
+                $this->assigneeIds,
+                fn (int $selectedUserId) => $selectedUserId !== $userId
+            ));
+
+            return;
+        }
+
+        $this->assigneeIds[] = $userId;
+        $this->assigneeIds = array_values(array_unique($this->assigneeIds));
+    }
+
     public function mount(): void
     {
         $this->projectId = $this->availableProjects()->value('id');
@@ -114,6 +129,7 @@ class CreateTaskModal extends Component
             'assignees' => $selectedProject
                 ? $this->assignableUsers($selectedProject)->get()
                 : collect(),
+            'selectedProject' => $selectedProject,
         ]);
     }
 

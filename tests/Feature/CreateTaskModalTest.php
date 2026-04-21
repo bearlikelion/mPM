@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Livewire\CreateTaskModal;
 use App\Models\Organization;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -46,7 +47,7 @@ class CreateTaskModalTest extends TestCase
             ->set('priority', 'high')
             ->set('status', 'todo')
             ->set('storyPoints', 5)
-            ->set('assigneeIds', [$assignee->id])
+            ->call('toggleAssignee', $assignee->id)
             ->call('createTask')
             ->assertHasNoErrors()
             ->assertRedirect(route('tasks.show', 'OPS-1'));
@@ -61,7 +62,7 @@ class CreateTaskModalTest extends TestCase
             'story_points' => 5,
         ]);
 
-        $taskId = \App\Models\Task::query()->where('key', 'OPS-1')->value('id');
+        $taskId = Task::query()->where('key', 'OPS-1')->value('id');
 
         $this->assertDatabaseHas('task_user', [
             'task_id' => $taskId,

@@ -211,6 +211,52 @@
         box-shadow: inset 0 1px 0 rgba(251, 241, 199, 0.03);
     }
 
+    .create-task-hero {
+        border: 1px solid rgba(168, 153, 132, 0.18);
+        background:
+            radial-gradient(circle at top right, rgba(250, 189, 47, 0.16), transparent 16rem),
+            linear-gradient(180deg, rgba(60, 56, 54, 0.78), rgba(40, 40, 40, 0.96));
+        box-shadow:
+            0 18px 40px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(251, 241, 199, 0.03);
+    }
+
+    .create-task-project-badge {
+        display: flex;
+        min-width: 14rem;
+        align-items: center;
+        gap: 0.9rem;
+        border-radius: 1.25rem;
+        border: 1px solid rgba(168, 153, 132, 0.16);
+        background: rgba(29, 32, 33, 0.56);
+        padding: 0.75rem;
+        backdrop-filter: blur(14px);
+    }
+
+    .create-task-assignee {
+        border: 1px solid rgba(168, 153, 132, 0.16);
+        background:
+            linear-gradient(180deg, rgba(50, 48, 47, 0.82), rgba(29, 32, 33, 0.86));
+        box-shadow: inset 0 1px 0 rgba(251, 241, 199, 0.02);
+    }
+
+    .create-task-assignee:hover {
+        border-color: rgba(215, 153, 33, 0.3);
+        background:
+            linear-gradient(180deg, rgba(60, 56, 54, 0.9), rgba(29, 32, 33, 0.92));
+        transform: translateY(-1px);
+    }
+
+    .create-task-assignee.is-selected {
+        border-color: rgba(215, 153, 33, 0.42);
+        background:
+            radial-gradient(circle at top right, rgba(250, 189, 47, 0.12), transparent 10rem),
+            linear-gradient(180deg, rgba(76, 71, 56, 0.94), rgba(40, 40, 40, 0.96));
+        box-shadow:
+            0 0 0 1px rgba(215, 153, 33, 0.18),
+            inset 0 1px 0 rgba(251, 241, 199, 0.03);
+    }
+
     .app-drawer {
         background:
             linear-gradient(180deg, rgba(50, 48, 47, 0.98), rgba(29, 32, 33, 0.99)),
