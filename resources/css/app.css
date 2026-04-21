@@ -150,20 +150,20 @@
         width: 100%;
         max-width: 110rem;
         flex-direction: column;
-        gap: 1.5rem;
-        padding: 1rem 1rem 2rem;
+        gap: 1rem;
+        padding: 0.75rem 0.75rem 1.25rem;
     }
 
     @media (min-width: 640px) {
         .app-main-inner {
-            padding-inline: 1.5rem;
+            padding-inline: 1rem;
         }
     }
 
     @media (min-width: 1024px) {
         .app-main-inner {
-            padding-inline: 2rem;
-            padding-top: 1.75rem;
+            padding-inline: 1.25rem;
+            padding-top: 1rem;
         }
     }
 
@@ -229,8 +229,8 @@
     }
 
     .app-title {
-        font-size: clamp(2rem, 4vw, 3.75rem);
-        line-height: 0.95;
+        font-size: clamp(2rem, 3.2vw, 3.25rem);
+        line-height: 0.98;
         font-weight: 700;
         letter-spacing: -0.04em;
         color: var(--color-neutral-50);
@@ -238,15 +238,15 @@
 
     .app-subtitle {
         max-width: 48rem;
-        font-size: 1rem;
-        line-height: 1.8;
+        font-size: 0.95rem;
+        line-height: 1.65;
         color: var(--color-neutral-300);
     }
 
     .app-kpi {
         position: relative;
         overflow: hidden;
-        padding: 1.25rem;
+        padding: 1rem;
     }
 
     .app-kpi::before {
@@ -258,7 +258,7 @@
     }
 
     .app-kpi-value {
-        font-size: clamp(2rem, 4vw, 3rem);
+        font-size: clamp(1.85rem, 3vw, 2.6rem);
         line-height: 1;
         font-weight: 700;
         letter-spacing: -0.05em;

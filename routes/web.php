@@ -14,6 +14,18 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::get('manager', function () {
+    $user = auth()->user();
+    $currentOrg = $user->defaultOrganization ?? $user->organizations()->first();
+
+    abort_unless($currentOrg && $user->can('update', $currentOrg), 403);
+
+    return view('manager', [
+        'currentOrg' => $currentOrg,
+    ]);
+})->middleware(['auth', 'verified'])
+    ->name('manager');
+
 Route::view('kanban', 'kanban')
     ->middleware(['auth', 'verified'])
     ->name('kanban');
