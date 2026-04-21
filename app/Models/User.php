@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
@@ -21,12 +24,13 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasMedia, HasTenants
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, InteractsWithMedia, Notifiable;
 
     protected $fillable = [
         'name',
         'email',
+        'timezone',
         'password',
         'avatar_path',
         'default_organization_id',
@@ -43,6 +47,25 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasTenants
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function preferredTimezone(): string
+    {
+        return $this->timezone ?: 'UTC';
+    }
+
+    public function convertToLocalTime(CarbonInterface|string $timestamp): Carbon
+    {
+        $date = $timestamp instanceof CarbonInterface
+            ? Carbon::instance($timestamp)
+            : Carbon::parse($timestamp);
+
+        return $date->setTimezone($this->preferredTimezone());
+    }
+
+    public function formatLocalTime(CarbonInterface|string $timestamp, string $format = 'M j, Y g:i A T'): string
+    {
+        return $this->convertToLocalTime($timestamp)->format($format);
     }
 
     public function organizations(): BelongsToMany

@@ -15,7 +15,18 @@ class ProfileUpdateTest extends TestCase
     {
         $this->actingAs($user = User::factory()->create());
 
-        $this->get('/settings/profile')->assertOk();
+        $this->get('/settings/profile')
+            ->assertOk()
+            ->assertSee('Profile')
+            ->assertSee('Password')
+            ->assertDontSee('Appearance');
+    }
+
+    public function test_appearance_page_is_not_available(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->get('/settings/appearance')->assertNotFound();
     }
 
     public function test_profile_information_can_be_updated(): void
@@ -27,6 +38,7 @@ class ProfileUpdateTest extends TestCase
         $response = Volt::test('settings.profile')
             ->set('name', 'Test User')
             ->set('email', 'test@example.com')
+            ->set('timezone', 'America/Los_Angeles')
             ->call('updateProfileInformation');
 
         $response->assertHasNoErrors();
@@ -35,6 +47,7 @@ class ProfileUpdateTest extends TestCase
 
         $this->assertEquals('Test User', $user->name);
         $this->assertEquals('test@example.com', $user->email);
+        $this->assertEquals('America/Los_Angeles', $user->timezone);
         $this->assertNull($user->email_verified_at);
     }
 
@@ -47,6 +60,7 @@ class ProfileUpdateTest extends TestCase
         $response = Volt::test('settings.profile')
             ->set('name', 'Test User')
             ->set('email', $user->email)
+            ->set('timezone', 'America/New_York')
             ->call('updateProfileInformation');
 
         $response->assertHasNoErrors();

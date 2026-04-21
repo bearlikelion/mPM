@@ -5,7 +5,6 @@ namespace App\Filament\App\Resources;
 use App\Filament\App\Resources\EpicResource\Pages;
 use App\Models\Epic;
 use App\Models\Project;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;

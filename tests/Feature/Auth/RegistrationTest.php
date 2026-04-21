@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
@@ -22,6 +24,9 @@ class RegistrationTest extends TestCase
         $response = Volt::test('auth.register')
             ->set('name', 'Test User')
             ->set('email', 'test@example.com')
+            ->set('timezone', 'America/New_York')
+            ->set('organization_name', 'Test Org')
+            ->set('organization_timezone', 'America/Chicago')
             ->set('password', 'password')
             ->set('password_confirmation', 'password')
             ->call('register');
@@ -31,5 +36,18 @@ class RegistrationTest extends TestCase
             ->assertRedirect(route('dashboard', absolute: false));
 
         $this->assertAuthenticated();
+
+        $user = User::where('email', 'test@example.com')->first();
+
+        $this->assertNotNull($user);
+        $this->assertSame('America/New_York', $user->timezone);
+        $this->assertNotNull($user->defaultOrganization);
+        $this->assertSame('Test Org', $user->defaultOrganization->name);
+        $this->assertSame('America/Chicago', $user->defaultOrganization->timezone);
+        $this->assertTrue(
+            Organization::where('name', 'Test Org')
+                ->where('timezone', 'America/Chicago')
+                ->exists()
+        );
     }
 }

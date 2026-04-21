@@ -4,7 +4,9 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\OrganizationResource\Pages;
 use App\Models\Organization;
+use App\Support\Timezones;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -26,6 +28,10 @@ class OrganizationResource extends Resource
             TextInput::make('name')->required()->live(onBlur: true)
                 ->afterStateUpdated(fn ($state, $set) => $set('slug', Str::slug($state))),
             TextInput::make('slug')->required()->unique(ignoreRecord: true),
+            Select::make('timezone')
+                ->options(Timezones::options())
+                ->required()
+                ->searchable(),
             FileUpload::make('logo_path')
                 ->label('Logo')
                 ->image()
@@ -44,6 +50,7 @@ class OrganizationResource extends Resource
             ->columns([
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('slug')->sortable(),
+                TextColumn::make('timezone')->toggleable(),
                 TextColumn::make('users_count')->counts('users')->label('Members'),
                 TextColumn::make('projects_count')->counts('projects')->label('Projects'),
                 IconColumn::make('registration_enabled')->boolean(),

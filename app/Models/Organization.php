@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Database\Factories\OrganizationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +21,7 @@ class Organization extends Model
     protected $fillable = [
         'name',
         'slug',
+        'timezone',
         'logo_path',
         'settings',
         'registration_enabled',
@@ -30,6 +33,25 @@ class Organization extends Model
             'settings' => 'array',
             'registration_enabled' => 'boolean',
         ];
+    }
+
+    public function preferredTimezone(): string
+    {
+        return $this->timezone ?: 'UTC';
+    }
+
+    public function convertToLocalTime(CarbonInterface|string $timestamp): Carbon
+    {
+        $date = $timestamp instanceof CarbonInterface
+            ? Carbon::instance($timestamp)
+            : Carbon::parse($timestamp);
+
+        return $date->setTimezone($this->preferredTimezone());
+    }
+
+    public function formatLocalTime(CarbonInterface|string $timestamp, string $format = 'M j, Y g:i A T'): string
+    {
+        return $this->convertToLocalTime($timestamp)->format($format);
     }
 
     public function users(): BelongsToMany

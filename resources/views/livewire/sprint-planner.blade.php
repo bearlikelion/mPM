@@ -1,17 +1,43 @@
-<div class="flex h-full w-full flex-col gap-4 p-1">
-    <div class="flex flex-wrap items-center gap-3">
-        <h1 class="text-xl font-semibold">Sprints</h1>
+<div class="flex h-full w-full flex-col gap-5">
+    <section class="app-panel app-hero px-5 py-6 sm:px-7">
+        <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            <div class="space-y-4">
+                <div class="app-eyebrow">Cadence</div>
+                <div>
+                    <h1 class="text-4xl font-semibold tracking-tight text-neutral-50 sm:text-5xl">Sprints</h1>
+                    <p class="mt-3 max-w-3xl text-base leading-7 text-neutral-300">
+                        Plan focused work windows, start them when the team is ready, and end them with a clean read on what shipped and what rolls back.
+                    </p>
+                </div>
+            </div>
 
-        <select wire:model.live="projectId" class="rounded-md border-neutral-300 bg-white text-sm dark:border-neutral-700 dark:bg-neutral-900">
-            <option value="">Select project</option>
-            @foreach($projects as $project)
-                <option value="{{ $project->id }}">{{ $project->name }}</option>
-            @endforeach
-        </select>
-    </div>
+            <div class="flex flex-wrap gap-2">
+                <span class="app-chip">{{ $sprints->count() }} sprint{{ $sprints->count() === 1 ? '' : 's' }}</span>
+                @if($projectId)
+                    <span class="app-chip">Project selected</span>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    <section class="app-panel px-4 py-4 sm:px-5">
+        <div class="mb-4">
+            <div class="app-eyebrow">Scope</div>
+            <div class="mt-2 text-lg font-semibold text-neutral-50">Choose a project</div>
+        </div>
+
+        <div class="max-w-md">
+            <select wire:model.live="projectId" class="app-select w-full">
+                <option value="">Select project</option>
+                @foreach($projects as $project)
+                    <option value="{{ $project->id }}">{{ $project->name }}</option>
+                @endforeach
+            </select>
+        </div>
+    </section>
 
     @if($projectId)
-        <form wire:submit="createSprint" class="grid gap-3 rounded-xl border border-neutral-200 p-4 md:grid-cols-4 dark:border-neutral-700">
+        <form wire:submit="createSprint" class="app-panel grid gap-4 px-4 py-5 md:grid-cols-4 md:px-5">
             <div class="md:col-span-2">
                 <flux:input wire:model="name" label="Name" placeholder="Sprint 7" />
             </div>
@@ -23,30 +49,37 @@
         </form>
     @endif
 
-    <div class="rounded-xl border border-neutral-200 dark:border-neutral-700">
-        <div class="border-b border-neutral-200 px-4 py-3 text-sm font-medium dark:border-neutral-700">
-            Sprints ({{ $sprints->count() }})
+    <section class="app-panel overflow-hidden">
+        <div class="flex flex-col gap-3 border-b border-neutral-700/60 px-5 py-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <div class="app-eyebrow">Timeline</div>
+                <div class="mt-2 text-2xl font-semibold text-neutral-50">Sprint schedule</div>
+            </div>
+            <span class="app-chip">{{ $sprints->count() }} total</span>
         </div>
 
         @if($sprints->isEmpty())
-            <div class="px-4 py-8 text-center text-sm text-neutral-500">No sprints yet.</div>
+            <div class="px-5 py-14 text-center text-sm text-neutral-500">No sprints yet.</div>
         @else
-            <ul class="divide-y divide-neutral-200 dark:divide-neutral-700">
+            <ul class="divide-y divide-neutral-700/60">
                 @foreach($sprints as $sprint)
-                    <li wire:key="sprint-{{ $sprint->id }}" class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="font-medium">{{ $sprint->name }}</span>
-                            <span class="text-xs text-neutral-500">
-                                {{ $sprint->starts_at?->format('M j') }} – {{ $sprint->ends_at?->format('M j') }}
-                            </span>
-                            <span class="rounded bg-neutral-100 px-2 text-xs dark:bg-neutral-800">{{ $sprint->tasks_count }} tasks</span>
-                            @if($sprint->isActive())
-                                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-700">Active</span>
-                            @elseif($sprint->ended_at)
-                                <span class="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-neutral-600">Ended</span>
-                            @else
-                                <span class="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-blue-700">Planned</span>
-                            @endif
+                    <li wire:key="sprint-{{ $sprint->id }}" class="flex flex-col gap-4 px-5 py-4 xl:flex-row xl:items-center xl:justify-between">
+                        <div class="space-y-2">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="text-xl font-semibold text-neutral-50">{{ $sprint->name }}</span>
+                                <span @class([
+                                    'rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]',
+                                    'status-active' => $sprint->isActive(),
+                                    'status-ended' => $sprint->ended_at,
+                                    'status-planned' => ! $sprint->isActive() && ! $sprint->ended_at,
+                                ])>
+                                    {{ $sprint->isActive() ? 'Active' : ($sprint->ended_at ? 'Ended' : 'Planned') }}
+                                </span>
+                            </div>
+                            <div class="text-sm text-neutral-400">
+                                {{ $sprint->starts_at?->format('M j') }} - {{ $sprint->ends_at?->format('M j, Y') }}
+                            </div>
+                            <div class="text-sm text-neutral-500">{{ $sprint->tasks_count }} {{ \Illuminate\Support\Str::plural('task', $sprint->tasks_count) }}</div>
                         </div>
                         <div class="flex items-center gap-2">
                             @if(! $sprint->started_at)
@@ -59,5 +92,5 @@
                 @endforeach
             </ul>
         @endif
-    </div>
+    </section>
 </div>

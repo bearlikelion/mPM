@@ -4,7 +4,9 @@
             <div class="font-mono text-xs text-neutral-500">{{ $task->project->name }} · {{ $task->key }}</div>
             <h1 class="text-2xl font-semibold">{{ $task->title }}</h1>
             @if($task->creator)
-                <div class="mt-1 text-xs text-neutral-500">Created by {{ $task->creator->name }} · {{ $task->created_at->diffForHumans() }}</div>
+                <div class="mt-1 text-xs text-neutral-500">
+                    Created by {{ $task->creator->name }} · {{ auth()->user()->formatLocalTime($task->created_at) }} · {{ $task->created_at->diffForHumans() }}
+                </div>
             @endif
         </div>
         <a href="{{ route('kanban', ['project' => $task->project_id, 'highlight' => $task->id]) }}" wire:navigate class="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800">
@@ -33,7 +35,7 @@
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
                                         <span class="font-medium">{{ $comment->user?->name ?? 'Someone' }}</span>
-                                        <span class="text-xs text-neutral-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                        <span class="text-xs text-neutral-500">{{ auth()->user()->formatLocalTime($comment->created_at) }} · {{ $comment->created_at->diffForHumans() }}</span>
                                     </div>
                                     @if($comment->body)
                                         <div class="mt-1 whitespace-pre-wrap">{{ $comment->body }}</div>

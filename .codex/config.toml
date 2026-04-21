@@ -2,3 +2,6 @@
 command = "vendor/bin/sail"
 args = ["artisan", "boost:mcp"]
 cwd = "/home/mark/Source/mPM"
+
+[mcp_servers.laravel-boost.tools.search-docs]
+approval_mode = "approve"

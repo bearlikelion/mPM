@@ -20,6 +20,7 @@ class OrganizationFactory extends Factory
         return [
             'name' => $name,
             'slug' => Str::slug($name).'-'.Str::lower(Str::random(4)),
+            'timezone' => fake()->timezone(),
             'registration_enabled' => false,
         ];
     }

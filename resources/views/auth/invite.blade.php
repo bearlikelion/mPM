@@ -15,6 +15,14 @@
             @guest
                 <flux:input label="Name" name="name" required autofocus />
                 <flux:input label="Email" type="email" value="{{ $invite->email }}" disabled />
+                <div class="grid gap-2">
+                    <label for="timezone" class="text-sm font-medium text-neutral-200">Your timezone</label>
+                    <select id="timezone" name="timezone" class="app-select w-full" required>
+                        @foreach(\App\Support\Timezones::options() as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <flux:input label="Password" type="password" name="password" required />
                 <flux:input label="Confirm password" type="password" name="password_confirmation" required />
             @else

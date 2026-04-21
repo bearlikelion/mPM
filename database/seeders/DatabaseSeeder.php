@@ -22,12 +22,14 @@ class DatabaseSeeder extends Seeder
         $siteAdmin = User::factory()->create([
             'name' => 'Mark Arneman',
             'email' => 'mark@example.test',
+            'timezone' => 'America/New_York',
         ]);
         $siteAdmin->assignRole('site_admin');
 
         $org = Organization::factory()->create([
             'name' => 'Nerdibear',
             'slug' => 'nerdibear',
+            'timezone' => 'America/New_York',
             'registration_enabled' => true,
         ]);
 
@@ -96,4 +98,3 @@ class DatabaseSeeder extends Seeder
         }
     }
 }
-

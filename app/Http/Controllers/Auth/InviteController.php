@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\OrganizationInvite;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class InviteController extends Controller
 {
@@ -27,6 +27,7 @@ class InviteController extends Controller
 
         $data = $request->validate([
             'name' => ['required_without:_existing', 'string', 'max:255'],
+            'timezone' => ['required_without:_existing', 'timezone:all'],
             'password' => ['required_without:_existing', 'string', 'min:8', 'confirmed'],
         ]);
 
@@ -35,6 +36,7 @@ class InviteController extends Controller
                 ['email' => $invite->email],
                 [
                     'name' => $data['name'],
+                    'timezone' => $data['timezone'],
                     'password' => Hash::make($data['password']),
                     'email_verified_at' => now(),
                 ]

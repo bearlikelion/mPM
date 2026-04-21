@@ -9,10 +9,14 @@ class ExampleTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_returns_a_successful_response(): void
+    public function test_the_home_page_reflects_the_product_positioning(): void
     {
         $response = $this->get('/');
 
-        $response->assertStatus(200);
+        $response
+            ->assertOk()
+            ->assertSee('A self-hosted project room that feels like your team actually lives there.')
+            ->assertSee('Backlog to sprint')
+            ->assertSee('Kanban, backlog views, sprint planning, and dashboard pulse');
     }
 }

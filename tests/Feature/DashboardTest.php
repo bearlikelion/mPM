@@ -22,6 +22,10 @@ class DashboardTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->get('/dashboard');
-        $response->assertStatus(200);
+        $response
+            ->assertOk()
+            ->assertSee('Execution Cockpit')
+            ->assertSee('My open tasks')
+            ->assertSee('Active epics');
     }
 }

@@ -5,20 +5,23 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 
-new class extends Component {
+new #[Layout('components.layouts.app')] class extends Component {
     use WithFileUploads;
 
     public string $name = '';
     public string $email = '';
+    public string $timezone = 'UTC';
     public $avatar = null;
 
     public function mount(): void
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->timezone = Auth::user()->preferredTimezone();
     }
 
     public function updatedAvatar(): void
@@ -58,7 +61,6 @@ new class extends Component {
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
-
             'email' => [
                 'required',
                 'string',
@@ -67,6 +69,7 @@ new class extends Component {
                 'max:255',
                 Rule::unique(User::class)->ignore($user->id)
             ],
+            'timezone' => ['required', 'timezone:all'],
         ]);
 
         $user->fill($validated);
@@ -102,7 +105,7 @@ new class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <x-settings.layout heading="Profile" subheading="Update your name and email address">
+    <x-settings.layout heading="Profile" subheading="Update your name, email address, and local timezone">
         <div class="my-6 flex items-center gap-4">
             <img src="{{ auth()->user()->avatarUrl() }}" alt="avatar" class="h-16 w-16 rounded-full" />
             <div class="flex flex-col gap-2">
@@ -140,6 +143,36 @@ new class extends Component {
                         @endif
                     </div>
                 @endif
+            </div>
+
+            <div class="grid gap-2">
+                <label for="timezone" class="text-sm font-medium text-neutral-200">{{ __('Timezone') }}</label>
+                <select wire:model="timezone" id="timezone" name="timezone" class="app-select w-full" required>
+                    @foreach(\App\Support\Timezones::options() as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+                <p class="text-sm text-neutral-400">This controls how timestamps are shown to you across the app.</p>
+            </div>
+
+            @php
+                $currentOrg = auth()->user()->defaultOrganization;
+                $now = now();
+            @endphp
+            <div class="app-panel-muted rounded-2xl p-4">
+                <div class="app-eyebrow">Time Conversion Preview</div>
+                <div class="mt-3 grid gap-3 md:grid-cols-2">
+                    <div>
+                        <div class="text-sm font-medium text-neutral-200">Your local time</div>
+                        <div class="mt-1 text-sm text-neutral-400">{{ auth()->user()->formatLocalTime($now) }}</div>
+                    </div>
+                    @if($currentOrg)
+                        <div>
+                            <div class="text-sm font-medium text-neutral-200">{{ $currentOrg->name }} time</div>
+                            <div class="mt-1 text-sm text-neutral-400">{{ $currentOrg->formatLocalTime($now) }}</div>
+                        </div>
+                    @endif
+                </div>
             </div>
 
             <div class="flex items-center gap-4">

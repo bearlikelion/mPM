@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
+use SocialiteProviders\Discord\DiscordExtendSocialite;
+use SocialiteProviders\Manager\SocialiteWasCalled;
+use SocialiteProviders\Steam\SteamExtendSocialite;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,13 +17,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(Dispatcher $events): void
     {
-        $events->listen(\SocialiteProviders\Manager\SocialiteWasCalled::class, [
-            \SocialiteProviders\Discord\DiscordExtendSocialite::class,
+        $events->listen(SocialiteWasCalled::class, [
+            DiscordExtendSocialite::class,
             'handle',
         ]);
 
-        $events->listen(\SocialiteProviders\Manager\SocialiteWasCalled::class, [
-            \SocialiteProviders\Steam\SteamExtendSocialite::class,
+        $events->listen(SocialiteWasCalled::class, [
+            SteamExtendSocialite::class,
             'handle',
         ]);
     }

@@ -2,7 +2,9 @@
 
 namespace App\Filament\App\Pages;
 
+use App\Support\Timezones;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\Tenancy\EditTenantProfile;
@@ -19,6 +21,10 @@ class EditOrganizationProfile extends EditTenantProfile
     {
         return $schema->components([
             TextInput::make('name')->required()->maxLength(255),
+            Select::make('timezone')
+                ->options(Timezones::options())
+                ->required()
+                ->searchable(),
             FileUpload::make('logo_path')
                 ->label('Logo')
                 ->image()
