@@ -118,7 +118,10 @@
                         @php $pct = $epic->tasks_count > 0 ? round(($epic->completed_tasks_count / $epic->tasks_count) * 100) : 0; @endphp
                         <a href="{{ route('kanban', ['project' => $epic->project_id, 'epic' => $epic->id]) }}" wire:navigate class="flex flex-col gap-2 rounded-lg border border-neutral-200 p-3 transition hover:border-indigo-500 dark:border-neutral-700">
                             <div class="flex items-start justify-between gap-2">
-                                <div class="font-medium">{{ $epic->name }}</div>
+                                <div class="flex items-center gap-2">
+                                    <img src="{{ $epic->avatarUrl() }}" alt="" class="h-6 w-6 rounded" />
+                                    <div class="font-medium">{{ $epic->name }}</div>
+                                </div>
                                 @if($epic->due_date)
                                     <span class="text-[10px] text-neutral-500">{{ $epic->due_date->format('M j') }}</span>
                                 @endif

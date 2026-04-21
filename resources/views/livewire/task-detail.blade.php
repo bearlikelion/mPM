@@ -137,7 +137,8 @@
                     @if($task->epic)
                         <div class="flex items-center gap-2">
                             <span class="text-neutral-500">Epic:</span>
-                            <a href="{{ route('kanban', ['project' => $task->project_id, 'epic' => $task->epic_id]) }}" wire:navigate class="text-indigo-600 hover:underline dark:text-indigo-400">
+                            <a href="{{ route('kanban', ['project' => $task->project_id, 'epic' => $task->epic_id]) }}" wire:navigate class="flex items-center gap-1 text-indigo-600 hover:underline dark:text-indigo-400">
+                                <img src="{{ $task->epic->avatarUrl() }}" alt="" class="h-4 w-4 rounded" />
                                 {{ $task->epic->name }}
                             </a>
                         </div>

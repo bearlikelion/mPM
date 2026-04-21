@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Epic extends Model
 {
@@ -16,9 +18,21 @@ class Epic extends Model
         'project_id',
         'name',
         'description',
+        'avatar_path',
         'due_date',
         'completed_at',
     ];
+
+    public function avatarUrl(): string
+    {
+        if ($this->avatar_path) {
+            return Storage::disk('public')->url($this->avatar_path);
+        }
+
+        $initials = Str::upper(Str::substr($this->name, 0, 2));
+
+        return route('avatars.default', ['initials' => $initials ?: '?']);
+    }
 
     protected function casts(): array
     {

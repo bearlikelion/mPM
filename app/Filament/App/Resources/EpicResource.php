@@ -7,6 +7,7 @@ use App\Models\Epic;
 use App\Models\Project;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -33,6 +34,14 @@ class EpicResource extends Resource
                 ->searchable(),
             TextInput::make('name')->required()->maxLength(255),
             Textarea::make('description')->rows(3),
+            FileUpload::make('avatar_path')
+                ->label('Epic avatar')
+                ->image()
+                ->avatar()
+                ->disk('public')
+                ->directory('epic-avatars')
+                ->visibility('public')
+                ->maxSize(2048),
             DatePicker::make('due_date'),
         ]);
     }

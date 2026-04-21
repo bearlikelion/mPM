@@ -7,8 +7,22 @@
         <flux:sidebar sticky stashable class="border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="mr-5 flex items-center space-x-2" wire:navigate>
-                <x-app-logo class="size-8" href="#"></x-app-logo>
+            @php
+                $currentOrg = auth()->user()->defaultOrganization ?? auth()->user()->organizations()->first();
+                $isSiteAdmin = auth()->user()->hasRole('site_admin');
+                $isOrgAdmin = $currentOrg && auth()->user()->organizations()
+                    ->whereKey($currentOrg->id)
+                    ->wherePivot('role', 'org_admin')
+                    ->exists();
+            @endphp
+
+            <a href="{{ route('dashboard') }}" class="mr-5 flex items-center gap-2" wire:navigate>
+                @if($currentOrg)
+                    <img src="{{ $currentOrg->logoUrl() }}" alt="" class="size-8 rounded-lg" />
+                    <span class="truncate font-semibold">{{ $currentOrg->name }}</span>
+                @else
+                    <x-app-logo class="size-8" href="#"></x-app-logo>
+                @endif
             </a>
 
             <flux:navlist variant="outline">
@@ -23,15 +37,21 @@
 
             <flux:spacer />
 
-            <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    Repository
-                </flux:navlist.item>
+            @if($isSiteAdmin || $isOrgAdmin)
+                <flux:navlist variant="outline">
+                    @if($isOrgAdmin && $currentOrg)
+                        <flux:navlist.item icon="building-office" :href="url('/app/'.$currentOrg->slug)">
+                            Org admin
+                        </flux:navlist.item>
+                    @endif
 
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits" target="_blank">
-                    Documentation
-                </flux:navlist.item>
-            </flux:navlist>
+                    @if($isSiteAdmin)
+                        <flux:navlist.item icon="shield-check" href="/admin">
+                            Site admin
+                        </flux:navlist.item>
+                    @endif
+                </flux:navlist>
+            @endif
 
             <!-- Desktop User Menu -->
             <flux:dropdown position="bottom" align="start">

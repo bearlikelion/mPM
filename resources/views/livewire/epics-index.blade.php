@@ -26,7 +26,10 @@
                     class="flex flex-col gap-2 rounded-xl border border-neutral-200 p-4 transition hover:border-indigo-500 dark:border-neutral-700"
                 >
                     <div class="flex items-start justify-between gap-2">
-                        <div class="font-medium">{{ $epic->name }}</div>
+                        <div class="flex items-center gap-2">
+                            <img src="{{ $epic->avatarUrl() }}" alt="" class="h-8 w-8 rounded-lg" />
+                            <div class="font-medium">{{ $epic->name }}</div>
+                        </div>
                         @if($epic->completed_at)
                             <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-700">Done</span>
                         @endif
