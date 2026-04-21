@@ -120,6 +120,7 @@
 
                 <div class="flex flex-1 flex-col gap-3 p-3">
                     @forelse($tasks as $task)
+                        @php($projectColor = $projectColors[$task->project_id] ?? null)
                         <article
                             draggable="true"
                             x-on:dragstart="start({{ $task->id }})"
@@ -128,6 +129,9 @@
                             x-on:click="open('{{ $task->key }}')"
                             @if($highlightId === $task->id)
                                 x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'center' }); $el.classList.add('ring-2','ring-amber-300','ring-offset-2','ring-offset-neutral-950'); setTimeout(() => $el.classList.remove('ring-2','ring-amber-300','ring-offset-2','ring-offset-neutral-950'), 2500)"
+                            @endif
+                            @if($projectColor)
+                                style="border-left: 3px solid {{ $projectColor['stripe'] }};"
                             @endif
                             class="app-panel-muted cursor-pointer rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-amber-400/40 hover:bg-neutral-950/70"
                         >
@@ -163,7 +167,14 @@
 
                                 <div class="flex items-center gap-2">
                                     @if($task->project)
-                                        <span class="text-xs text-neutral-500">{{ $task->project->name }}</span>
+                                        @if($projectColor)
+                                            <span
+                                                class="rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide"
+                                                style="background: {{ $projectColor['chip_bg'] }}; color: {{ $projectColor['chip_fg'] }};"
+                                            >{{ $task->project->name }}</span>
+                                        @else
+                                            <span class="text-xs text-neutral-500">{{ $task->project->name }}</span>
+                                        @endif
                                     @endif
                                     @if($task->story_points)
                                         <span class="rounded-full bg-neutral-800 px-2.5 py-1 font-mono text-xs text-neutral-200">{{ $task->story_points }}</span>

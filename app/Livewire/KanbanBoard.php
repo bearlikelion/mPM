@@ -14,6 +14,15 @@ use Livewire\Component;
 
 class KanbanBoard extends Component
 {
+    private const PROJECT_PALETTE = [
+        ['key' => 'amber', 'stripe' => '#d79921', 'chip_bg' => 'rgba(215, 153, 33, 0.18)', 'chip_fg' => '#fabd2f'],
+        ['key' => 'aqua', 'stripe' => '#689d6a', 'chip_bg' => 'rgba(142, 192, 124, 0.18)', 'chip_fg' => '#8ec07c'],
+        ['key' => 'blue', 'stripe' => '#458588', 'chip_bg' => 'rgba(131, 165, 152, 0.18)', 'chip_fg' => '#83a598'],
+        ['key' => 'purple', 'stripe' => '#b16286', 'chip_bg' => 'rgba(211, 134, 155, 0.18)', 'chip_fg' => '#d3869b'],
+        ['key' => 'orange', 'stripe' => '#d65d0e', 'chip_bg' => 'rgba(254, 128, 25, 0.18)', 'chip_fg' => '#fe8019'],
+        ['key' => 'red', 'stripe' => '#cc241d', 'chip_bg' => 'rgba(251, 73, 52, 0.18)', 'chip_fg' => '#fb4934'],
+    ];
+
     #[Url(as: 'project')]
     public ?int $projectId = null;
 
@@ -104,6 +113,16 @@ class KanbanBoard extends Component
                 : (clone $tasksQuery)->where('status', $s)->get(),
         ]);
 
+        $visibleProjectIds = $this->projectId
+            ? collect([$this->projectId])
+            : $lanes->flatten()->pluck('project_id')->unique()->values();
+
+        $projectColors = $visibleProjectIds->count() > 1
+            ? $visibleProjectIds->mapWithKeys(fn ($id, $index) => [
+                $id => self::PROJECT_PALETTE[$index % count(self::PROJECT_PALETTE)],
+            ])
+            : collect();
+
         return view('livewire.kanban-board', [
             'projects' => $projects,
             'sprints' => $sprints,
@@ -133,6 +152,7 @@ class KanbanBoard extends Component
                 'name' => $tag->name,
             ]),
             'lanes' => $lanes,
+            'projectColors' => $projectColors,
         ]);
     }
 }
