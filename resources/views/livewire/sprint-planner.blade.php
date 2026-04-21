@@ -20,31 +20,33 @@
         </div>
     </section>
 
-    <section class="app-panel px-4 py-4 sm:px-5">
+    <section class="app-panel app-filter-panel px-4 py-4 sm:px-5">
         <div class="mb-4">
             <div class="app-eyebrow">Scope</div>
             <div class="mt-2 text-lg font-semibold text-neutral-50">Choose a project</div>
         </div>
 
         <div class="max-w-md">
-            <select wire:model.live="projectId" class="app-select w-full">
-                <option value="">Select project</option>
-                @foreach($projects as $project)
-                    <option value="{{ $project->id }}">{{ $project->name }}</option>
-                @endforeach
-            </select>
+            <x-mary-choices-offline
+                wire:model.live="projectId"
+                :options="$projects"
+                single
+                searchable
+                clearable
+                placeholder="Select project"
+            />
         </div>
     </section>
 
     @if($projectId)
         <form wire:submit="createSprint" class="app-panel grid gap-4 px-4 py-5 md:grid-cols-4 md:px-5">
             <div class="md:col-span-2">
-                <flux:input wire:model="name" label="Name" placeholder="Sprint 7" />
+                <x-mary-input wire:model="name" label="Name" placeholder="Sprint 7" />
             </div>
-            <flux:input wire:model="startsAt" type="date" label="Starts" />
-            <flux:input wire:model="endsAt" type="date" label="Ends" />
+            <x-mary-input wire:model="startsAt" type="date" label="Starts" />
+            <x-mary-input wire:model="endsAt" type="date" label="Ends" />
             <div class="md:col-span-4 flex justify-end">
-                <flux:button type="submit" variant="primary" size="sm">Create sprint</flux:button>
+                <x-mary-button type="submit" label="Create sprint" spinner="createSprint" class="btn-primary btn-sm" />
             </div>
         </form>
     @endif
@@ -83,9 +85,9 @@
                         </div>
                         <div class="flex items-center gap-2">
                             @if(! $sprint->started_at)
-                                <flux:button wire:click="startSprint({{ $sprint->id }})" size="sm">Start</flux:button>
+                                <x-mary-button wire:click="startSprint({{ $sprint->id }})" label="Start" spinner="startSprint({{ $sprint->id }})" class="btn-sm" />
                             @elseif(! $sprint->ended_at)
-                                <flux:button wire:click="endSprint({{ $sprint->id }})" size="sm" variant="danger">End</flux:button>
+                                <x-mary-button wire:click="endSprint({{ $sprint->id }})" label="End" spinner="endSprint({{ $sprint->id }})" class="btn-sm btn-error" />
                             @endif
                         </div>
                     </li>

@@ -18,19 +18,21 @@
         </div>
     </section>
 
-    <section class="app-panel px-4 py-4 sm:px-5">
+    <section class="app-panel app-filter-panel px-4 py-4 sm:px-5">
         <div class="mb-4">
             <div class="app-eyebrow">Scope</div>
             <div class="mt-2 text-lg font-semibold text-neutral-50">Choose a project backlog</div>
         </div>
 
         <div class="max-w-md">
-            <select wire:model.live="projectId" class="app-select w-full">
-                <option value="">Select project</option>
-                @foreach($projects as $project)
-                    <option value="{{ $project->id }}">{{ $project->name }}</option>
-                @endforeach
-            </select>
+            <x-mary-choices-offline
+                wire:model.live="projectId"
+                :options="$projects"
+                single
+                searchable
+                clearable
+                placeholder="Select project"
+            />
         </div>
     </section>
 

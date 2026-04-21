@@ -42,4 +42,36 @@ class KanbanTest extends TestCase
             ->assertSee(route('tasks.show', $task->key), false)
             ->assertSee($task->title);
     }
+
+    public function test_planning_pages_render_after_searchable_filter_migration(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = User::factory()->create([
+            'default_organization_id' => $organization->id,
+        ]);
+
+        $organization->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+
+        $project = Project::factory()->create([
+            'organization_id' => $organization->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('backlog', ['project' => $project->id]))
+            ->assertOk()
+            ->assertSee('Tasks waiting for a sprint');
+
+        $this->actingAs($user)
+            ->get(route('epics', ['project' => $project->id]))
+            ->assertOk()
+            ->assertSee('Milestone Map');
+
+        $this->actingAs($user)
+            ->get(route('sprints', ['project' => $project->id]))
+            ->assertOk()
+            ->assertSee('Sprint schedule');
+    }
 }

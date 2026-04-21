@@ -10,10 +10,13 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CreateTaskModal extends Component
 {
+    public bool $showModal = false;
+
     public ?int $projectId = null;
 
     public ?int $epicId = null;
@@ -33,6 +36,17 @@ class CreateTaskModal extends Component
     public ?int $storyPoints = null;
 
     public ?string $dueDate = null;
+
+    #[On('open-create-task-modal')]
+    public function openModal(): void
+    {
+        $this->showModal = true;
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+    }
 
     public function toggleAssignee(int $userId): void
     {
@@ -108,7 +122,7 @@ class CreateTaskModal extends Component
         });
 
         $this->resetForm();
-        $this->modal('create-task-modal')->close();
+        $this->showModal = false;
 
         $this->redirectRoute('tasks.show', ['key' => $task->key], navigate: true);
     }
@@ -120,14 +134,46 @@ class CreateTaskModal extends Component
 
         return view('livewire.create-task-modal', [
             'projects' => $projects,
+            'projectOptions' => $projects->map(fn (Project $project) => [
+                'id' => $project->id,
+                'name' => $project->name,
+                'key' => $project->key,
+            ]),
             'epics' => $selectedProject
                 ? Epic::query()->where('project_id', $selectedProject->id)->orderBy('name')->get()
                 : collect(),
             'sprints' => $selectedProject
                 ? Sprint::query()->where('project_id', $selectedProject->id)->orderByDesc('starts_at')->get()
                 : collect(),
-            'assignees' => $selectedProject
-                ? $this->assignableUsers($selectedProject)->get()
+            'epicOptions' => $selectedProject
+                ? Epic::query()
+                    ->where('project_id', $selectedProject->id)
+                    ->orderBy('name')
+                    ->get()
+                    ->map(fn (Epic $epic) => [
+                        'id' => $epic->id,
+                        'name' => $epic->name,
+                    ])
+                : collect(),
+            'sprintOptions' => $selectedProject
+                ? Sprint::query()
+                    ->where('project_id', $selectedProject->id)
+                    ->orderByDesc('starts_at')
+                    ->get()
+                    ->map(fn (Sprint $sprint) => [
+                        'id' => $sprint->id,
+                        'name' => $sprint->name,
+                    ])
+                : collect(),
+            'assigneeOptions' => $selectedProject
+                ? $this->assignableUsers($selectedProject)
+                    ->get()
+                    ->map(fn (User $user) => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'avatar' => $user->avatarUrl(),
+                    ])
                 : collect(),
             'selectedProject' => $selectedProject,
         ]);

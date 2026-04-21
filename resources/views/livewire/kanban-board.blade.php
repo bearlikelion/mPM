@@ -36,55 +36,66 @@
         </div>
     </section>
 
-    <section class="app-panel px-4 py-4 sm:px-5">
+    <section class="app-panel app-filter-panel px-4 py-4 sm:px-5">
         <div class="mb-4 flex items-center justify-between">
             <div>
                 <div class="app-eyebrow">Filters</div>
                 <div class="mt-2 text-lg font-semibold text-neutral-50">Slice the board by project context</div>
             </div>
         </div>
-        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
-            <select wire:model.live="projectId" class="app-select">
-                <option value="">All projects</option>
-                @foreach($projects as $project)
-                    <option value="{{ $project->id }}">{{ $project->name }}</option>
-                @endforeach
-            </select>
+        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+            <x-mary-choices-offline
+                wire:model.live="projectId"
+                :options="$projectOptions"
+                single
+                searchable
+                clearable
+                placeholder="All projects"
+            />
 
-            <select wire:model.live="sprintId" class="app-select">
-                <option value="">All sprints</option>
-                @foreach($sprints as $sprint)
-                    <option value="{{ $sprint->id }}">{{ $sprint->name }}</option>
-                @endforeach
-            </select>
+            <x-mary-choices-offline
+                wire:model.live="sprintId"
+                :options="$sprintOptions"
+                single
+                searchable
+                clearable
+                placeholder="All sprints"
+            />
 
-            <select wire:model.live="assigneeId" class="app-select">
-                <option value="">Anyone</option>
-                @foreach($assignees as $user)
-                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                @endforeach
-            </select>
+            <x-mary-choices-offline
+                wire:model.live="assigneeId"
+                :options="$assigneeOptions"
+                single
+                searchable
+                clearable
+                placeholder="Anyone"
+                option-sub-label="email"
+                option-avatar="avatar"
+            />
 
-            <select wire:model.live="epicId" class="app-select">
-                <option value="">All epics</option>
-                @foreach($epics as $epic)
-                    <option value="{{ $epic->id }}">{{ $epic->name }}</option>
-                @endforeach
-            </select>
+            <x-mary-choices-offline
+                wire:model.live="epicId"
+                :options="$epicOptions"
+                single
+                searchable
+                clearable
+                placeholder="All epics"
+            />
 
-            <select wire:model.live="tagId" class="app-select">
-                <option value="">All tags</option>
-                @foreach($tags as $tag)
-                    <option value="{{ $tag->id }}">{{ $tag->name }}</option>
-                @endforeach
-            </select>
+            <x-mary-choices-offline
+                wire:model.live="tagId"
+                :options="$tagOptions"
+                single
+                searchable
+                clearable
+                placeholder="All tags"
+            />
 
-            <select wire:model.live="statusFilter" class="app-select">
-                <option value="">All statuses</option>
+            <x-mary-select wire:model.live="statusFilter" placeholder="All statuses" placeholder-value="" icon-right="o-chevron-up-down">
                 @foreach(\App\Models\Task::STATUSES as $status)
                     <option value="{{ $status }}">{{ str($status)->replace('_', ' ')->title() }}</option>
                 @endforeach
-            </select>
+            </x-mary-select>
         </div>
     </section>
 

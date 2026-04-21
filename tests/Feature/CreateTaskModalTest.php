@@ -15,6 +15,31 @@ class CreateTaskModalTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_modal_can_be_opened_via_event_listener(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = User::factory()->create([
+            'default_organization_id' => $organization->id,
+        ]);
+
+        $organization->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+
+        Project::factory()->create([
+            'organization_id' => $organization->id,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(CreateTaskModal::class)
+            ->call('openModal')
+            ->assertSet('showModal', true)
+            ->call('closeModal')
+            ->assertSet('showModal', false);
+    }
+
     public function test_users_can_create_and_assign_a_task_from_the_global_modal(): void
     {
         $organization = Organization::factory()->create();

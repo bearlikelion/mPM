@@ -32,15 +32,18 @@
                     </div>
                 </a>
 
-                <flux:modal.trigger name="create-task-modal">
-                    <button type="button" class="app-task-trigger mt-4 flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:border-amber-400/40 hover:bg-neutral-950/75">
-                        <div>
-                            <div class="app-eyebrow">Create</div>
-                            <div class="mt-1 text-base font-semibold text-neutral-50">New task</div>
-                        </div>
-                        <span class="text-2xl font-semibold text-amber-300">+</span>
-                    </button>
-                </flux:modal.trigger>
+                <button
+                    type="button"
+                    x-data
+                    x-on:click="$dispatch('open-create-task-modal')"
+                    class="app-task-trigger mt-4 flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:border-amber-400/40 hover:bg-neutral-950/75"
+                >
+                    <div>
+                        <div class="app-eyebrow">Create</div>
+                        <div class="mt-1 text-base font-semibold text-neutral-50">New task</div>
+                    </div>
+                    <span class="text-2xl font-semibold text-amber-300">+</span>
+                </button>
 
                 <flux:navlist variant="outline">
                     <flux:navlist.group heading="Platform" class="grid">
@@ -124,11 +127,14 @@
             <flux:header class="app-mobile-header lg:hidden">
                 <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
-                <flux:modal.trigger name="create-task-modal">
-                    <button type="button" class="rounded-full border border-neutral-700/70 bg-neutral-950/60 px-3 py-1.5 text-sm font-semibold text-neutral-50 transition hover:border-amber-400/50 hover:text-amber-200">
-                        + Task
-                    </button>
-                </flux:modal.trigger>
+                <button
+                    type="button"
+                    x-data
+                    x-on:click="$dispatch('open-create-task-modal')"
+                    class="rounded-full border border-neutral-700/70 bg-neutral-950/60 px-3 py-1.5 text-sm font-semibold text-neutral-50 transition hover:border-amber-400/50 hover:text-amber-200"
+                >
+                    + Task
+                </button>
 
                 <flux:spacer />
 

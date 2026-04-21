@@ -110,6 +110,28 @@ class KanbanBoard extends Component
             'epics' => $epics,
             'assignees' => $assignees,
             'tags' => $tags,
+            'projectOptions' => $projects->map(fn (Project $project) => [
+                'id' => $project->id,
+                'name' => $project->name,
+            ]),
+            'sprintOptions' => $sprints->map(fn (Sprint $sprint) => [
+                'id' => $sprint->id,
+                'name' => $sprint->name,
+            ]),
+            'epicOptions' => $epics->map(fn (Epic $epic) => [
+                'id' => $epic->id,
+                'name' => $epic->name,
+            ]),
+            'assigneeOptions' => $assignees->map(fn (User $user) => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $user->avatarUrl(),
+            ]),
+            'tagOptions' => $tags->map(fn (Tag $tag) => [
+                'id' => $tag->id,
+                'name' => $tag->name,
+            ]),
             'lanes' => $lanes,
         ]);
     }

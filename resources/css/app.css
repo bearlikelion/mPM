@@ -5,6 +5,11 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+@source '../../vendor/robsontenorio/mary/src/View/Components/**/*.php';
+
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark;
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -76,6 +81,34 @@
 }
 
 @layer base {
+    :root,
+    .dark {
+        --color-base-100: #32302f;
+        --color-base-200: #282828;
+        --color-base-300: #1d2021;
+        --color-base-content: #f2e5bc;
+        --color-primary: #d79921;
+        --color-primary-content: #1d2021;
+        --color-secondary: #83a598;
+        --color-secondary-content: #1d2021;
+        --color-accent: #fabd2f;
+        --color-accent-content: #1d2021;
+        --color-neutral: #282828;
+        --color-neutral-content: #ebdbb2;
+        --color-info: #83a598;
+        --color-info-content: #1d2021;
+        --color-success: #8ec07c;
+        --color-success-content: #1d2021;
+        --color-warning: #fe8019;
+        --color-warning-content: #1d2021;
+        --color-error: #fb4934;
+        --color-error-content: #fbf1c7;
+        --radius-box: 1.25rem;
+        --radius-field: 1rem;
+        --radius-selector: 1rem;
+        --border: 1px;
+    }
+
     html {
         background: var(--color-neutral-950);
         color: var(--color-neutral-100);
@@ -203,12 +236,114 @@
         backdrop-filter: blur(14px);
     }
 
+    .app-filter-panel {
+        position: relative;
+        z-index: 35;
+        overflow: visible;
+    }
+
     .app-task-trigger {
         border: 1px solid rgba(168, 153, 132, 0.18);
         background:
             linear-gradient(135deg, rgba(215, 153, 33, 0.12), rgba(29, 32, 33, 0.9)),
             rgba(29, 32, 33, 0.88);
         box-shadow: inset 0 1px 0 rgba(251, 241, 199, 0.03);
+    }
+
+    .mary-task-modal {
+        width: min(72rem, calc(100vw - 1.5rem));
+    }
+
+    .mary-task-modal .modal-action {
+        margin-top: 0;
+        border-top: 1px solid rgba(168, 153, 132, 0.16);
+        padding-top: 1rem;
+    }
+
+    .mary-task-modal .fieldset-legend {
+        margin-bottom: 0.45rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--color-neutral-300);
+    }
+
+    .mary-task-modal .input,
+    .mary-task-modal .select,
+    .mary-task-modal .textarea,
+    .mary-task-modal .btn,
+    .app-panel .input,
+    .app-panel .select,
+    .app-panel .textarea,
+    .app-panel .btn {
+        border-color: rgba(168, 153, 132, 0.18) !important;
+        background: rgba(29, 32, 33, 0.9) !important;
+        color: var(--color-neutral-100) !important;
+        box-shadow: inset 0 1px 0 rgba(251, 241, 199, 0.02);
+    }
+
+    .mary-task-modal .input::placeholder,
+    .mary-task-modal .textarea::placeholder,
+    .app-panel .input::placeholder,
+    .app-panel .textarea::placeholder {
+        color: rgba(213, 196, 161, 0.55);
+    }
+
+    .mary-task-modal .badge,
+    .app-panel .badge,
+    .mary-task-modal .menu,
+    .app-panel .menu,
+    .mary-task-modal .modal-box,
+    .app-panel .modal-box,
+    .mary-task-modal .bg-base-100,
+    .app-panel .bg-base-100 {
+        border-color: rgba(168, 153, 132, 0.16);
+        background:
+            linear-gradient(180deg, rgba(50, 48, 47, 0.96), rgba(29, 32, 33, 0.98)) !important;
+        color: var(--color-neutral-200) !important;
+        box-shadow:
+            0 18px 40px rgba(0, 0, 0, 0.26),
+            inset 0 1px 0 rgba(251, 241, 199, 0.03);
+    }
+
+    .mary-task-modal .btn.btn-primary,
+    .app-panel .btn.btn-primary {
+        border-color: rgba(215, 153, 33, 0.4);
+        background: linear-gradient(135deg, rgba(250, 189, 47, 0.95), rgba(215, 153, 33, 0.92));
+        color: #1d2021;
+    }
+
+    .mary-task-modal .btn.btn-ghost,
+    .app-panel .btn.btn-ghost {
+        background: rgba(29, 32, 33, 0.62);
+    }
+
+    .mary-task-modal [x-show='focused'],
+    .app-filter-panel [x-show='focused'] {
+        position: relative;
+        z-index: 90;
+    }
+
+    .mary-task-modal [x-show='focused'] > div,
+    .app-filter-panel [x-show='focused'] > div {
+        z-index: 95 !important;
+        border-color: rgba(168, 153, 132, 0.18) !important;
+        background:
+            radial-gradient(circle at top right, rgba(250, 189, 47, 0.08), transparent 12rem),
+            linear-gradient(180deg, rgba(50, 48, 47, 0.98), rgba(29, 32, 33, 0.99)) !important;
+        color: var(--color-neutral-100) !important;
+        backdrop-filter: blur(20px);
+    }
+
+    .mary-task-modal [x-show='focused'] [tabindex],
+    .app-filter-panel [x-show='focused'] [tabindex] {
+        color: var(--color-neutral-100);
+    }
+
+    .mary-task-modal [x-show='focused'] [tabindex]:hover,
+    .mary-task-modal [x-show='focused'] [tabindex]:focus,
+    .app-filter-panel [x-show='focused'] [tabindex]:hover,
+    .app-filter-panel [x-show='focused'] [tabindex]:focus {
+        background: rgba(80, 73, 69, 0.72) !important;
     }
 
     .create-task-hero {
