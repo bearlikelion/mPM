@@ -1,29 +1,31 @@
+@php
+    use Illuminate\Support\Facades\Auth;
+    use App\Models\Task;
+    use App\Models\Comment;
+    use App\Models\Project;
+@endphp
 <x-layouts.app>
     @php
-        use Illuminate\Support\Facades\Auth;
-        use App\Models\Task;
-        use App\Models\Comment;
-
         $user = Auth::user();
         $orgIds = $user->organizations()->pluck('organizations.id');
 
         $myTasks = Task::with('project', 'sprint')
             ->whereHas('assignees', fn($q) => $q->whereKey($user->id))
-            ->whereIn('project_id', \App\Models\Project::whereIn('organization_id', $orgIds)->pluck('id'))
+            ->whereIn('project_id', Project::whereIn('organization_id', $orgIds)->pluck('id'))
             ->where('status', '!=', 'done')
             ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)")
             ->limit(10)
             ->get();
 
         $recentCompleted = Task::with('project')
-            ->whereIn('project_id', \App\Models\Project::whereIn('organization_id', $orgIds)->pluck('id'))
+            ->whereIn('project_id', Project::whereIn('organization_id', $orgIds)->pluck('id'))
             ->where('status', 'done')
             ->latest('updated_at')
             ->limit(5)
             ->get();
 
         $recentComments = Comment::with('user', 'task.project')
-            ->whereHas('task', fn($q) => $q->whereIn('project_id', \App\Models\Project::whereIn('organization_id', $orgIds)->pluck('id')))
+            ->whereHas('task', fn($q) => $q->whereIn('project_id', Project::whereIn('organization_id', $orgIds)->pluck('id')))
             ->latest()
             ->limit(5)
             ->get();
