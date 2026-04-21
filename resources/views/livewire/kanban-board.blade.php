@@ -90,6 +90,44 @@
                                 <div class="mt-1 line-clamp-2 text-xs leading-relaxed text-[color:var(--gv-fg4)]">{{ $task->description }}</div>
                             @endif
 
+                            @if($task->blockedTasks->isNotEmpty())
+                                @php
+                                    $firstBlockedTask = $task->blockedTasks->first();
+                                    $remainingBlockedTasks = $task->blockedTasks->count() - 1;
+                                @endphp
+                                <div class="mt-2 flex items-start gap-2 rounded-md border border-red-500/25 bg-red-500/10 px-2 py-1.5 text-xs text-red-100">
+                                    <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red-500/20 font-mono text-[0.65rem] font-bold text-red-200">!</span>
+                                    <span>
+                                        This task is blocking {{ $firstBlockedTask->title }}
+                                        @if($remainingBlockedTasks > 0)
+                                            <span class="text-red-200/80">+{{ $remainingBlockedTasks }} more</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            @elseif($task->blockers->isNotEmpty())
+                                @php
+                                    $firstBlocker = $task->blockers->first();
+                                    $remainingBlockers = $task->blockers->count() - 1;
+                                @endphp
+                                <div class="mt-2 flex items-start gap-2 rounded-md border border-amber-400/25 bg-amber-400/10 px-2 py-1.5 text-xs text-amber-100">
+                                    <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-amber-400/20 font-mono text-[0.65rem] font-bold text-amber-200">!</span>
+                                    <span>
+                                        Blocked by
+                                        <a
+                                            href="{{ route('tasks.show', $firstBlocker->key) }}"
+                                            wire:navigate
+                                            x-on:click.stop
+                                            class="underline underline-offset-2 transition hover:text-amber-50"
+                                        >
+                                            {{ $firstBlocker->title }}
+                                        </a>
+                                        @if($remainingBlockers > 0)
+                                            <span class="text-amber-200/80">+{{ $remainingBlockers }} more</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            @endif
+
                             <div class="mt-3 flex items-center justify-between gap-2">
                                 @if($task->assignees->isNotEmpty())
                                     <div class="flex -space-x-1.5">

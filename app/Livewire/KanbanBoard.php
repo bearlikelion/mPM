@@ -116,12 +116,14 @@ class KanbanBoard extends Component
             ->get();
 
         $tasksQuery = Task::with('assignees', 'project', 'tags')
+            ->withDependencyState()
             ->when($this->projectId, fn ($q) => $q->where('project_id', $this->projectId))
             ->when(! $this->projectId, fn ($q) => $q->whereIn('project_id', $projects->pluck('id')))
             ->when($this->sprintId, fn ($q) => $q->where('sprint_id', $this->sprintId))
             ->when($this->epicId, fn ($q) => $q->where('epic_id', $this->epicId))
             ->when($this->assigneeId, fn ($q) => $q->whereHas('assignees', fn ($a) => $a->whereKey($this->assigneeId)))
             ->when($this->tagId, fn ($q) => $q->whereHas('tags', fn ($t) => $t->whereKey($this->tagId)))
+            ->orderByDependencyPriority()
             ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)");
 
         $lanes = collect(Task::STATUSES)->mapWithKeys(fn ($s) => [

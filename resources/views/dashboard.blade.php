@@ -13,9 +13,11 @@
             : $projects->pluck('id');
 
         $myTasks = \App\Models\Task::with('project', 'sprint')
+            ->withDependencyState()
             ->whereHas('assignees', fn ($q) => $q->whereKey($user->id))
             ->whereIn('project_id', $projectIds)
             ->where('status', '!=', 'done')
+            ->orderByDependencyPriority()
             ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)")
             ->limit(6)
             ->get();
@@ -120,6 +122,38 @@
                                 <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="min-w-0 truncate text-sm text-[color:var(--gv-fg1)] hover:text-[color:var(--gv-amber)]">{{ $task->title }}</a>
                                 <span class="shrink-0 font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">{{ $task->project->name }}</span>
                             </div>
+                            @if($task->blockedTasks->isNotEmpty())
+                                @php
+                                    $firstBlockedTask = $task->blockedTasks->first();
+                                    $remainingBlockedTasks = $task->blockedTasks->count() - 1;
+                                @endphp
+                                <div class="flex items-center gap-1.5 text-xs text-red-300">
+                                    <span class="inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-500/20 font-mono text-[0.65rem] font-bold text-red-200">!</span>
+                                    <span>
+                                        This task is blocking {{ $firstBlockedTask->title }}
+                                        @if($remainingBlockedTasks > 0)
+                                            <span class="text-red-200/80">+{{ $remainingBlockedTasks }} more</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            @elseif($task->blockers->isNotEmpty())
+                                @php
+                                    $firstBlocker = $task->blockers->first();
+                                    $remainingBlockers = $task->blockers->count() - 1;
+                                @endphp
+                                <div class="flex items-center gap-1.5 text-xs text-amber-300">
+                                    <span class="inline-flex h-4 w-4 items-center justify-center rounded-md bg-amber-400/20 font-mono text-[0.65rem] font-bold text-amber-200">!</span>
+                                    <span>
+                                        Blocked by
+                                        <a href="{{ route('tasks.show', $firstBlocker->key) }}" wire:navigate class="underline underline-offset-2 transition hover:text-amber-100">
+                                            {{ $firstBlocker->title }}
+                                        </a>
+                                        @if($remainingBlockers > 0)
+                                            <span class="text-amber-200/80">+{{ $remainingBlockers }} more</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            @endif
                         </li>
                     @empty
                         <li class="px-3 py-6 text-center text-sm text-[color:var(--gv-fg4)]">nothing assigned</li>

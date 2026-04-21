@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\TaskFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -74,8 +75,41 @@ class Task extends Model implements HasMedia
         return $this->hasMany(Comment::class);
     }
 
+    public function blockers(): BelongsToMany
+    {
+        return $this->belongsToMany(Task::class, 'task_blockers', 'task_id', 'blocking_task_id')
+            ->withTimestamps();
+    }
+
+    public function blockedTasks(): BelongsToMany
+    {
+        return $this->belongsToMany(Task::class, 'task_blockers', 'blocking_task_id', 'task_id')
+            ->withTimestamps();
+    }
+
     public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, 'taggable');
+    }
+
+    public function scopeWithDependencyState(Builder $query): Builder
+    {
+        return $query
+            ->withCount(['blockers', 'blockedTasks'])
+            ->with([
+                'blockers:id,key,title,project_id',
+                'blockedTasks:id,key,title,project_id',
+            ]);
+    }
+
+    public function scopeOrderByDependencyPriority(Builder $query): Builder
+    {
+        return $query->orderByRaw('
+            case
+                when blocked_tasks_count > 0 then 0
+                when blockers_count > 0 then 2
+                else 1
+            end asc
+        ');
     }
 }

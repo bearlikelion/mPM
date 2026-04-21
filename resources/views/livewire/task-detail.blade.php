@@ -20,6 +20,45 @@
         @endif
     </div>
 
+    @if($task->blockedTasks->isNotEmpty() || $task->blockers->isNotEmpty())
+        <div class="grid gap-2">
+            @if($task->blockedTasks->isNotEmpty())
+                @php
+                    $firstBlockedTask = $task->blockedTasks->first();
+                    $remainingBlockedTasks = $task->blockedTasks->count() - 1;
+                @endphp
+                <div class="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-100">
+                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500/20 font-mono text-xs font-bold text-red-200">!</span>
+                    <span>
+                        This task is blocking {{ $firstBlockedTask->title }}
+                        @if($remainingBlockedTasks > 0)
+                            <span class="text-red-200/80">+{{ $remainingBlockedTasks }} more</span>
+                        @endif
+                    </span>
+                </div>
+            @endif
+
+            @if($task->blockers->isNotEmpty())
+                @php
+                    $firstBlocker = $task->blockers->first();
+                    $remainingBlockers = $task->blockers->count() - 1;
+                @endphp
+                <div class="flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-sm text-amber-100">
+                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-md bg-amber-400/20 font-mono text-xs font-bold text-amber-200">!</span>
+                    <span>
+                        Blocked by
+                        <a href="{{ route('tasks.show', $firstBlocker->key) }}" wire:navigate class="font-medium underline underline-offset-2 transition hover:text-amber-50">
+                            {{ $firstBlocker->title }}
+                        </a>
+                        @if($remainingBlockers > 0)
+                            <span class="text-amber-200/80">+{{ $remainingBlockers }} more</span>
+                        @endif
+                    </span>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="lg:col-span-2 flex flex-col gap-4">
             <div class="rounded-xl border border-neutral-200 p-4 dark:border-neutral-700">
@@ -190,6 +229,38 @@
                             </a>
                         @endforeach
                     </div>
+                </div>
+            @endif
+
+            <div class="rounded-xl border border-neutral-200 p-4 dark:border-neutral-700">
+                <div class="mb-2 text-xs uppercase tracking-wide text-neutral-500">Blocked by</div>
+                <select
+                    wire:model.live="blockerIds"
+                    multiple
+                    class="min-h-32 w-full rounded-md border-neutral-300 bg-white text-sm dark:border-neutral-700 dark:bg-neutral-900"
+                >
+                    @foreach($blockerOptions as $option)
+                        <option value="{{ $option['id'] }}">{{ $option['label'] }}</option>
+                    @endforeach
+                </select>
+                <div class="mt-2 text-xs text-neutral-500">
+                    Select one or more tasks in this project that are blocking this work.
+                </div>
+                @error('blockerIds.*')<div class="mt-1 text-xs text-red-600">{{ $message }}</div>@enderror
+            </div>
+
+            @if($task->blockedTasks->isNotEmpty())
+                <div class="rounded-xl border border-neutral-200 p-4 dark:border-neutral-700">
+                    <div class="mb-2 text-xs uppercase tracking-wide text-neutral-500">Blocking</div>
+                    <ul class="flex flex-col gap-2 text-sm">
+                        @foreach($task->blockedTasks as $blockedTask)
+                            <li>
+                                <a href="{{ route('tasks.show', $blockedTask->key) }}" wire:navigate class="transition hover:text-amber-300">
+                                    {{ $blockedTask->key }} · {{ $blockedTask->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
         </aside>

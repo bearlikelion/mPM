@@ -6,6 +6,7 @@ use App\Models\Comment;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -27,6 +28,8 @@ class TaskDetail extends Component
 
     public ?int $storyPoints = null;
 
+    public array $blockerIds = [];
+
     public function mount(string $taskKey, bool $embedded = false): void
     {
         $this->embedded = $embedded;
@@ -35,6 +38,7 @@ class TaskDetail extends Component
         $projectIds = Project::whereIn('organization_id', $orgIds)->pluck('id');
 
         $this->task = Task::with('project', 'epic', 'sprint', 'assignees', 'tags', 'comments.user', 'comments.media', 'creator', 'media')
+            ->withDependencyState()
             ->whereIn('project_id', $projectIds)
             ->where('key', $taskKey)
             ->firstOrFail();
@@ -42,6 +46,7 @@ class TaskDetail extends Component
         $this->status = $this->task->status;
         $this->priority = $this->task->priority;
         $this->storyPoints = $this->task->story_points;
+        $this->blockerIds = $this->task->blockers->pluck('id')->all();
     }
 
     public function updateField(string $field): void
@@ -96,8 +101,41 @@ class TaskDetail extends Component
         $this->task->load('comments.user', 'comments.media');
     }
 
+    public function updatedBlockerIds(): void
+    {
+        $availableTaskIds = $this->availableTasks()->pluck('id')->all();
+
+        $validated = $this->validate([
+            'blockerIds' => ['array'],
+            'blockerIds.*' => [Rule::in($availableTaskIds)],
+        ]);
+
+        $this->task->blockers()->sync($validated['blockerIds']);
+        $this->task->loadCount(['blockers', 'blockedTasks']);
+        $this->task->load([
+            'blockers:id,key,title,project_id',
+            'blockedTasks:id,key,title,project_id',
+        ]);
+        $this->blockerIds = $this->task->blockers->pluck('id')->all();
+    }
+
+    protected function availableTasks()
+    {
+        return Task::query()
+            ->where('project_id', $this->task->project_id)
+            ->whereKeyNot($this->task->id)
+            ->orderBy('key');
+    }
+
     public function render()
     {
-        return view('livewire.task-detail');
+        return view('livewire.task-detail', [
+            'blockerOptions' => $this->availableTasks()
+                ->get(['id', 'key', 'title'])
+                ->map(fn (Task $task) => [
+                    'id' => $task->id,
+                    'label' => $task->key.' · '.$task->title,
+                ]),
+        ]);
     }
 }
