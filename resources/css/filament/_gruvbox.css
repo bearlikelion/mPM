@@ -1,6 +1,16 @@
 /* Shared gruvbox theme for Filament panels.
    Panel-specific accents are set via --fi-accent-* in the entry files. */
 
+/* Guard: Filament @apply's these utilities; define them explicitly so
+   dev HMR doesn't trip when the JIT source graph is partial. */
+@utility wrap-anywhere {
+    overflow-wrap: anywhere;
+}
+
+@utility wrap-break-word {
+    overflow-wrap: break-word;
+}
+
 :root {
     --gv-bg0-h: #1d2021;
     --gv-bg0: #282828;
