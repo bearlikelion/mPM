@@ -1,4 +1,7 @@
-<div>
+<div
+    x-data
+    x-on:focus-task-title.window="$nextTick(() => { const el = $el.querySelector('[data-title-input] input, [data-title-input]'); el?.focus(); })"
+>
     <x-mary-modal wire:model="showModal" box-class="mary-task-modal max-w-5xl border-0 bg-transparent p-0 shadow-none">
         <form wire:submit="createTask" class="space-y-5">
             <section class="create-task-hero rounded-[1.65rem] px-5 py-5 sm:px-6">
@@ -42,13 +45,16 @@
                                 label="Project"
                                 placeholder="Search a project"
                                 option-sub-label="key"
+                                tabindex="-1"
                             />
 
-                            <x-mary-input
-                                wire:model="title"
-                                label="Title"
-                                placeholder="Investigate login handoff"
-                            />
+                            <div data-title-input>
+                                <x-mary-input
+                                    wire:model="title"
+                                    label="Title"
+                                    placeholder="Investigate login handoff"
+                                />
+                            </div>
                         </div>
 
                         <div class="mt-4">
@@ -110,15 +116,22 @@
                                 placeholder="No epic"
                             />
 
-                            <x-mary-choices-offline
-                                wire:model.live="sprintId"
-                                :options="$sprintOptions"
-                                single
-                                searchable
-                                clearable
-                                label="Sprint"
-                                placeholder="No sprint"
-                            />
+                            @if($activeSprint)
+                                <div class="rounded-lg border border-amber-700/40 bg-amber-950/30 px-3 py-2.5">
+                                    <div class="text-xs font-semibold uppercase tracking-wide text-amber-400">Sprint active: {{ $activeSprint->name }}</div>
+                                    <div class="mt-0.5 text-xs text-neutral-400">New tasks go to the Unassigned queue for sprint planning.</div>
+                                </div>
+                            @else
+                                <x-mary-choices-offline
+                                    wire:model.live="sprintId"
+                                    :options="$sprintOptions"
+                                    single
+                                    searchable
+                                    clearable
+                                    label="Sprint"
+                                    placeholder="No sprint"
+                                />
+                            @endif
                         </div>
                     </section>
 
@@ -153,6 +166,7 @@
             <x-slot:actions>
                 <div class="flex w-full items-center justify-end gap-3">
                     <x-mary-button label="Cancel" wire:click="closeModal" class="btn-ghost border border-neutral-700/70 text-neutral-300" />
+                    <x-mary-button label="Create & Add Another" wire:click="createTaskAndAddAnother" spinner="createTaskAndAddAnother" class="btn-ghost border border-neutral-700/70 text-neutral-300" />
                     <x-mary-button label="Create task" spinner="createTask" type="submit" class="btn-primary" />
                 </div>
             </x-slot:actions>

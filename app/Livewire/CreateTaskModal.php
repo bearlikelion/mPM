@@ -43,6 +43,7 @@ class CreateTaskModal extends Component
     public function openModal(): void
     {
         $this->showModal = true;
+        $this->dispatch('focus-task-title');
     }
 
     public function closeModal(): void
@@ -80,49 +81,7 @@ class CreateTaskModal extends Component
 
     public function createTask(): void
     {
-        $project = $this->availableProjects()->findOrFail($this->projectId);
-
-        $assignableUserIds = $this->assignableUsers($project)->pluck('id')->all();
-        $epicIds = Epic::query()->where('project_id', $project->id)->pluck('id')->all();
-        $sprintIds = Sprint::query()->where('project_id', $project->id)->pluck('id')->all();
-
-        $validated = $this->validate([
-            'projectId' => ['required', Rule::in($this->availableProjects()->pluck('id')->all())],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'priority' => ['required', Rule::in(Task::PRIORITIES)],
-            'status' => ['required', Rule::in(Task::STATUSES)],
-            'storyPoints' => ['nullable', Rule::in(Task::STORY_POINTS)],
-            'epicId' => ['nullable', Rule::in($epicIds)],
-            'sprintId' => ['nullable', Rule::in($sprintIds)],
-            'assigneeIds' => ['array'],
-            'assigneeIds.*' => [Rule::in($assignableUserIds)],
-            'dueDate' => ['nullable', 'date'],
-        ]);
-
-        $task = DB::transaction(function () use ($project, $validated) {
-            $lockedProject = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
-            $lockedProject->increment('task_counter');
-            $lockedProject->refresh();
-
-            $task = Task::query()->create([
-                'project_id' => $lockedProject->id,
-                'epic_id' => $validated['epicId'],
-                'sprint_id' => $validated['sprintId'],
-                'created_by' => Auth::id(),
-                'key' => $lockedProject->key.'-'.$lockedProject->task_counter,
-                'title' => $validated['title'],
-                'description' => $validated['description'],
-                'status' => $validated['status'],
-                'priority' => $validated['priority'],
-                'story_points' => $validated['storyPoints'],
-                'due_date' => $validated['dueDate'],
-            ]);
-
-            $task->assignees()->sync($validated['assigneeIds']);
-
-            return $task;
-        });
+        $task = $this->performCreate();
 
         $this->resetForm();
         $this->showModal = false;
@@ -130,10 +89,31 @@ class CreateTaskModal extends Component
         $this->redirectRoute('tasks.show', ['key' => $task->key], navigate: true);
     }
 
+    public function createTaskAndAddAnother(): void
+    {
+        $savedProjectId = $this->projectId;
+
+        $this->performCreate();
+
+        $this->resetForm();
+        $this->projectId = $this->resolvedProjectId($savedProjectId);
+        $this->showModal = true;
+
+        $this->dispatch('focus-task-title');
+    }
+
     public function render()
     {
         $projects = $this->availableProjects()->orderBy('name')->get();
         $selectedProject = $this->projectId ? $projects->firstWhere('id', $this->projectId) : null;
+
+        $activeSprint = $selectedProject
+            ? Sprint::query()
+                ->where('project_id', $selectedProject->id)
+                ->whereNotNull('started_at')
+                ->whereNull('ended_at')
+                ->first()
+            : null;
 
         return view('livewire.create-task-modal', [
             'projects' => $projects,
@@ -179,6 +159,7 @@ class CreateTaskModal extends Component
                     ])
                 : collect(),
             'selectedProject' => $selectedProject,
+            'activeSprint' => $activeSprint,
         ]);
     }
 
@@ -221,5 +202,61 @@ class CreateTaskModal extends Component
         $this->priority = 'med';
         $this->status = 'todo';
         $this->projectId = $this->resolvedProjectId(null);
+    }
+
+    private function performCreate(): Task
+    {
+        $project = $this->availableProjects()->findOrFail($this->projectId);
+
+        $activeSprint = Sprint::query()
+            ->where('project_id', $project->id)
+            ->whereNotNull('started_at')
+            ->whereNull('ended_at')
+            ->first();
+
+        $assignableUserIds = $this->assignableUsers($project)->pluck('id')->all();
+        $epicIds = Epic::query()->where('project_id', $project->id)->pluck('id')->all();
+        $sprintIds = Sprint::query()->where('project_id', $project->id)->pluck('id')->all();
+
+        $validated = $this->validate([
+            'projectId' => ['required', Rule::in($this->availableProjects()->pluck('id')->all())],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'priority' => ['required', Rule::in(Task::PRIORITIES)],
+            'status' => ['required', Rule::in(Task::STATUSES)],
+            'storyPoints' => ['nullable', Rule::in(Task::STORY_POINTS)],
+            'epicId' => ['nullable', Rule::in($epicIds)],
+            'sprintId' => ['nullable', Rule::in($sprintIds)],
+            'assigneeIds' => ['array'],
+            'assigneeIds.*' => [Rule::in($assignableUserIds)],
+            'dueDate' => ['nullable', 'date'],
+        ]);
+
+        // When a sprint is active, new tasks always land in the unassigned queue
+        $resolvedSprintId = $activeSprint ? null : $validated['sprintId'];
+
+        return DB::transaction(function () use ($project, $validated, $resolvedSprintId) {
+            $lockedProject = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
+            $lockedProject->increment('task_counter');
+            $lockedProject->refresh();
+
+            $task = Task::query()->create([
+                'project_id' => $lockedProject->id,
+                'epic_id' => $validated['epicId'],
+                'sprint_id' => $resolvedSprintId,
+                'created_by' => Auth::id(),
+                'key' => $lockedProject->key.'-'.$lockedProject->task_counter,
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'status' => $validated['status'],
+                'priority' => $validated['priority'],
+                'story_points' => $validated['storyPoints'],
+                'due_date' => $validated['dueDate'],
+            ]);
+
+            $task->assignees()->sync($validated['assigneeIds']);
+
+            return $task;
+        });
     }
 }

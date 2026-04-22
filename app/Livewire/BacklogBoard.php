@@ -63,18 +63,42 @@ class BacklogBoard extends Component
             ? Sprint::where('project_id', $this->projectId)->orderByDesc('starts_at')->get()
             : collect();
 
-        $backlog = $this->projectId
-            ? Task::with('epic', 'assignees')
+        $activeSprint = $this->projectId
+            ? Sprint::query()
+                ->where('project_id', $this->projectId)
+                ->whereNotNull('started_at')
+                ->whereNull('ended_at')
+                ->first()
+            : null;
+
+        $unassignedTasks = collect();
+        $backlog = collect();
+
+        if ($this->projectId) {
+            $baseQuery = Task::with('epic', 'assignees')
                 ->where('project_id', $this->projectId)
                 ->whereNull('sprint_id')
                 ->where('status', '!=', 'done')
-                ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)")
-                ->get()
-            : collect();
+                ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)");
+
+            if ($activeSprint) {
+                $unassignedTasks = (clone $baseQuery)
+                    ->where('created_at', '>', $activeSprint->started_at)
+                    ->get();
+
+                $backlog = (clone $baseQuery)
+                    ->where('created_at', '<=', $activeSprint->started_at)
+                    ->get();
+            } else {
+                $backlog = $baseQuery->get();
+            }
+        }
 
         return view('livewire.backlog-board', [
             'projects' => $projects,
             'sprints' => $sprints,
+            'activeSprint' => $activeSprint,
+            'unassignedTasks' => $unassignedTasks,
             'backlog' => $backlog,
         ]);
     }
