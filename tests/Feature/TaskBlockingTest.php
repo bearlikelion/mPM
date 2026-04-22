@@ -96,6 +96,21 @@ class TaskBlockingTest extends TestCase
             ->assertSee(route('tasks.show', $blockingTask->key), false);
     }
 
+    public function test_dependency_priority_ordering_uses_portable_exists_subqueries(): void
+    {
+        $sql = Task::query()
+            ->withDependencyState()
+            ->orderByDependencyPriority()
+            ->toSql();
+
+        $normalizedSql = strtolower((string) preg_replace('/\s+/', ' ', $sql));
+
+        $this->assertStringContainsString('case when exists', $normalizedSql);
+        $this->assertStringContainsString('task_blockers', $normalizedSql);
+        $this->assertStringNotContainsString('when blocked_tasks_count > 0', $normalizedSql);
+        $this->assertStringNotContainsString('when blockers_count > 0', $normalizedSql);
+    }
+
     public function test_task_detail_can_sync_blockers_for_a_task(): void
     {
         [$user, $project] = $this->memberWithProject();

@@ -104,10 +104,20 @@ class Task extends Model implements HasMedia
 
     public function scopeOrderByDependencyPriority(Builder $query): Builder
     {
+        $qualifiedTaskId = $query->getModel()->qualifyColumn('id');
+
         return $query->orderByRaw('
             case
-                when blocked_tasks_count > 0 then 0
-                when blockers_count > 0 then 2
+                when exists (
+                    select 1
+                    from task_blockers
+                    where task_blockers.blocking_task_id = '.$qualifiedTaskId.'
+                ) then 0
+                when exists (
+                    select 1
+                    from task_blockers
+                    where task_blockers.task_id = '.$qualifiedTaskId.'
+                ) then 2
                 else 1
             end asc
         ');

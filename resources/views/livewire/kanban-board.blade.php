@@ -91,10 +91,8 @@
                             @endif
 
                             @if($task->blockedTasks->isNotEmpty())
-                                @php
-                                    $firstBlockedTask = $task->blockedTasks->first();
-                                    $remainingBlockedTasks = $task->blockedTasks->count() - 1;
-                                @endphp
+                                @php($firstBlockedTask = $task->blockedTasks->first())
+                                @php($remainingBlockedTasks = $task->blockedTasks->count() - 1)
                                 <div class="mt-2 flex items-start gap-2 rounded-md border border-red-500/25 bg-red-500/10 px-2 py-1.5 text-xs text-red-100">
                                     <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red-500/20 font-mono text-[0.65rem] font-bold text-red-200">!</span>
                                     <span>
@@ -105,10 +103,8 @@
                                     </span>
                                 </div>
                             @elseif($task->blockers->isNotEmpty())
-                                @php
-                                    $firstBlocker = $task->blockers->first();
-                                    $remainingBlockers = $task->blockers->count() - 1;
-                                @endphp
+                                @php($firstBlocker = $task->blockers->first())
+                                @php($remainingBlockers = $task->blockers->count() - 1)
                                 <div class="mt-2 flex items-start gap-2 rounded-md border border-amber-400/25 bg-amber-400/10 px-2 py-1.5 text-xs text-amber-100">
                                     <span class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-amber-400/20 font-mono text-[0.65rem] font-bold text-amber-200">!</span>
                                     <span>
