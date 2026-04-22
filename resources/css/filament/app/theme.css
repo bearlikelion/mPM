@@ -10,3 +10,61 @@
     --fi-accent: #d79921;
     --fi-accent-hover: #fabd2f;
 }
+
+.fi-body .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    border: 1px solid var(--gv-border);
+    background-color: var(--gv-bg1);
+    color: var(--gv-fg1);
+    padding: 0.3rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.fi-body .badge.badge-soft {
+    background-color: var(--gv-bg0-s);
+    color: var(--fi-accent);
+}
+
+.fi-body .progress {
+    width: 100%;
+    overflow: hidden;
+    border: none;
+    border-radius: 999px;
+    background-color: var(--gv-bg1);
+}
+
+.fi-body .progress::-webkit-progress-bar {
+    background-color: var(--gv-bg1);
+}
+
+.fi-body .progress::-webkit-progress-value {
+    background-color: var(--fi-accent);
+    border-radius: 999px;
+}
+
+.fi-body .progress::-moz-progress-bar {
+    background-color: var(--fi-accent);
+    border-radius: 999px;
+}
+
+.org-widget-panel {
+    border-radius: 0.9rem;
+    border: 1px solid var(--gv-border);
+    background:
+        linear-gradient(180deg, rgb(60 56 54 / 0.3) 0%, rgb(40 40 40 / 0) 100%),
+        var(--gv-bg0);
+    padding: 1rem;
+}
+
+.org-widget-kicker {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gv-fg4);
+}

@@ -136,4 +136,11 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasTenants
     {
         return $this->organizations()->whereKey($tenant->getKey())->exists();
     }
+
+    public function organizationRoleFor(int $organizationId): ?string
+    {
+        return $this->organizations()
+            ->whereKey($organizationId)
+            ->value('organization_user.role');
+    }
 }

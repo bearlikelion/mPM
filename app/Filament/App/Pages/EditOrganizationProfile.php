@@ -12,6 +12,10 @@ use Filament\Schemas\Schema;
 
 class EditOrganizationProfile extends EditTenantProfile
 {
+    protected static string|\UnitEnum|null $navigationGroup = 'Organization';
+
+    protected static ?int $navigationSort = 90;
+
     public static function getLabel(): string
     {
         return 'Organization settings';

@@ -3,13 +3,14 @@
 namespace App\Providers\Filament;
 
 use App\Filament\App\Pages\EditOrganizationProfile;
+use App\Filament\App\Pages\RegisterOrganization;
 use App\Http\Middleware\ApplyTenantScopes;
 use App\Models\Organization;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -47,14 +48,16 @@ class AppPanelProvider extends PanelProvider
             )
             ->tenant(Organization::class, slugAttribute: 'slug')
             ->tenantProfile(EditOrganizationProfile::class)
+            ->tenantRegistration(RegisterOrganization::class)
+            ->tenantMenuItems([
+                'register' => fn (Action $action) => $action->label('Create organization'),
+            ])
             ->tenantMiddleware([
                 ApplyTenantScopes::class,
             ], isPersistent: true)
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
-            ->pages([
-                Dashboard::class,
-            ])
+            ->pages([])
             ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
             ->middleware([
                 EncryptCookies::class,

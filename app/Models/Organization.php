@@ -18,6 +18,10 @@ class Organization extends Model
     /** @use HasFactory<OrganizationFactory> */
     use HasFactory;
 
+    public const DEFAULT_SPRINT_LENGTH_DAYS = 14;
+
+    public const DEFAULT_STORY_POINTS_PER_SPRINT = 20;
+
     protected $fillable = [
         'name',
         'slug',
@@ -38,6 +42,27 @@ class Organization extends Model
     public function preferredTimezone(): string
     {
         return $this->timezone ?: 'UTC';
+    }
+
+    public function sprintLengthDays(): int
+    {
+        return max(1, (int) ($this->settings['sprint_length_days'] ?? self::DEFAULT_SPRINT_LENGTH_DAYS));
+    }
+
+    public function storyPointsPerSprint(): int
+    {
+        return max(1, (int) ($this->settings['story_points_per_sprint'] ?? self::DEFAULT_STORY_POINTS_PER_SPRINT));
+    }
+
+    /**
+     * @return array{sprint_length_days: int, story_points_per_sprint: int}
+     */
+    public function sprintSettings(): array
+    {
+        return [
+            'sprint_length_days' => $this->sprintLengthDays(),
+            'story_points_per_sprint' => $this->storyPointsPerSprint(),
+        ];
     }
 
     public function convertToLocalTime(CarbonInterface|string $timestamp): Carbon

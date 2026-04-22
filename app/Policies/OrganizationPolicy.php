@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Organization;
+use App\Models\SiteSetting;
 use App\Models\User;
 
 class OrganizationPolicy
@@ -32,6 +33,12 @@ class OrganizationPolicy
 
     public function create(User $user): bool
     {
-        return true;
+        $settings = SiteSetting::current();
+
+        if (! $settings->org_creation_enabled) {
+            return false;
+        }
+
+        return $user->organizations()->count() < $settings->org_limit_per_user;
     }
 }
