@@ -97,6 +97,11 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasTenants
         return $this->hasMany(Comment::class);
     }
 
+    public function facilitatedSprintPlanningMeetings(): HasMany
+    {
+        return $this->hasMany(SprintPlanningMeeting::class, 'facilitator_id');
+    }
+
     public function initials(): string
     {
         return Str::upper(Str::substr(

@@ -83,6 +83,10 @@
 
                 <flux:spacer />
 
+                <div class="flex items-center justify-end">
+                    <livewire:notification-bell />
+                </div>
+
                 @if($isSiteAdmin || $isOrgAdmin)
                     <flux:navlist variant="outline">
                         @if($isOrgAdmin && $currentOrg)
@@ -159,6 +163,8 @@
                 </button>
 
                 <flux:spacer />
+
+                <livewire:notification-bell />
 
                 <flux:dropdown position="top" align="end">
                     <flux:profile

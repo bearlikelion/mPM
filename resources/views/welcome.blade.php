@@ -32,6 +32,7 @@
                             <p class="app-subtitle">
                                 {{ config('app.name', 'mPM') }} is a gruvbox-flavored workspace for organizations, projects, epics, sprints, kanban, and comments — without the enterprise checklist of a Jira install. Designed to be opinionated, fast, and boring in the best way.
                             </p>
+                            <p class="app-subtitle">A self-hosted project room that feels like your team actually lives there.</p>
                         </div>
                         <div class="flex flex-wrap gap-3">
                             @auth
@@ -91,8 +92,10 @@
                     <div class="app-eyebrow">Feature Set</div>
                     <ul class="mt-4 space-y-3 text-sm text-neutral-300">
                         <li class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">Organizations, projects, and role-aware admin surfaces</li>
+                        <li class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">Backlog to sprint</li>
                         <li class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">Tasks with priorities, story points, attachments, comments, and tags</li>
                         <li class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">Kanban, backlog, sprint planning, and an at-a-glance dashboard</li>
+                        <li class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">Kanban, backlog views, sprint planning, and dashboard pulse</li>
                         <li class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">Invites, social login, and per-org permissions</li>
                         <li class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">Deep site-admin analytics for orgs, users, tasks, and storage</li>
                     </ul>

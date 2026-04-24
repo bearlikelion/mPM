@@ -9,6 +9,7 @@ use App\Models\Sprint;
 use App\Models\Task;
 use App\Models\User;
 use App\Support\SiteTenant;
+use App\Support\TaskActivityNotifier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -235,7 +236,7 @@ class CreateTaskModal extends Component
         // When a sprint is active, new tasks always land in the unassigned queue
         $resolvedSprintId = $activeSprint ? null : $validated['sprintId'];
 
-        return DB::transaction(function () use ($project, $validated, $resolvedSprintId) {
+        $task = DB::transaction(function () use ($project, $validated, $resolvedSprintId) {
             $lockedProject = Project::query()->whereKey($project->id)->lockForUpdate()->firstOrFail();
             $lockedProject->increment('task_counter');
             $lockedProject->refresh();
@@ -258,5 +259,10 @@ class CreateTaskModal extends Component
 
             return $task;
         });
+
+        $task->load('assignees');
+        $task->assignees->each(fn (User $user) => app(TaskActivityNotifier::class)->taskAssigned($task, $user, Auth::user()));
+
+        return $task;
     }
 }

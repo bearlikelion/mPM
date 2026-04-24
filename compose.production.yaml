@@ -1,0 +1,89 @@
+services:
+    app:
+        image: '${APP_IMAGE:-mpm-app:latest}'
+        restart: unless-stopped
+        env_file:
+            - .env
+        ports:
+            - '${APP_PORT:-80}:80'
+        depends_on:
+            - pgsql
+            - redis
+        networks:
+            - mpm
+
+    queue:
+        image: '${APP_IMAGE:-mpm-app:latest}'
+        restart: unless-stopped
+        command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+        env_file:
+            - .env
+        depends_on:
+            - app
+            - pgsql
+            - redis
+        networks:
+            - mpm
+
+    reverb:
+        image: '${APP_IMAGE:-mpm-app:latest}'
+        restart: unless-stopped
+        command: php artisan reverb:start --host=0.0.0.0 --port=${REVERB_SERVER_PORT:-8080}
+        env_file:
+            - .env
+        ports:
+            - '${REVERB_SERVER_PORT:-8080}:${REVERB_SERVER_PORT:-8080}'
+        depends_on:
+            - app
+            - redis
+        networks:
+            - mpm
+
+    pgsql:
+        image: 'postgres:18-alpine'
+        restart: unless-stopped
+        environment:
+            PGPASSWORD: '${DB_PASSWORD:-secret}'
+            POSTGRES_DB: '${DB_DATABASE}'
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+        volumes:
+            - 'mpm-pgsql:/var/lib/postgresql'
+        networks:
+            - mpm
+        healthcheck:
+            test:
+                - CMD
+                - pg_isready
+                - '-q'
+                - '-d'
+                - '${DB_DATABASE}'
+                - '-U'
+                - '${DB_USERNAME}'
+            retries: 3
+            timeout: 5s
+
+    redis:
+        image: 'redis:alpine'
+        restart: unless-stopped
+        volumes:
+            - 'mpm-redis:/data'
+        networks:
+            - mpm
+        healthcheck:
+            test:
+                - CMD
+                - redis-cli
+                - ping
+            retries: 3
+            timeout: 5s
+
+networks:
+    mpm:
+        driver: bridge
+
+volumes:
+    mpm-pgsql:
+        driver: local
+    mpm-redis:
+        driver: local

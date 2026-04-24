@@ -75,6 +75,11 @@ class Task extends Model implements HasMedia
         return $this->hasMany(Comment::class);
     }
 
+    public function sprintPlanningItems(): HasMany
+    {
+        return $this->hasMany(SprintPlanningItem::class);
+    }
+
     public function blockers(): BelongsToMany
     {
         return $this->belongsToMany(Task::class, 'task_blockers', 'task_id', 'blocking_task_id')

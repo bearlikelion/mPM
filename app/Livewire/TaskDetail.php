@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Comment;
 use App\Models\Project;
 use App\Models\Task;
+use App\Support\TaskActivityNotifier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -68,6 +69,10 @@ class TaskDetail extends Component
         } else {
             $this->task->update([$field => $value]);
         }
+
+        if ($field === 'status' && $value === 'review') {
+            app(TaskActivityNotifier::class)->reviewRequested($this->task->refresh(), Auth::user());
+        }
     }
 
     public function addComment(): void
@@ -99,6 +104,10 @@ class TaskDetail extends Component
         $this->newComment = '';
         $this->attachments = [];
         $this->task->load('comments.user', 'comments.media');
+
+        if ($comment->body !== '') {
+            app(TaskActivityNotifier::class)->mentioned($this->task, $comment->body, Auth::user());
+        }
     }
 
     public function updatedBlockerIds(): void
@@ -110,6 +119,8 @@ class TaskDetail extends Component
             'blockerIds.*' => [Rule::in($availableTaskIds)],
         ]);
 
+        $previousBlockers = $this->task->blockers()->get(['tasks.id', 'tasks.key', 'tasks.title']);
+
         $this->task->blockers()->sync($validated['blockerIds']);
         $this->task->loadCount(['blockers', 'blockedTasks']);
         $this->task->load([
@@ -117,6 +128,15 @@ class TaskDetail extends Component
             'blockedTasks:id,key,title,project_id',
         ]);
         $this->blockerIds = $this->task->blockers->pluck('id')->all();
+
+        $currentBlockers = $this->task->blockers;
+
+        app(TaskActivityNotifier::class)->blockersChanged(
+            task: $this->task,
+            added: $currentBlockers->whereNotIn('id', $previousBlockers->pluck('id')),
+            removed: $previousBlockers->whereNotIn('id', $currentBlockers->pluck('id')),
+            actor: Auth::user(),
+        );
     }
 
     protected function availableTasks()

@@ -4,8 +4,11 @@ namespace App\Livewire;
 
 use App\Models\Organization;
 use App\Models\Sprint;
+use App\Models\SprintPlanningMeeting;
 use App\Support\SiteTenant;
+use App\Support\SprintPlanningService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -14,11 +17,12 @@ class SprintPlanner extends Component
     #[Url(as: 'project')]
     public ?int $projectId = null;
 
-    public string $name = '';
+    #[Url(as: 'meeting')]
+    public ?int $meetingId = null;
 
-    public ?string $startsAt = null;
+    public string $meetingName = '';
 
-    public ?string $endsAt = null;
+    public ?string $scheduledAt = null;
 
     public function mount(): void
     {
@@ -28,27 +32,32 @@ class SprintPlanner extends Component
     public function updatedProjectId(): void
     {
         $this->projectId = $this->resolvedProjectId($this->projectId);
+        $this->meetingId = null;
     }
 
-    public function createSprint(): void
+    public function scheduleMeeting(): void
     {
+        $projectIds = $this->availableProjects()->pluck('id')->all();
+
         $this->validate([
-            'projectId' => 'required|integer',
-            'name' => 'required|string|max:255',
-            'startsAt' => 'required|date',
-            'endsAt' => 'required|date|after:startsAt',
+            'projectId' => ['required', Rule::in($projectIds)],
+            'meetingName' => ['required', 'string', 'max:255'],
+            'scheduledAt' => ['required', 'date'],
         ]);
 
-        $this->availableProjects()->findOrFail($this->projectId);
+        $project = $this->availableProjects()->findOrFail($this->projectId);
+        abort_unless(Auth::user()->can('update', $project), 403);
 
-        Sprint::create([
-            'project_id' => $this->projectId,
-            'name' => $this->name,
-            'starts_at' => $this->startsAt,
-            'ends_at' => $this->endsAt,
-        ]);
+        $meeting = app(SprintPlanningService::class)->schedule(
+            project: $project,
+            facilitator: Auth::user(),
+            name: $this->meetingName,
+            scheduledAt: $this->scheduledAt,
+            storyPointsLimit: $this->currentOrganization()?->storyPointsPerSprint() ?? Organization::DEFAULT_STORY_POINTS_PER_SPRINT,
+        );
 
-        $this->reset('name', 'startsAt', 'endsAt');
+        $this->reset('meetingName', 'scheduledAt');
+        $this->meetingId = $meeting->id;
     }
 
     public function startSprint(int $sprintId): void
@@ -97,9 +106,26 @@ class SprintPlanner extends Component
                 ->get()
             : collect();
 
+        $meetings = $this->projectId
+            ? SprintPlanningMeeting::query()
+                ->with('facilitator', 'sprint')
+                ->where('project_id', $this->projectId)
+                ->orderByDesc('scheduled_at')
+                ->get()
+            : collect();
+
+        $selectedMeeting = $this->meetingId
+            ? $meetings->firstWhere('id', $this->meetingId)
+            : null;
+
+        $selectedProject = $this->projectId ? $projects->firstWhere('id', $this->projectId) : null;
+
         return view('livewire.sprint-planner', [
             'projects' => $projects,
             'sprints' => $sprints,
+            'meetings' => $meetings,
+            'selectedMeeting' => $selectedMeeting,
+            'canScheduleMeeting' => $selectedProject ? Auth::user()->can('update', $selectedProject) : false,
         ]);
     }
 }

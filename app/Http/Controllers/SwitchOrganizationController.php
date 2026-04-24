@@ -6,12 +6,13 @@ use App\Models\Organization;
 use App\Support\SiteTenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class SwitchOrganizationController extends Controller
 {
     public function __invoke(Request $request, Organization $organization, SiteTenant $siteTenant): RedirectResponse
     {
-        $this->authorize('view', $organization);
+        Gate::authorize('view', $organization);
 
         $siteTenant->switchOrganization($request->user(), $organization);
 
