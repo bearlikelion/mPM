@@ -1,10 +1,15 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/livewire-starter-kit",
+    "name": "bearlikelion/mpm",
     "type": "project",
-    "description": "The official Laravel starter kit for Livewire.",
-    "keywords": ["laravel", "framework"],
-    "license": "MIT",
+    "description": "Active-development, self-hosted project management for organizations, projects, kanban, sprint planning, notifications, and YAML scaffolding.",
+    "keywords": ["project-management", "self-hosted", "kanban", "sprint-planning", "laravel", "livewire", "filament"],
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Mark Arneman"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "filament/filament": "^5.0",
@@ -69,6 +74,11 @@
         ]
     },
     "extra": {
+        "mpm": {
+            "status": "active-development",
+            "license_intent": "copyleft self-hosted source-available license",
+            "commercial_service_restriction": "You may not use this code to create, operate, resell, or host a paid project-management service or SaaS offering."
+        },
         "laravel": {
             "dont-discover": []
         }
