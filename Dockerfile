@@ -22,6 +22,7 @@ RUN docker-php-ext-install \
     pgsql \
     mbstring \
     pcntl \
+    exif \
     gd \
     zip \
     intl
