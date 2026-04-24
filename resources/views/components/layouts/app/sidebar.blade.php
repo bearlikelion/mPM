@@ -16,21 +16,25 @@
             <flux:sidebar sticky stashable class="app-sidebar">
                 <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 rounded-sm border border-transparent p-1 transition hover:border-[color:var(--gv-border)]" wire:navigate>
-                    @if($currentOrg)
-                        <img src="{{ $currentOrg->logoUrl() }}" alt="" class="h-9 w-9 rounded-sm border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] object-cover" />
-                    @else
-                        <span class="app-brand-mark">mPM</span>
-                    @endif
-                    <div class="min-w-0">
-                        <div class="truncate font-mono text-sm font-semibold text-[color:var(--gv-fg0)]">
-                            {{ $currentOrg?->name ?? config('app.name', 'mPM') }}
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('dashboard') }}" class="flex min-w-0 flex-1 items-center gap-2.5 rounded-sm border border-transparent p-1 transition hover:border-[color:var(--gv-border)]" wire:navigate>
+                        @if($currentOrg)
+                            <img src="{{ $currentOrg->logoUrl() }}" alt="" class="h-9 w-9 shrink-0 rounded-sm border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] object-cover" />
+                        @else
+                            <span class="app-brand-mark shrink-0">mPM</span>
+                        @endif
+                        <div class="min-w-0">
+                            <div class="truncate font-mono text-sm font-semibold text-[color:var(--gv-fg0)]">
+                                {{ $currentOrg?->name ?? config('app.name', 'mPM') }}
+                            </div>
+                            <div class="text-xs text-[color:var(--gv-fg4)]">
+                                {{ $projectCount }} {{ \Illuminate\Support\Str::plural('project', $projectCount) }}
+                            </div>
                         </div>
-                        <div class="text-xs text-[color:var(--gv-fg4)]">
-                            {{ $projectCount }} {{ \Illuminate\Support\Str::plural('project', $projectCount) }}
-                        </div>
-                    </div>
-                </a>
+                    </a>
+
+                    <livewire:notification-bell />
+                </div>
 
                 @if($organizations->count() > 1)
                     <flux:dropdown position="bottom" align="start">
@@ -69,39 +73,35 @@
 
                 <flux:navlist variant="outline">
                     <flux:navlist.group heading="Platform" class="grid">
-                        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Dashboard</flux:navlist.item>
-                        <flux:navlist.item icon="squares-2x2" :href="route('projects.index')" :current="request()->routeIs('projects.index')" wire:navigate>Projects</flux:navlist.item>
+                        <flux:navlist.item data-desktop-tray-link icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Dashboard</flux:navlist.item>
+                        <flux:navlist.item data-desktop-tray-link icon="squares-2x2" :href="route('projects.index')" :current="request()->routeIs('projects.index')" wire:navigate>Projects</flux:navlist.item>
                         @if($isOrgAdmin)
-                            <flux:navlist.item icon="presentation-chart-line" :href="route('manager')" :current="request()->routeIs('manager')" wire:navigate>Manager</flux:navlist.item>
+                            <flux:navlist.item data-desktop-tray-link icon="presentation-chart-line" :href="route('manager')" :current="request()->routeIs('manager')" wire:navigate>Manager</flux:navlist.item>
                         @endif
-                        <flux:navlist.item icon="view-columns" :href="route('kanban')" :current="request()->routeIs('kanban')" wire:navigate>Kanban</flux:navlist.item>
-                        <flux:navlist.item icon="queue-list" :href="route('backlog')" :current="request()->routeIs('backlog')" wire:navigate>Backlog</flux:navlist.item>
-                        <flux:navlist.item icon="flag" :href="route('epics')" :current="request()->routeIs('epics')" wire:navigate>Epics</flux:navlist.item>
-                        <flux:navlist.item icon="rocket-launch" :href="route('sprints')" :current="request()->routeIs('sprints')" wire:navigate>Sprints</flux:navlist.item>
+                        <flux:navlist.item data-desktop-tray-link icon="view-columns" :href="route('kanban')" :current="request()->routeIs('kanban')" wire:navigate>Kanban</flux:navlist.item>
+                        <flux:navlist.item data-desktop-tray-link icon="queue-list" :href="route('backlog')" :current="request()->routeIs('backlog')" wire:navigate>Backlog</flux:navlist.item>
+                        <flux:navlist.item data-desktop-tray-link icon="flag" :href="route('epics')" :current="request()->routeIs('epics')" wire:navigate>Epics</flux:navlist.item>
+                        <flux:navlist.item data-desktop-tray-link icon="rocket-launch" :href="route('sprints')" :current="request()->routeIs('sprints')" wire:navigate>Sprints</flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
 
                 <flux:spacer />
 
-                <div class="flex items-center justify-end">
-                    <livewire:notification-bell />
-                </div>
-
                 <flux:navlist variant="outline">
-                    <flux:navlist.item icon="bug-ant" href="https://github.com/bearlikelion/mPM/issues/new?template=bug_report.md" target="_blank">Bug Report</flux:navlist.item>
-                    <flux:navlist.item icon="light-bulb" href="https://github.com/bearlikelion/mPM/issues/new?template=feature_request.md" target="_blank">Feature Request</flux:navlist.item>
+                    <flux:navlist.item data-desktop-tray-link icon="bug-ant" href="https://github.com/bearlikelion/mPM/issues/new?template=bug_report.md" target="_blank">Bug Report</flux:navlist.item>
+                    <flux:navlist.item data-desktop-tray-link icon="light-bulb" href="https://github.com/bearlikelion/mPM/issues/new?template=feature_request.md" target="_blank">Feature Request</flux:navlist.item>
                 </flux:navlist>
 
                 @if($isSiteAdmin || $isOrgAdmin)
                     <flux:navlist variant="outline">
                         @if($isOrgAdmin && $currentOrg)
-                            <flux:navlist.item icon="building-office" :href="url('/app/'.$currentOrg->slug)">
+                            <flux:navlist.item data-desktop-tray-link icon="building-office" :href="url('/app/'.$currentOrg->slug)">
                                 Org admin
                             </flux:navlist.item>
                         @endif
 
                         @if($isSiteAdmin)
-                            <flux:navlist.item icon="shield-check" href="/admin">
+                            <flux:navlist.item data-desktop-tray-link icon="shield-check" href="/admin">
                                 Site admin
                             </flux:navlist.item>
                         @endif

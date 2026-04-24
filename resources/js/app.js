@@ -5,8 +5,15 @@
  */
 
 import './echo';
-import { bootDesktopNotifications } from './desktop-notifications';
+import { bootDesktopNotifications, bootDesktopTray } from './desktop-notifications';
 
-bootDesktopNotifications();
+const bootDesktop = () => {
+    bootDesktopNotifications();
+    bootDesktopTray().catch((error) => {
+        console.warn('Unable to configure desktop tray.', error);
+    });
+};
 
-document.addEventListener('livewire:navigated', bootDesktopNotifications);
+bootDesktop();
+
+document.addEventListener('livewire:navigated', bootDesktop);
