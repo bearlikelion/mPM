@@ -16,7 +16,7 @@ class ExampleTest extends TestCase
         $response
             ->assertOk()
             ->assertSee('A self-hosted project room that feels like your team actually lives there.')
-            ->assertSee('Backlog to sprint')
-            ->assertSee('Kanban, backlog views, sprint planning, and dashboard pulse');
+            ->assertSee('Every tool is too much.')
+            ->assertSee('Boring Laravel. Sharp UI.');
     }
 }

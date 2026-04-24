@@ -70,7 +70,7 @@
                                 aria-label="Open screenshot fullscreen"
                             >
                                 <img
-                                    src="{{ asset('storage/img/example_board.png') }}"
+                                    src="{{ asset('img/example_board.png') }}"
                                     alt="mPM kanban board screenshot"
                                     class="block w-full transition group-hover:opacity-90"
                                     loading="lazy"
@@ -103,7 +103,7 @@
                                 </svg>
                             </button>
                             <img
-                                src="{{ asset('storage/img/example_board.png') }}"
+                                src="{{ asset('img/example_board.png') }}"
                                 alt="mPM kanban board screenshot"
                                 x-on:click.stop
                                 class="max-h-full max-w-full rounded-xl border border-neutral-700/70 shadow-2xl"
@@ -204,9 +204,9 @@
                         <div class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">
                             <dt class="app-eyebrow">Backend</dt>
                             <dd class="mt-1 flex flex-wrap gap-x-2 gap-y-1">
-                                <a href="https://www.php.net/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-md px-1 -mx-1 text-neutral-200 transition hover:text-amber-300 hover:bg-amber-300/5">PHP 8.4</a>
+                                <a href="https://www.php.net/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-md px-1 -mx-1 text-neutral-200 transition hover:text-amber-300 hover:bg-amber-300/5">PHP 8.5</a>
                                 <span class="text-neutral-600">·</span>
-                                <a href="https://laravel.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-md px-1 -mx-1 text-neutral-200 transition hover:text-amber-300 hover:bg-amber-300/5">Laravel 12</a>
+                                <a href="https://laravel.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-md px-1 -mx-1 text-neutral-200 transition hover:text-amber-300 hover:bg-amber-300/5">Laravel 13</a>
                             </dd>
                         </div>
                         <div class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">
@@ -264,7 +264,9 @@
                         <div class="rounded-2xl border border-neutral-700/60 bg-neutral-950/30 px-4 py-3">
                             <dt class="app-eyebrow">Testing</dt>
                             <dd class="mt-1 flex flex-wrap gap-x-2 gap-y-1">
-                                <a href="https://pestphp.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-md px-1 -mx-1 text-neutral-200 transition hover:text-amber-300 hover:bg-amber-300/5">Pest 3</a>
+                                <a href="https://pestphp.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-md px-1 -mx-1 text-neutral-200 transition hover:text-amber-300 hover:bg-amber-300/5">Pest 4</a>
+                                <span class="text-neutral-600">·</span>
+                                <a href="https://phpunit.de/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-md px-1 -mx-1 text-neutral-200 transition hover:text-amber-300 hover:bg-amber-300/5">PHPUnit 12</a>
                             </dd>
                         </div>
                     </dl>

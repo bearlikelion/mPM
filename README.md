@@ -18,15 +18,15 @@ mPM (Mark's Project Management) is an open-source, self-hosted project managemen
 
 | Layer | Technology |
 |---|---|
-| Language | [PHP 8.4](https://www.php.net/) |
-| Framework | [Laravel 12](https://laravel.com/) |
+| Language | [PHP 8.5](https://www.php.net/) |
+| Framework | [Laravel 13](https://laravel.com/) |
 | UI | [Livewire 4](https://livewire.laravel.com/) · [Flux UI 2](https://fluxui.dev/) · [Filament 5](https://filamentphp.com/) · [Mary UI 2](https://mary-ui.com/) · [Tailwind CSS 4](https://tailwindcss.com/) |
 | Realtime | [Laravel Reverb](https://reverb.laravel.com/) |
 | Database | [PostgreSQL](https://www.postgresql.org/) |
 | Cache / Queue | [Redis](https://redis.io/) |
 | Media | [Spatie Media Library](https://spatie.be/docs/laravel-medialibrary) |
 | Auth | [Spatie Permission](https://spatie.be/docs/laravel-permission) · [Laravel Socialite](https://laravel.com/docs/socialite) |
-| Testing | [Pest 3](https://pestphp.com/) |
+| Testing | [Pest 4](https://pestphp.com/) · [PHPUnit 12](https://phpunit.de/) |
 | Local Dev | [Laravel Sail](https://laravel.com/docs/sail) |
 
 ## Local Development
