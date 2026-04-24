@@ -92,3 +92,65 @@ it('shows attendance before the websocket presence channel connects', function (
         ->assertSee('realtime pending')
         ->assertDontSee('connecting');
 });
+
+it('tags oversized sprint planning estimates as split up', function (int $storyPoints) {
+    $organization = Organization::factory()->create();
+    $project = Project::factory()->create(['organization_id' => $organization->id]);
+    $facilitator = User::factory()->create(['default_organization_id' => $organization->id]);
+    $member = User::factory()->create(['default_organization_id' => $organization->id]);
+
+    $organization->users()->attach($facilitator, ['role' => 'org_admin', 'joined_at' => now()]);
+    $organization->users()->attach($member, ['role' => 'member', 'joined_at' => now()]);
+
+    $task = Task::factory()->create([
+        'project_id' => $project->id,
+        'sprint_id' => null,
+        'status' => 'todo',
+        'story_points' => null,
+    ]);
+
+    $service = app(SprintPlanningService::class);
+    $meeting = $service->schedule($project, $facilitator, 'Sprint 1 planning', now()->toDateTimeString(), 34);
+
+    $service->join($meeting, $member);
+    $meeting = $service->begin($meeting, $facilitator);
+    $item = $meeting->items()->whereBelongsTo($task)->firstOrFail();
+
+    $service->vote($item, $facilitator, $storyPoints);
+    $service->vote($item->fresh(), $member, $storyPoints);
+
+    expect($task->tags()->where('name', Task::SPLIT_RECOMMENDED_TAG)->exists())->toBeTrue();
+})->with([
+    '13 points' => 13,
+    '21 points' => 21,
+]);
+
+it('tags oversized facilitator tie resolutions as split up', function () {
+    $organization = Organization::factory()->create();
+    $project = Project::factory()->create(['organization_id' => $organization->id]);
+    $facilitator = User::factory()->create(['default_organization_id' => $organization->id]);
+    $member = User::factory()->create(['default_organization_id' => $organization->id]);
+
+    $organization->users()->attach($facilitator, ['role' => 'org_admin', 'joined_at' => now()]);
+    $organization->users()->attach($member, ['role' => 'member', 'joined_at' => now()]);
+
+    $task = Task::factory()->create([
+        'project_id' => $project->id,
+        'sprint_id' => null,
+        'status' => 'todo',
+        'story_points' => null,
+    ]);
+
+    $service = app(SprintPlanningService::class);
+    $meeting = $service->schedule($project, $facilitator, 'Sprint 1 planning', now()->toDateTimeString(), 34);
+
+    $service->join($meeting, $member);
+    $meeting = $service->begin($meeting, $facilitator);
+    $item = $meeting->items()->whereBelongsTo($task)->firstOrFail();
+
+    $service->vote($item, $facilitator, 13);
+    $service->vote($item->fresh(), $member, 21);
+    $service->resolveTie($item->fresh(), $facilitator, 21);
+
+    expect($task->tags()->where('name', Task::SPLIT_RECOMMENDED_TAG)->exists())->toBeTrue();
+});

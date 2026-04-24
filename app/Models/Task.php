@@ -24,6 +24,10 @@ class Task extends Model implements HasMedia
 
     public const STORY_POINTS = [1, 2, 3, 5, 8, 13, 21];
 
+    public const SPLIT_RECOMMENDED_STORY_POINTS = [13, 21];
+
+    public const SPLIT_RECOMMENDED_TAG = 'split-up';
+
     protected $fillable = [
         'project_id',
         'epic_id',

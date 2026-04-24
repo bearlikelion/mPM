@@ -10,6 +10,7 @@ use App\Models\SprintPlanningItem;
 use App\Models\SprintPlanningMeeting;
 use App\Models\SprintPlanningParticipant;
 use App\Models\SprintPlanningVote;
+use App\Models\Tag;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -133,12 +134,20 @@ class SprintPlanningService
             throw ValidationException::withMessages(['storyPoints' => 'Choose one of the tied story point values.']);
         }
 
-        $item->update([
-            'status' => SprintPlanningItem::STATUS_ESTIMATED,
-            'selected_story_points' => $storyPoints,
-            'decision_by' => $user->id,
-            'decided_at' => now(),
-        ]);
+        DB::transaction(function () use ($item, $user, $storyPoints): void {
+            $item->update([
+                'status' => SprintPlanningItem::STATUS_ESTIMATED,
+                'selected_story_points' => $storyPoints,
+                'decision_by' => $user->id,
+                'decided_at' => now(),
+            ]);
+
+            $updatedItem = $item->fresh('task.project');
+
+            if ($updatedItem) {
+                $this->tagTaskForSplitting($updatedItem, $storyPoints);
+            }
+        });
 
         broadcast(new SprintPlanningMeetingUpdated($item->meeting));
 
@@ -278,12 +287,45 @@ class SprintPlanningService
         $tieOptions = $this->tieOptions($item);
 
         if ($tieOptions->count() === 1) {
+            $storyPoints = $tieOptions->first();
+
             $item->update([
                 'status' => SprintPlanningItem::STATUS_ESTIMATED,
-                'selected_story_points' => $tieOptions->first(),
+                'selected_story_points' => $storyPoints,
                 'decided_at' => now(),
             ]);
+
+            $updatedItem = $item->fresh('task.project');
+
+            if ($updatedItem) {
+                $this->tagTaskForSplitting($updatedItem, $storyPoints);
+            }
         }
+    }
+
+    private function tagTaskForSplitting(SprintPlanningItem $item, int $storyPoints): void
+    {
+        if (! in_array($storyPoints, Task::SPLIT_RECOMMENDED_STORY_POINTS, true)) {
+            return;
+        }
+
+        $task = $item->task;
+
+        if (! $task?->project) {
+            return;
+        }
+
+        $tag = Tag::query()->firstOrCreate(
+            [
+                'organization_id' => $task->project->organization_id,
+                'name' => Task::SPLIT_RECOMMENDED_TAG,
+            ],
+            [
+                'color' => '#f59e0b',
+            ],
+        );
+
+        $task->tags()->syncWithoutDetaching([$tag->id]);
     }
 
     private function advance(SprintPlanningMeeting $meeting): void
