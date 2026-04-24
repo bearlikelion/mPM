@@ -11,7 +11,7 @@
                 <div class="flex items-center gap-4">
                     <span class="app-brand-mark">mPM</span>
                     <div>
-                        <div class="app-eyebrow">Mini Project Manager</div>
+                        <div class="app-eyebrow">Mark's Project Manager</div>
                         <div class="mt-1 text-2xl font-semibold tracking-tight text-neutral-50">{{ config('app.name', 'mPM') }}</div>
                     </div>
                 </div>
