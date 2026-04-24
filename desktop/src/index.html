@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mPM Desktop</title>
+    <style>
+      :root {
+        font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+        color: #0f172a;
+        background-color: #f8fafc;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        display: flex;
+        place-items: center;
+        min-width: 320px;
+        min-height: 100vh;
+      }
+
+      .container {
+        margin: 0 auto;
+        padding: 2rem;
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+      }
+
+      .card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+      }
+
+      .input-group {
+        margin-bottom: 1rem;
+        text-align: left;
+      }
+
+      label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #64748b;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      input:focus {
+        border-color: #3b82f6;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #2563eb;
+      }
+
+      .status {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #64748b;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div id="setup-card" class="card hidden">
+        <h1>Connect to mPM</h1>
+        <div class="input-group">
+          <label for="server-url">Server URL</label>
+          <input type="url" id="server-url" placeholder="https://mpm.arneman.me" value="https://mpm.arneman.me" />
+        </div>
+        <button id="connect-btn">Connect</button>
+        <p class="status">Enter your self-hosted domain to get started.</p>
+      </div>
+
+      <div id="loading-card" class="card">
+        <h1>Connecting...</h1>
+        <p id="connecting-to" class="status"></p>
+        <button id="change-server-btn" style="background: transparent; color: #64748b; font-size: 0.75rem; margin-top: 1rem; font-weight: normal;">Change Server</button>
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

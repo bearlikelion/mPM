@@ -5,3 +5,8 @@
  */
 
 import './echo';
+import { bootDesktopNotifications } from './desktop-notifications';
+
+bootDesktopNotifications();
+
+document.addEventListener('livewire:navigated', bootDesktopNotifications);
