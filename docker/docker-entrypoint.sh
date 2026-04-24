@@ -68,10 +68,9 @@ php /app/artisan config:cache
 php /app/artisan route:cache
 php /app/artisan view:cache
 
-if [ ! -L "/app/public/storage" ]; then
-    echo "==> Creating storage symbolic link..."
-    php /app/artisan storage:link
-fi
+echo "==> Refreshing storage symbolic link..."
+rm -rf /app/public/storage
+php /app/artisan storage:link
 
 echo "==> Setting permissions..."
 mkdir -p /app/storage/logs /app/bootstrap/cache
