@@ -7,6 +7,7 @@ RUN apk add --no-cache \
     git \
     unzip \
     postgresql-client \
+    libpq-dev \
     nodejs \
     npm \
     oniguruma-dev \
