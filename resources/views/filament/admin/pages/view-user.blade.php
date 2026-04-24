@@ -12,7 +12,7 @@
             ['Comments · 30d', $stats['comments_30d']],
             ['Tasks created', $stats['created_tasks']],
             ['Storage', $stats['storage']],
-            ['Last active', $stats['last_active'] ? \Carbon\Carbon::parse($stats['last_active'])->diffForHumans() : '—'],
+            ['Last active', $stats['last_active'] ? \Carbon\Carbon::parse($stats['last_active'])->diffForHumans() : '-'],
         ] as [$label, $value])
             <div class="p-4 rounded-sm border border-[color:var(--gv-border)] bg-[color:var(--gv-bg0)]">
                 <div class="text-xs uppercase tracking-wider text-[color:var(--gv-fg4)]">{{ $label }}</div>
@@ -71,7 +71,7 @@
                             </td>
                             <td class="font-mono text-xs">{{ $o->pivot->role }}</td>
                             <td class="text-xs text-[color:var(--gv-fg4)]">
-                                {{ $o->pivot->joined_at ? \Carbon\Carbon::parse($o->pivot->joined_at)->diffForHumans() : '—' }}
+                                {{ $o->pivot->joined_at ? \Carbon\Carbon::parse($o->pivot->joined_at)->diffForHumans() : '-' }}
                             </td>
                         </tr>
                     @endforeach
@@ -112,7 +112,7 @@
                     <li class="py-2 text-sm">
                         <div class="flex items-center justify-between">
                             <span class="text-[color:var(--gv-fg3)]">
-                                on <span class="font-mono text-xs">{{ $c->task?->key ?? '—' }}</span>
+                                on <span class="font-mono text-xs">{{ $c->task?->key ?? '-' }}</span>
                                 @if($c->task?->project) · <span class="text-[color:var(--gv-fg4)]">{{ $c->task->project->name }}</span> @endif
                             </span>
                             <span class="text-xs text-[color:var(--gv-fg4)]">{{ $c->created_at?->diffForHumans() }}</span>

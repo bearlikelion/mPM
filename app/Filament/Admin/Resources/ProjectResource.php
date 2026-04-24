@@ -40,7 +40,7 @@ class ProjectResource extends Resource
                     ->state(function (Project $record) {
                         $latest = $record->tasks()->max('updated_at') ?? $record->updated_at;
 
-                        return $latest ? Carbon::parse($latest)->diffForHumans() : '—';
+                        return $latest ? Carbon::parse($latest)->diffForHumans() : '-';
                     }),
                 TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])

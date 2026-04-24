@@ -6,13 +6,13 @@ mPM (Mark's Project Management) is an open-source, self-hosted project managemen
 
 ## Features
 
-- **Organizations & Projects** — workspaces with member management, roles, and admin tooling
-- **Tasks & Epics** — assignment, comments, tags, attachments, and blockers
-- **Kanban & Sprints** — board view, sprint creation, sprint defaults, and dashboards
-- **Sprint Planning** — realtime attendance, story-point voting, tie resolution, and automatic `split-up` tagging for estimates of 13 or 21 points
-- **Notifications** — activity alerts for relevant task events
-- **YAML Scaffolding** — import/export projects, tasks, sprints, tags, assignees, and blockers
-- **OAuth Login** — Discord and Steam via Laravel Socialite
+- **Organizations & Projects** - workspaces with member management, roles, and admin tooling
+- **Tasks & Epics** - assignment, comments, tags, attachments, and blockers
+- **Kanban & Sprints** - board view, sprint creation, sprint defaults, and dashboards
+- **Sprint Planning** - realtime attendance, story-point voting, tie resolution, and automatic `split-up` tagging for estimates of 13 or 21 points
+- **Notifications** - activity alerts for relevant task events
+- **YAML Scaffolding** - import/export projects, tasks, sprints, tags, assignees, and blockers
+- **OAuth Login** - Discord and Steam via Laravel Socialite
 
 ## Tech Stack
 
@@ -64,8 +64,8 @@ mPM ships with a production `Dockerfile` and CapRover configuration for single-s
 
 1. Create a new app in CapRover.
 2. Mount two persistent volumes:
-   - `/config` — place your production `.env` here as `.env`
-   - `/app/storage` — persists uploads, logs, and framework cache across deploys
+   - `/config` - place your production `.env` here as `.env`
+   - `/app/storage` - persists uploads, logs, and framework cache across deploys
 3. Push to `main` and trigger a deploy via CapRover's webhook.
 
 On first boot the entrypoint will:

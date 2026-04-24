@@ -92,8 +92,8 @@
                             <td class="py-2 text-[color:var(--gv-fg1)]">{{ $e->name }}</td>
                             <td class="font-mono text-xs">{{ $e->tasks_count }}</td>
                             <td class="font-mono text-xs">{{ $e->tasks_done_count }}</td>
-                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $e->due_date?->format('M j, Y') ?? '—' }}</td>
-                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $e->completed_at?->diffForHumans() ?? '—' }}</td>
+                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $e->due_date?->format('M j, Y') ?? '-' }}</td>
+                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $e->completed_at?->diffForHumans() ?? '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -121,8 +121,8 @@
                         <tr class="border-t border-[color:var(--gv-border)]">
                             <td class="py-2 text-[color:var(--gv-fg1)]">{{ $s->name }}</td>
                             <td class="font-mono text-xs">{{ $s->tasks_count }}</td>
-                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $s->starts_at?->format('M j') ?? '—' }}</td>
-                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $s->ends_at?->format('M j') ?? '—' }}</td>
+                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $s->starts_at?->format('M j') ?? '-' }}</td>
+                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $s->ends_at?->format('M j') ?? '-' }}</td>
                             <td class="font-mono text-xs">
                                 @if($s->started_at && ! $s->ended_at)
                                     <span class="text-[color:var(--fi-accent,var(--gv-amber))]">active</span>
@@ -160,7 +160,7 @@
                                    class="hover:text-[color:var(--fi-accent,var(--gv-amber))]">{{ $u->name }}</a>
                             </td>
                             <td class="text-[color:var(--gv-fg3)]">{{ $u->email }}</td>
-                            <td class="font-mono text-xs">{{ $u->pivot->role ?? '—' }}</td>
+                            <td class="font-mono text-xs">{{ $u->pivot->role ?? '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>

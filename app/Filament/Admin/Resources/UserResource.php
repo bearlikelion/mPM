@@ -88,7 +88,7 @@ class UserResource extends Resource
                     ->state(function (User $record) {
                         $ts = Analytics::userLastActivityAt($record->id);
 
-                        return $ts ? Carbon::parse($ts)->diffForHumans() : '—';
+                        return $ts ? Carbon::parse($ts)->diffForHumans() : '-';
                     }),
                 TextColumn::make('roles.name')->label('Roles')->badge()->toggleable(),
                 TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),

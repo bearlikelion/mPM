@@ -141,7 +141,7 @@
                         @else
                             <div class="mt-4 rounded-xl border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] p-4 text-center">
                                 <div class="text-xs uppercase tracking-[0.16em] text-[color:var(--gv-fg4)]">Selected estimate</div>
-                                <div class="mt-1 font-mono text-4xl font-semibold text-[color:var(--gv-amber)]">{{ $currentItem->selected_story_points ?? '—' }}</div>
+                                <div class="mt-1 font-mono text-4xl font-semibold text-[color:var(--gv-amber)]">{{ $currentItem->selected_story_points ?? '-' }}</div>
                             </div>
                         @endif
 

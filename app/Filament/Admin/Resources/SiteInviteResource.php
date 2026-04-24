@@ -42,7 +42,7 @@ class SiteInviteResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('label')->searchable()->placeholder('—'),
+                TextColumn::make('label')->searchable()->placeholder('-'),
                 TextColumn::make('token')
                     ->label('Link')
                     ->formatStateUsing(fn (SiteInvite $record) => $record->url())
@@ -55,7 +55,7 @@ class SiteInviteResource extends Resource
                         ? "{$record->used_count} / {$record->max_uses}"
                         : "{$record->used_count} / ∞"),
                 TextColumn::make('expires_at')->dateTime()->placeholder('Never'),
-                TextColumn::make('creator.name')->label('Created by')->placeholder('—'),
+                TextColumn::make('creator.name')->label('Created by')->placeholder('-'),
                 TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->defaultSort('created_at', 'desc')

@@ -77,7 +77,7 @@ class OrganizationResource extends Resource
                     ->state(function (Organization $record) {
                         $ts = Analytics::orgLastActivityAt($record->id);
 
-                        return $ts ? Carbon::parse($ts)->diffForHumans() : '—';
+                        return $ts ? Carbon::parse($ts)->diffForHumans() : '-';
                     }),
                 IconColumn::make('registration_enabled')->boolean()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')->dateTime()->sortable()->toggleable(),

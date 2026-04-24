@@ -206,7 +206,7 @@
         text-transform: uppercase;
     }
 
-    /* Card / surface — flat, single pixel border, no gradients */
+    /* Card / surface - flat, single pixel border, no gradients */
     .gv-card {
         border: 1px solid var(--gv-border);
         background: var(--gv-bg0);
@@ -234,7 +234,7 @@
         background: var(--gv-bg1);
     }
 
-    /* Legacy aliases (incrementally removed) — keep flat */
+    /* Legacy aliases (incrementally removed) - keep flat */
     .app-panel {
         border: 1px solid var(--gv-border);
         background: var(--gv-bg0);
@@ -316,7 +316,7 @@
         color: var(--gv-yellow);
     }
 
-    /* Priority / status pills — flat gruvbox */
+    /* Priority / status pills - flat gruvbox */
     .priority-crit { background: transparent; color: var(--gv-red); border: 1px solid rgba(251, 73, 52, 0.35); }
     .priority-high { background: transparent; color: var(--gv-orange); border: 1px solid rgba(254, 128, 25, 0.35); }
     .priority-med  { background: transparent; color: var(--gv-blue); border: 1px solid rgba(131, 165, 152, 0.35); }
@@ -535,7 +535,7 @@
         color: var(--gv-fg3);
     }
 
-    /* Flux sidebar nav — tighter with amber active */
+    /* Flux sidebar nav - tighter with amber active */
     [data-flux-navlist-item] {
         border-radius: 0.25rem !important;
         font-family: var(--font-sans);

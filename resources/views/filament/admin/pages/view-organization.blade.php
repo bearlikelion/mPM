@@ -75,7 +75,7 @@
                             <td class="font-mono text-xs">{{ $p->tasks_count }}</td>
                             <td class="font-mono text-xs">{{ $p->tasks_open_count }}</td>
                             <td class="font-mono text-xs">{{ $p->tasks_done_count }}</td>
-                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $p->updated_at?->diffForHumans() ?? '—' }}</td>
+                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $p->updated_at?->diffForHumans() ?? '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -104,7 +104,7 @@
                             <td class="text-[color:var(--gv-fg3)]">{{ $u->email }}</td>
                             <td class="font-mono text-xs">{{ $u->pivot->role }}</td>
                             <td class="text-xs text-[color:var(--gv-fg4)]">
-                                {{ $u->pivot->joined_at ? \Carbon\Carbon::parse($u->pivot->joined_at)->diffForHumans() : '—' }}
+                                {{ $u->pivot->joined_at ? \Carbon\Carbon::parse($u->pivot->joined_at)->diffForHumans() : '-' }}
                             </td>
                         </tr>
                     @endforeach
@@ -134,8 +134,8 @@
                             <td class="py-2 text-[color:var(--gv-fg1)]">{{ $i->email }}</td>
                             <td class="font-mono text-xs">{{ $i->role }}</td>
                             <td class="text-xs text-[color:var(--gv-fg4)]">{{ $i->created_at?->diffForHumans() }}</td>
-                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $i->accepted_at?->diffForHumans() ?? '—' }}</td>
-                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $i->expires_at?->diffForHumans() ?? '—' }}</td>
+                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $i->accepted_at?->diffForHumans() ?? '-' }}</td>
+                            <td class="text-xs text-[color:var(--gv-fg4)]">{{ $i->expires_at?->diffForHumans() ?? '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>

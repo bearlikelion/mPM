@@ -160,7 +160,7 @@
 
                 <div class="mt-3 mb-2 text-xs uppercase tracking-wide text-neutral-500">Story points</div>
                 <select wire:model.live="storyPoints" wire:change="updateField('storyPoints')" class="w-full rounded-md border-neutral-300 bg-white text-sm dark:border-neutral-700 dark:bg-neutral-900">
-                    <option value="">—</option>
+                    <option value="">-</option>
                     @foreach(\App\Models\Task::STORY_POINTS as $pt)
                         <option value="{{ $pt }}">{{ $pt }}</option>
                     @endforeach

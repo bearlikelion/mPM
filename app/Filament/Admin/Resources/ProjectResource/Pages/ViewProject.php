@@ -56,7 +56,7 @@ class ViewProject extends ViewRecord
                 'epics' => $project->epics()->count(),
                 'epics_done' => $project->epics()->whereNotNull('completed_at')->count(),
                 'members' => $project->members()->count(),
-                'active_sprint' => $activeSprint?->name ?? '—',
+                'active_sprint' => $activeSprint?->name ?? '-',
                 'completion_rate' => $statusTotal > 1
                     ? round(($statusCounts['done'] ?? 0) / $statusTotal * 100, 1)
                     : 0.0,
