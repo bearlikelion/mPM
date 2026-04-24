@@ -186,6 +186,8 @@ YAML;
         $data = $this->parse($yaml);
 
         DB::transaction(function () use ($organization, $data): void {
+            $this->importOrganizationSettings($organization, $data['organization'] ?? []);
+
             $projects = $this->importProjects($organization, $data['projects'] ?? []);
             $tags = $this->importTags($organization, $data['tags'] ?? []);
             $epics = $this->importEpics($projects, $data['epics'] ?? []);
@@ -229,6 +231,25 @@ YAML;
         $data = Yaml::parse($yaml);
 
         return is_array($data) ? $data : [];
+    }
+
+    /**
+     * @param  array<string, mixed>  $item
+     */
+    private function importOrganizationSettings(Organization $organization, array $item): void
+    {
+        $settings = $item['settings'] ?? null;
+
+        if (! is_array($settings)) {
+            return;
+        }
+
+        $organization->update([
+            'settings' => [
+                'sprint_length_days' => max(1, (int) ($settings['sprint_length_days'] ?? $organization->sprintLengthDays())),
+                'story_points_per_sprint' => max(1, (int) ($settings['story_points_per_sprint'] ?? $organization->storyPointsPerSprint())),
+            ],
+        ]);
     }
 
     /**

@@ -80,7 +80,10 @@ pub fn run() {
         .setup(|app| {
             let menu = build_tray_menu(app, &[])?;
 
+            let tray_icon = app.default_window_icon().unwrap().clone();
+
             TrayIconBuilder::with_id(TRAY_ID)
+                .icon(tray_icon)
                 .menu(&menu)
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id().as_ref() {

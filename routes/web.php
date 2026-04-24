@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\InviteController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AvatarController;
+use App\Http\Controllers\PublicDemoController;
 use App\Http\Controllers\SwitchOrganizationController;
 use App\Models\Comment;
 use App\Models\Project;
@@ -15,6 +16,9 @@ use Livewire\Volt\Volt;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+Route::get('demo', PublicDemoController::class)
+    ->name('demo');
 
 Route::get('dashboard', function (SiteTenant $siteTenant) {
     return view('dashboard', [

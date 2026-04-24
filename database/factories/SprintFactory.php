@@ -20,7 +20,12 @@ class SprintFactory extends Factory
 
         return [
             'project_id' => Project::factory(),
-            'name' => 'Sprint '.fake()->numberBetween(1, 50),
+            'name' => fake()->randomElement([
+                'Sprint '.fake()->numberBetween(12, 30).' - Stabilize',
+                'Sprint '.fake()->numberBetween(12, 30).' - Customer polish',
+                'Sprint '.fake()->numberBetween(12, 30).' - Workflow cleanup',
+                'Sprint '.fake()->numberBetween(12, 30).' - Release prep',
+            ]),
             'starts_at' => $start,
             'ends_at' => $end,
         ];

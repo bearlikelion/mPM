@@ -1,5 +1,7 @@
 # mPM
 
+![mPM Logo](./mPM_logo.png)
+
 mPM (Mark's Project Management) is an open-source, self-hosted project management app for small teams who want a focused alternative to heavyweight issue trackers.
 
 > **Active development.** Usable for local testing and early self-hosting, but the feature set, schema, UI, and deployment story are still moving. Breaking changes are possible until the first stable release.

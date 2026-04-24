@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Database\Factories\SiteSettingFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SiteSetting extends Model
 {
+    /** @use HasFactory<SiteSettingFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'registration_enabled',
         'org_creation_enabled',

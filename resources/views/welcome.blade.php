@@ -9,7 +9,7 @@
         <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
             <header class="app-panel flex flex-col gap-5 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
                 <div class="flex items-center gap-4">
-                    <span class="app-brand-mark">mPM</span>
+                    <img src="{{ asset('mPM_logo.png') }}" alt="mPM Logo" class="h-10 w-auto" />
                     <div>
                         <div class="app-eyebrow">Mark's Project Manager</div>
                         <div class="mt-1 text-2xl font-semibold tracking-tight text-neutral-50">{{ config('app.name', 'mPM') }}</div>
@@ -20,6 +20,9 @@
                         <a href="{{ route('dashboard') }}" class="app-link font-medium" wire:navigate>Dashboard</a>
                     @else
                         <a href="https://github.com/bearlikelion/mPM" target="_blank" rel="noopener noreferrer" class="text-neutral-300 transition hover:text-neutral-50">GitHub</a>
+                        @if(config('demo.enabled'))
+                            <a href="{{ route('demo') }}" class="text-neutral-300 transition hover:text-neutral-50">Demo</a>
+                        @endif
                         <a href="{{ route('login') }}" class="text-neutral-300 transition hover:text-neutral-50">Log in</a>
                         @if($registrationOpen)
                             <a href="{{ route('register') }}" class="rounded-full bg-amber-300 px-4 py-2 font-medium text-neutral-950 transition hover:bg-amber-400">Get started</a>
@@ -48,9 +51,15 @@
                             @else
                                 @if($registrationOpen)
                                     <a href="{{ route('register') }}" class="rounded-full bg-amber-300 px-5 py-3 font-semibold text-neutral-950 transition hover:bg-amber-400">Create organization</a>
+                                    @if(config('demo.enabled'))
+                                        <a href="{{ route('demo') }}" class="rounded-full border border-amber-400/50 bg-amber-400/10 px-5 py-3 font-semibold text-amber-200 transition hover:border-amber-300 hover:bg-amber-400/15">Try public demo</a>
+                                    @endif
                                     <a href="{{ route('login') }}" class="rounded-full border border-neutral-700 bg-neutral-950/50 px-5 py-3 font-semibold text-neutral-100 transition hover:border-neutral-500">Sign in</a>
                                 @else
                                     <a href="{{ route('login') }}" class="rounded-full bg-amber-300 px-5 py-3 font-semibold text-neutral-950 transition hover:bg-amber-400">Sign in</a>
+                                    @if(config('demo.enabled'))
+                                        <a href="{{ route('demo') }}" class="rounded-full border border-amber-400/50 bg-amber-400/10 px-5 py-3 font-semibold text-amber-200 transition hover:border-amber-300 hover:bg-amber-400/15">Try public demo</a>
+                                    @endif
                                     <a href="https://github.com/bearlikelion/mPM" target="_blank" rel="noopener noreferrer" class="rounded-full border border-neutral-700 bg-neutral-950/50 px-5 py-3 font-semibold text-neutral-100 transition hover:border-neutral-500">View on GitHub</a>
                                 @endif
                             @endauth

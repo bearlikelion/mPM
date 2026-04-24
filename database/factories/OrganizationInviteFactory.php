@@ -18,8 +18,8 @@ class OrganizationInviteFactory extends Factory
         return [
             'organization_id' => Organization::factory(),
             'email' => fake()->unique()->safeEmail(),
-            'role' => 'member',
-            'expires_at' => now()->addDays(7),
+            'role' => fake()->randomElement(['member', 'project_admin']),
+            'expires_at' => fake()->dateTimeBetween('+3 days', '+3 weeks'),
         ];
     }
 }

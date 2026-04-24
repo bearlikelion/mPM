@@ -19,10 +19,16 @@ class SprintPlanningMeetingFactory extends Factory
         return [
             'project_id' => Project::factory(),
             'facilitator_id' => User::factory(),
-            'name' => 'Sprint Planning '.fake()->numberBetween(1, 20),
+            'name' => fake()->randomElement([
+                'Sprint planning: intake triage',
+                'Sprint planning: release candidate',
+                'Sprint planning: customer feedback',
+                'Sprint planning: platform cleanup',
+                'Sprint planning: roadmap review',
+            ]),
             'status' => SprintPlanningMeeting::STATUS_SCHEDULED,
-            'scheduled_at' => now()->addDay(),
-            'story_points_limit' => 20,
+            'scheduled_at' => fake()->dateTimeBetween('-3 days', '+10 days'),
+            'story_points_limit' => fake()->randomElement([20, 30, 40]),
         ];
     }
 

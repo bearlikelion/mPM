@@ -1,0 +1,175 @@
+organization:
+  name: "mPM Public Demo"
+  settings:
+    sprint_length_days: 14
+    story_points_per_sprint: 30
+
+projects:
+  - key: DEMO
+    name: Demo Workspace
+    description: Explore a realistic mPM project with epics, sprints, blockers, tags, and assigned work.
+    visibility: org
+  - key: OPS
+    name: Operations Launch
+    description: A cross-functional project for onboarding, release readiness, and support handoff.
+    visibility: org
+
+epics:
+  - key: onboarding
+    project: DEMO
+    name: Onboarding Experience
+    description: Make it obvious how new team members find work, claim tasks, and understand priorities.
+  - key: planning-room
+    project: DEMO
+    name: Planning Room
+    description: Improve sprint planning, estimation, blocker visibility, and follow-through.
+  - key: launch-readiness
+    project: OPS
+    name: Launch Readiness
+    description: Coordinate public demo operations, documentation, and support preparation.
+
+sprints:
+  - key: demo-current
+    project: DEMO
+    name: Sprint 19 - Public Demo Polish
+    starts_at: 2026-04-20
+    ends_at: 2026-05-03
+    started: true
+  - key: demo-next
+    project: DEMO
+    name: Sprint 20 - Feedback Loop
+    starts_at: 2026-05-04
+    ends_at: 2026-05-17
+    started: false
+  - key: ops-current
+    project: OPS
+    name: Sprint 7 - Launch Prep
+    starts_at: 2026-04-20
+    ends_at: 2026-05-03
+    started: true
+
+tags:
+  - name: feature
+    color: "#3b82f6"
+  - name: bug
+    color: "#ef4444"
+  - name: customer-impact
+    color: "#f59e0b"
+  - name: design
+    color: "#8b5cf6"
+  - name: docs
+    color: "#14b8a6"
+  - name: split-up
+    color: "#ec4899"
+  - name: tech-debt
+    color: "#64748b"
+
+tasks:
+  - key: DEMO-1
+    project: DEMO
+    title: Add onboarding checklist to dashboard
+    description: Show new members the first three actions they should take after entering a project.
+    status: in_progress
+    priority: high
+    story_points: 5
+    epic: onboarding
+    sprint: demo-current
+    tags: [feature, customer-impact]
+    assignees: [demo@example.test, casey.demo@example.test]
+    blockers: []
+  - key: DEMO-2
+    project: DEMO
+    title: Tighten task modal validation copy
+    description: Rewrite validation hints so required fields explain the next action instead of only showing an error.
+    status: review
+    priority: med
+    story_points: 3
+    epic: onboarding
+    sprint: demo-current
+    tags: [design]
+    assignees: [riley.demo@example.test]
+    blockers: []
+  - key: DEMO-3
+    project: DEMO
+    title: Create planning room facilitation notes
+    description: Add facilitator guidance for story point voting, tie resolution, and split-up decisions.
+    status: todo
+    priority: med
+    story_points: 3
+    epic: planning-room
+    sprint: demo-current
+    tags: [docs]
+    assignees: [morgan.demo@example.test]
+    blockers: [DEMO-2]
+  - key: DEMO-4
+    project: DEMO
+    title: Surface blockers above blocked work
+    description: Keep tasks that unblock other work near the top of the board while clearly showing what they block.
+    status: in_progress
+    priority: crit
+    story_points: 8
+    epic: planning-room
+    sprint: demo-current
+    tags: [feature, customer-impact]
+    assignees: [demo@example.test, jordan.demo@example.test]
+    blockers: []
+  - key: DEMO-5
+    project: DEMO
+    title: Split oversized reporting task
+    description: Break the reporting dashboard work into smaller cards so each piece can be estimated and reviewed independently.
+    status: todo
+    priority: high
+    story_points: 13
+    epic: planning-room
+    sprint: demo-next
+    tags: [split-up]
+    assignees: [casey.demo@example.test]
+    blockers: [DEMO-4]
+  - key: DEMO-6
+    project: DEMO
+    title: Repair notification bell empty state
+    description: Make the empty state helpful when a user has no notifications and ensure the dropdown stays aligned in the sidebar.
+    status: done
+    priority: low
+    story_points: 2
+    epic: onboarding
+    sprint: demo-current
+    tags: [bug]
+    assignees: [riley.demo@example.test]
+    blockers: []
+  - key: OPS-1
+    project: OPS
+    title: Draft public demo reset notes
+    description: Document that the demo workspace resets every thirty minutes and that user changes are intentionally temporary.
+    status: in_progress
+    priority: high
+    story_points: 3
+    epic: launch-readiness
+    sprint: ops-current
+    tags: [docs]
+    assignees: [morgan.demo@example.test]
+    blockers: []
+  - key: OPS-2
+    project: OPS
+    title: Review support handoff for demo feedback
+    description: Decide where demo feedback should be routed and what metadata the support team needs to triage reports.
+    status: todo
+    priority: med
+    story_points: 5
+    epic: launch-readiness
+    sprint: ops-current
+    tags: [customer-impact]
+    assignees: [jordan.demo@example.test]
+    blockers: [OPS-1]
+  - key: OPS-3
+    project: OPS
+    title: Audit seeded project permissions
+    description: Confirm the demo user can view org and project surfaces without granting site-admin access.
+    status: review
+    priority: high
+    story_points: 5
+    epic: launch-readiness
+    sprint: ops-current
+    tags: [tech-debt]
+    assignees: [demo@example.test, jordan.demo@example.test]
+    blockers: []
