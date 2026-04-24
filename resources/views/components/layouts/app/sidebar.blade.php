@@ -87,6 +87,11 @@
                     <livewire:notification-bell />
                 </div>
 
+                <flux:navlist variant="outline">
+                    <flux:navlist.item icon="bug-ant" href="https://github.com/bearlikelion/mPM/issues/new?template=bug_report.md" target="_blank">Bug Report</flux:navlist.item>
+                    <flux:navlist.item icon="light-bulb" href="https://github.com/bearlikelion/mPM/issues/new?template=feature_request.md" target="_blank">Feature Request</flux:navlist.item>
+                </flux:navlist>
+
                 @if($isSiteAdmin || $isOrgAdmin)
                     <flux:navlist variant="outline">
                         @if($isOrgAdmin && $currentOrg)
