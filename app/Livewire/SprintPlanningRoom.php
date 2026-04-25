@@ -16,6 +16,8 @@ class SprintPlanningRoom extends Component
 
     public ?int $storyPoints = null;
 
+    public bool $showHelp = false;
+
     public function mount(int $meetingId): void
     {
         $this->meeting = SprintPlanningMeeting::query()

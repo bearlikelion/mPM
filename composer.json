@@ -18,7 +18,6 @@
         "laravel/reverb": "^1.0",
         "laravel/socialite": "^5.26",
         "laravel/tinker": "^3.0",
-        "livewire/flux": "^2.0",
         "livewire/livewire": "^4.2",
         "livewire/volt": "^1.6.7",
         "robsontenorio/mary": "^2.0",

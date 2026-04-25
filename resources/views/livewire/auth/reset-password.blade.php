@@ -75,43 +75,30 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form wire:submit="resetPassword" class="flex flex-col gap-6">
-        <!-- Email Address -->
-        <div class="grid gap-2">
-            <flux:input wire:model="email" id="email" label="{{ __('Email') }}" type="email" name="email" required autocomplete="email" />
-        </div>
+        <x-mary-input wire:model="email" id="email" label="{{ __('Email') }}" type="email" name="email" required autocomplete="email" />
 
-        <!-- Password -->
-        <div class="grid gap-2">
-            <flux:input
-                wire:model="password"
-                id="password"
-                label="{{ __('Password') }}"
-                type="password"
-                name="password"
-                required
-                autocomplete="new-password"
-                placeholder="Password"
-            />
-        </div>
+        <x-mary-password
+            wire:model="password"
+            id="password"
+            label="{{ __('Password') }}"
+            name="password"
+            required
+            autocomplete="new-password"
+            placeholder="Password"
+        />
 
-        <!-- Confirm Password -->
-        <div class="grid gap-2">
-            <flux:input
-                wire:model="password_confirmation"
-                id="password_confirmation"
-                label="{{ __('Confirm password') }}"
-                type="password"
-                name="password_confirmation"
-                required
-                autocomplete="new-password"
-                placeholder="Confirm password"
-            />
-        </div>
+        <x-mary-password
+            wire:model="password_confirmation"
+            id="password_confirmation"
+            label="{{ __('Confirm password') }}"
+            name="password_confirmation"
+            required
+            autocomplete="new-password"
+            placeholder="Confirm password"
+        />
 
         <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full">
-                {{ __('Reset password') }}
-            </flux:button>
+            <x-mary-button type="submit" class="btn btn-primary w-full" :label="__('Reset password')" />
         </div>
     </form>
 </div>

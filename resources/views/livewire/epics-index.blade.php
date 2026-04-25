@@ -6,7 +6,8 @@
         </x-slot:actions>
     </x-page-header>
 
-    <div class="max-w-sm">
+    <div class="grid gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)]">
+        <x-mary-input wire:model.live.debounce.250ms="search" icon="o-magnifying-glass" placeholder="Search epics..." clearable />
         <x-mary-choices-offline
             wire:model.live="projectId"
             :options="$projects"

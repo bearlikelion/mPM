@@ -13,8 +13,21 @@
     </head>
     <body>
         <div class="app-shell">
-            <flux:sidebar sticky stashable class="app-sidebar">
-                <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+            <aside
+                x-data="{ open: false }"
+                @open-sidebar.window="open = true"
+                @close-sidebar.window="open = false"
+                :class="open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+                class="app-sidebar fixed inset-y-0 left-0 z-40 flex w-64 flex-col gap-2 overflow-y-auto p-3 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0"
+            >
+                <button
+                    type="button"
+                    class="self-end rounded p-1 text-[color:var(--gv-fg3)] hover:text-[color:var(--gv-fg0)] lg:hidden"
+                    @click="open = false"
+                    aria-label="Close sidebar"
+                >
+                    <x-mary-icon name="o-x-mark" class="h-5 w-5" />
+                </button>
 
                 <div class="flex items-center gap-2">
                     <a href="{{ route('dashboard') }}" class="flex min-w-0 flex-1 items-center gap-2.5 rounded-sm border border-transparent p-1 transition hover:border-[color:var(--gv-border)]" wire:navigate>
@@ -37,28 +50,19 @@
                 </div>
 
                 @if($organizations->count() > 1)
-                    <flux:dropdown position="bottom" align="start">
-                        <flux:button variant="subtle" icon:trailing="chevron-down" class="mt-2 w-full justify-between border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] text-[color:var(--gv-fg1)]">
-                            <span class="truncate">{{ $currentOrg?->name ?? 'Select organization' }}</span>
-                        </flux:button>
-
-                        <flux:menu class="w-72">
-                            @foreach($organizations as $organization)
-                                <form method="POST" action="{{ route('organizations.switch', $organization) }}" class="w-full">
-                                    @csrf
-
-                                    <flux:menu.item
-                                        as="button"
-                                        type="submit"
-                                        class="w-full justify-between"
-                                        :icon="$currentOrg?->is($organization) ? 'check' : 'building-office'"
-                                    >
-                                        <span class="truncate">{{ $organization->name }}</span>
-                                    </flux:menu.item>
-                                </form>
-                            @endforeach
-                        </flux:menu>
-                    </flux:dropdown>
+                    <x-mary-dropdown class="mt-2 w-full justify-between border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] text-[color:var(--gv-fg1)]" :label="$currentOrg?->name ?? 'Select organization'">
+                        @foreach($organizations as $organization)
+                            <form method="POST" action="{{ route('organizations.switch', $organization) }}" class="w-full">
+                                @csrf
+                                <x-mary-menu-item
+                                    :title="$organization->name"
+                                    :icon="$currentOrg?->is($organization) ? 'o-check' : 'o-building-office'"
+                                    type="submit"
+                                    no-wire-navigate
+                                />
+                            </form>
+                        @endforeach
+                    </x-mary-dropdown>
                 @endif
 
                 <button
@@ -71,92 +75,72 @@
                     <span class="font-mono text-base font-semibold text-[color:var(--gv-amber)]">+</span>
                 </button>
 
-                <flux:navlist variant="outline">
-                    <flux:navlist.group heading="Platform" class="grid">
-                        <flux:navlist.item data-desktop-tray-link icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Dashboard</flux:navlist.item>
-                        <flux:navlist.item data-desktop-tray-link icon="squares-2x2" :href="route('projects.index')" :current="request()->routeIs('projects.index')" wire:navigate>Projects</flux:navlist.item>
-                        @if($isOrgAdmin)
-                            <flux:navlist.item data-desktop-tray-link icon="presentation-chart-line" :href="route('manager')" :current="request()->routeIs('manager')" wire:navigate>Manager</flux:navlist.item>
-                        @endif
-                        <flux:navlist.item data-desktop-tray-link icon="view-columns" :href="route('kanban')" :current="request()->routeIs('kanban')" wire:navigate>Kanban</flux:navlist.item>
-                        <flux:navlist.item data-desktop-tray-link icon="queue-list" :href="route('backlog')" :current="request()->routeIs('backlog')" wire:navigate>Backlog</flux:navlist.item>
-                        <flux:navlist.item data-desktop-tray-link icon="flag" :href="route('epics')" :current="request()->routeIs('epics')" wire:navigate>Epics</flux:navlist.item>
-                        <flux:navlist.item data-desktop-tray-link icon="rocket-launch" :href="route('sprints')" :current="request()->routeIs('sprints')" wire:navigate>Sprints</flux:navlist.item>
-                    </flux:navlist.group>
-                </flux:navlist>
+                <x-mary-menu activate-by-route active-bg-color="bg-[color:var(--gv-bg1)]" class="app-nav">
+                    <li class="menu-title text-[color:var(--gv-fg4)]"><span>Platform</span></li>
+                    <x-mary-menu-item data-desktop-tray-link icon="o-home" title="Dashboard" :route="'dashboard'" />
+                    <x-mary-menu-item data-desktop-tray-link icon="o-squares-2x2" title="Projects" :route="'projects.index'" />
+                    @if($isOrgAdmin)
+                        <x-mary-menu-item data-desktop-tray-link icon="o-presentation-chart-line" title="Manager" :route="'manager'" />
+                    @endif
+                    <x-mary-menu-item data-desktop-tray-link icon="o-view-columns" title="Kanban" :route="'kanban'" />
+                    <x-mary-menu-item data-desktop-tray-link icon="o-queue-list" title="Backlog" :route="'backlog'" />
+                    <x-mary-menu-item data-desktop-tray-link icon="o-flag" title="Epics" :route="'epics'" />
+                    <x-mary-menu-item data-desktop-tray-link icon="o-rocket-launch" title="Sprints" :route="'sprints'" />
+                </x-mary-menu>
 
-                <flux:spacer />
+                <div class="grow"></div>
 
-                <flux:navlist variant="outline">
-                    <flux:navlist.item data-desktop-tray-link icon="bug-ant" href="https://github.com/bearlikelion/mPM/issues/new?template=bug_report.md" target="_blank">Bug Report</flux:navlist.item>
-                    <flux:navlist.item data-desktop-tray-link icon="light-bulb" href="https://github.com/bearlikelion/mPM/issues/new?template=feature_request.md" target="_blank">Feature Request</flux:navlist.item>
-                </flux:navlist>
+                <x-mary-menu class="app-nav">
+                    <x-mary-menu-item data-desktop-tray-link icon="o-bug-ant" title="Bug Report" link="https://github.com/bearlikelion/mPM/issues/new?template=bug_report.md" external />
+                    <x-mary-menu-item data-desktop-tray-link icon="o-light-bulb" title="Feature Request" link="https://github.com/bearlikelion/mPM/issues/new?template=feature_request.md" external />
+                </x-mary-menu>
 
                 @if($isSiteAdmin || $isOrgAdmin)
-                    <flux:navlist variant="outline">
+                    <x-mary-menu class="app-nav">
                         @if($isOrgAdmin && $currentOrg)
-                            <flux:navlist.item data-desktop-tray-link icon="building-office" :href="url('/app/'.$currentOrg->slug)">
-                                Org admin
-                            </flux:navlist.item>
+                            <x-mary-menu-item data-desktop-tray-link icon="o-building-office" title="Org admin" :link="url('/app/'.$currentOrg->slug)" no-wire-navigate />
                         @endif
-
                         @if($isSiteAdmin)
-                            <flux:navlist.item data-desktop-tray-link icon="shield-check" href="/admin">
-                                Site admin
-                            </flux:navlist.item>
+                            <x-mary-menu-item data-desktop-tray-link icon="o-shield-check" title="Site admin" link="/admin" no-wire-navigate />
                         @endif
-                    </flux:navlist>
+                    </x-mary-menu>
                 @endif
 
-                <!-- Desktop User Menu -->
-                <flux:dropdown position="bottom" align="start">
-                    <flux:profile
-                        :name="auth()->user()->name"
-                        :initials="auth()->user()->initials()"
-                        icon-trailing="chevrons-up-down"
-                    />
+                <x-mary-dropdown right class="w-full">
+                    <x-slot:trigger>
+                        <button type="button" class="flex w-full items-center gap-2 rounded-sm border border-[color:var(--gv-border)] bg-[color:var(--gv-bg0-s)] px-2 py-1.5 text-left text-sm hover:bg-[color:var(--gv-bg1)]">
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-800 text-neutral-100">
+                                {{ auth()->user()->initials() }}
+                            </span>
+                            <span class="flex-1 truncate font-medium">{{ auth()->user()->name }}</span>
+                            <x-mary-icon name="o-chevron-up-down" class="h-4 w-4 text-[color:var(--gv-fg4)]" />
+                        </button>
+                    </x-slot:trigger>
 
-                    <flux:menu class="w-[220px]">
-                        <flux:menu.radio.group>
-                            <div class="p-0 text-sm font-normal">
-                                <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                    <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                        <span
-                                            class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-800 text-neutral-100"
-                                        >
-                                            {{ auth()->user()->initials() }}
-                                        </span>
-                                    </span>
+                    <div class="px-3 py-2 text-sm">
+                        <div class="font-semibold">{{ auth()->user()->name }}</div>
+                        <div class="text-xs text-[color:var(--gv-fg4)]">{{ auth()->user()->email }}</div>
+                    </div>
+                    <hr class="border-[color:var(--gv-border)]" />
+                    <x-mary-menu-item icon="o-cog" title="Settings" link="/settings/profile" />
+                    <hr class="border-[color:var(--gv-border)]" />
+                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                        @csrf
+                        <x-mary-menu-item :title="__('Log Out')" icon="o-arrow-right-start-on-rectangle" type="submit" no-wire-navigate />
+                    </form>
+                </x-mary-dropdown>
+            </aside>
 
-                                    <div class="grid flex-1 text-left text-sm leading-tight">
-                                        <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                        <span class="truncate text-xs">{{ auth()->user()->email }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </flux:menu.radio.group>
-
-                        <flux:menu.separator />
-
-                        <flux:menu.radio.group>
-                            <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>Settings</flux:menu.item>
-                        </flux:menu.radio.group>
-
-                        <flux:menu.separator />
-
-                        <form method="POST" action="{{ route('logout') }}" class="w-full">
-                            @csrf
-                            <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
-                                {{ __('Log Out') }}
-                            </flux:menu.item>
-                        </form>
-                    </flux:menu>
-                </flux:dropdown>
-            </flux:sidebar>
-
-            <!-- Mobile User Menu -->
-            <flux:header class="app-mobile-header lg:hidden">
-                <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+            <header class="app-mobile-header sticky top-0 z-30 flex items-center gap-2 border-b border-[color:var(--gv-border)] bg-[color:var(--gv-bg0)] px-3 py-2 lg:hidden">
+                <button
+                    type="button"
+                    class="rounded p-1 text-[color:var(--gv-fg2)] hover:text-[color:var(--gv-fg0)]"
+                    x-data
+                    x-on:click="$dispatch('open-sidebar')"
+                    aria-label="Open sidebar"
+                >
+                    <x-mary-icon name="o-bars-2" class="h-5 w-5" />
+                </button>
 
                 <button
                     type="button"
@@ -167,59 +151,29 @@
                     + Task
                 </button>
 
-                <flux:spacer />
+                <div class="grow"></div>
 
                 <livewire:notification-bell />
 
-                <flux:dropdown position="top" align="end">
-                    <flux:profile
-                        :initials="auth()->user()->initials()"
-                        icon-trailing="chevron-down"
-                    />
+                <x-mary-dropdown right>
+                    <x-slot:trigger>
+                        <button type="button" class="flex h-9 w-9 items-center justify-center rounded-lg bg-neutral-800 text-sm font-semibold text-neutral-100">
+                            {{ auth()->user()->initials() }}
+                        </button>
+                    </x-slot:trigger>
+                    <x-mary-menu-item icon="o-cog" title="Settings" link="/settings/profile" />
+                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                        @csrf
+                        <x-mary-menu-item :title="__('Log Out')" icon="o-arrow-right-start-on-rectangle" type="submit" no-wire-navigate />
+                    </form>
+                </x-mary-dropdown>
+            </header>
 
-                    <flux:menu>
-                        <flux:menu.radio.group>
-                            <div class="p-0 text-sm font-normal">
-                                <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                    <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                        <span
-                                            class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-800 text-neutral-100"
-                                        >
-                                            {{ auth()->user()->initials() }}
-                                        </span>
-                                    </span>
-
-                                    <div class="grid flex-1 text-left text-sm leading-tight">
-                                        <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                        <span class="truncate text-xs">{{ auth()->user()->email }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </flux:menu.radio.group>
-
-                        <flux:menu.separator />
-
-                        <flux:menu.radio.group>
-                            <flux:menu.item href="/settings/profile" icon="cog" wire:navigate>Settings</flux:menu.item>
-                        </flux:menu.radio.group>
-
-                        <flux:menu.separator />
-
-                        <form method="POST" action="{{ route('logout') }}" class="w-full">
-                            @csrf
-                            <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
-                                {{ __('Log Out') }}
-                            </flux:menu.item>
-                        </form>
-                    </flux:menu>
-                </flux:dropdown>
-            </flux:header>
-
-            {{ $slot }}
+            <main class="app-main lg:pl-0">
+                {{ $slot }}
+            </main>
         </div>
 
         <livewire:create-task-modal />
-
-        @fluxScripts
     </body>
 </html>

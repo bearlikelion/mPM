@@ -51,19 +51,15 @@
         >
             <x-slot:actions>
                 @if($projects->isNotEmpty())
-                    <form method="GET" action="{{ route('dashboard') }}">
-                        <label for="dashboard-project" class="sr-only">Project</label>
+                    <form method="GET" action="{{ route('dashboard') }}" x-data class="min-w-52">
                         <select
-                            id="dashboard-project"
                             name="project"
-                            onchange="this.form.submit()"
-                            class="select select-sm min-w-52 bg-[color:var(--gv-bg1)] font-mono text-xs text-[color:var(--gv-fg1)]"
+                            x-on:change="$el.form.submit()"
+                            class="select select-sm w-full"
                         >
                             <option value="">All projects</option>
                             @foreach($projects as $project)
-                                <option value="{{ $project->id }}" @selected($selectedProjectId === $project->id)>
-                                    {{ $project->name }}
-                                </option>
+                                <option value="{{ $project->id }}" @selected($selectedProjectId === $project->id)>{{ $project->name }}</option>
                             @endforeach
                         </select>
                     </form>
@@ -119,41 +115,22 @@
                                 ])>{{ $task->priority }}</span>
                             </div>
                             <div class="flex items-center justify-between gap-3">
-                                <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="min-w-0 truncate text-sm text-[color:var(--gv-fg1)] hover:text-[color:var(--gv-amber)]">{{ $task->title }}</a>
+                                <div class="flex min-w-0 items-center gap-1.5">
+                                    @if($task->blockedTasks->isNotEmpty())
+                                        @php($blockingNames = $task->blockedTasks->take(3)->pluck('title')->implode(', '))
+                                        <span class="tooltip" data-tip="Blocking: {{ $blockingNames }}{{ $task->blockedTasks->count() > 3 ? ' +'.($task->blockedTasks->count() - 3).' more' : '' }}">
+                                            <x-mary-icon name="o-no-symbol" class="h-4 w-4 text-[color:var(--gv-red)]" />
+                                        </span>
+                                    @elseif($task->blockers->isNotEmpty())
+                                        @php($blockedByNames = $task->blockers->take(3)->pluck('title')->implode(', '))
+                                        <span class="tooltip" data-tip="Blocked by: {{ $blockedByNames }}{{ $task->blockers->count() > 3 ? ' +'.($task->blockers->count() - 3).' more' : '' }}">
+                                            <x-mary-icon name="o-lock-closed" class="h-4 w-4 text-[color:var(--gv-orange)]" />
+                                        </span>
+                                    @endif
+                                    <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="min-w-0 truncate text-sm text-[color:var(--gv-fg1)] hover:text-[color:var(--gv-amber)]">{{ $task->title }}</a>
+                                </div>
                                 <span class="shrink-0 font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">{{ $task->project->name }}</span>
                             </div>
-                            @if($task->blockedTasks->isNotEmpty())
-                                @php
-                                    $firstBlockedTask = $task->blockedTasks->first();
-                                    $remainingBlockedTasks = $task->blockedTasks->count() - 1;
-                                @endphp
-                                <div class="flex items-center gap-1.5 text-xs text-red-300">
-                                    <span class="inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-500/20 font-mono text-[0.65rem] font-bold text-red-200">!</span>
-                                    <span>
-                                        This task is blocking {{ $firstBlockedTask->title }}
-                                        @if($remainingBlockedTasks > 0)
-                                            <span class="text-red-200/80">+{{ $remainingBlockedTasks }} more</span>
-                                        @endif
-                                    </span>
-                                </div>
-                            @elseif($task->blockers->isNotEmpty())
-                                @php
-                                    $firstBlocker = $task->blockers->first();
-                                    $remainingBlockers = $task->blockers->count() - 1;
-                                @endphp
-                                <div class="flex items-center gap-1.5 text-xs text-amber-300">
-                                    <span class="inline-flex h-4 w-4 items-center justify-center rounded-md bg-amber-400/20 font-mono text-[0.65rem] font-bold text-amber-200">!</span>
-                                    <span>
-                                        Blocked by
-                                        <a href="{{ route('tasks.show', $firstBlocker->key) }}" wire:navigate class="underline underline-offset-2 transition hover:text-amber-100">
-                                            {{ $firstBlocker->title }}
-                                        </a>
-                                        @if($remainingBlockers > 0)
-                                            <span class="text-amber-200/80">+{{ $remainingBlockers }} more</span>
-                                        @endif
-                                    </span>
-                                </div>
-                            @endif
                         </li>
                     @empty
                         <li class="px-3 py-6 text-center text-sm text-[color:var(--gv-fg4)]">nothing assigned</li>

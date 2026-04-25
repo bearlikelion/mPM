@@ -64,19 +64,15 @@
         <x-page-header :title="$currentOrg->name" subtitle="KPI tracking, delivery signals, and contributor load.">
             <x-slot:actions>
                 @if($projects->isNotEmpty())
-                    <form method="GET" action="{{ route('manager') }}">
-                        <label for="manager-project" class="sr-only">Project</label>
+                    <form method="GET" action="{{ route('manager') }}" x-data class="min-w-52">
                         <select
-                            id="manager-project"
                             name="project"
-                            onchange="this.form.submit()"
-                            class="select select-sm min-w-52 bg-[color:var(--gv-bg1)] font-mono text-xs text-[color:var(--gv-fg1)]"
+                            x-on:change="$el.form.submit()"
+                            class="select select-sm w-full"
                         >
                             <option value="">All projects</option>
                             @foreach($projects as $project)
-                                <option value="{{ $project->id }}" @selected($selectedProjectId === $project->id)>
-                                    {{ $project->name }}
-                                </option>
+                                <option value="{{ $project->id }}" @selected($selectedProjectId === $project->id)>{{ $project->name }}</option>
                             @endforeach
                         </select>
                     </form>

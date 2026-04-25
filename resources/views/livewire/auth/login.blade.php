@@ -80,14 +80,13 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     <form wire:submit="login" class="flex flex-col gap-6">
         <!-- Email Address -->
-        <flux:input wire:model="email" label="{{ __('Email address') }}" type="email" name="email" required autofocus autocomplete="email" placeholder="email@example.com" />
+        <x-mary-input wire:model="email" label="{{ __('Email address') }}" type="email" name="email" required autofocus autocomplete="email" placeholder="email@example.com" />
 
         <!-- Password -->
         <div class="relative">
-            <flux:input
+            <x-mary-password
                 wire:model="password"
                 label="{{ __('Password') }}"
-                type="password"
                 name="password"
                 required
                 autocomplete="current-password"
@@ -102,11 +101,10 @@ new #[Layout('components.layouts.auth')] class extends Component {
         </div>
 
         <!-- Remember Me -->
-        <flux:checkbox wire:model="remember" label="{{ __('Remember me') }}" />
+        <x-mary-checkbox wire:model="remember" label="{{ __('Remember me') }}" />
 
         <div class="flex items-center justify-end">
-            <flux:button variant="primary" type="submit" class="w-full">{{ __('Log in') }}</flux:button>
-        </div>
+            <x-mary-button class="btn btn-primary w-full" type="submit" :label="__('Log in')" />
     </form>
 
     @if(config('services.google.client_id') || config('services.discord.client_id') || config('services.steam.api_key'))

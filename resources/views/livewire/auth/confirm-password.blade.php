@@ -42,20 +42,16 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form wire:submit="confirmPassword" class="flex flex-col gap-6">
-        <!-- Password -->
-        <div class="grid gap-2">
-            <flux:input
-                wire:model="password"
-                id="password"
-                label="{{ __('Password') }}"
-                type="password"
-                name="password"
-                required
-                autocomplete="new-password"
-                placeholder="Password"
-            />
-        </div>
+        <x-mary-password
+            wire:model="password"
+            id="password"
+            label="{{ __('Password') }}"
+            name="password"
+            required
+            autocomplete="new-password"
+            placeholder="Password"
+        />
 
-        <flux:button variant="primary" type="submit" class="w-full">{{ __('Confirm') }}</flux:button>
+        <x-mary-button class="btn btn-primary w-full" type="submit" :label="__('Confirm')" />
     </form>
 </div>

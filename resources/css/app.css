@@ -1,10 +1,7 @@
 @import 'tailwindcss';
-@import '../../vendor/livewire/flux/dist/flux.css';
 
 @source "../views";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
-@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
 @source '../../vendor/robsontenorio/mary/src/View/Components/**/*.php';
 
 @plugin "daisyui" {
@@ -362,10 +359,7 @@
     .input,
     .select,
     .textarea,
-    .app-select,
-    input[data-flux-control],
-    textarea[data-flux-control],
-    select[data-flux-control] {
+    .app-select {
         border: 1px solid var(--gv-border) !important;
         background: var(--gv-bg0-s) !important;
         color: var(--gv-fg1) !important;
@@ -375,9 +369,7 @@
     }
 
     .input::placeholder,
-    .textarea::placeholder,
-    input[data-flux-control]::placeholder,
-    textarea[data-flux-control]::placeholder {
+    .textarea::placeholder {
         color: var(--gv-fg4);
     }
 
@@ -386,10 +378,7 @@
     .select:focus-within,
     .textarea:focus,
     .input:focus-within,
-    .app-select:focus,
-    input[data-flux-control]:focus,
-    textarea[data-flux-control]:focus,
-    select[data-flux-control]:focus {
+    .app-select:focus {
         outline: none !important;
         border-color: var(--gv-amber) !important;
         box-shadow: 0 0 0 1px var(--gv-amber) !important;
@@ -521,29 +510,15 @@
         width: min(72rem, calc(100vw - 1.5rem));
     }
 
-    /* Flux field helpers */
-    [data-flux-field] {
-        display: grid;
-        gap: 0.4rem;
-    }
-    [data-flux-label] {
-        margin-bottom: 0 !important;
-        line-height: 1.2 !important;
-        font-family: var(--font-sans);
-        font-size: 0.78rem;
-        font-weight: 500;
-        color: var(--gv-fg3);
-    }
-
-    /* Flux sidebar nav - tighter with amber active */
-    [data-flux-navlist-item] {
+    /* Mary menu - tighter sidebar nav with amber active */
+    .app-nav .menu li > a {
         border-radius: 0.25rem !important;
         font-family: var(--font-sans);
         font-size: 0.9rem;
         font-weight: 500;
     }
-    [data-flux-navlist-item][aria-current='page'],
-    [data-flux-navlist-item][data-current] {
+    .app-nav .menu li > a.mary-active-menu,
+    .app-nav .menu li > a[aria-current='page'] {
         background: var(--gv-bg1) !important;
         color: var(--gv-amber) !important;
         border-left: 2px solid var(--gv-amber);

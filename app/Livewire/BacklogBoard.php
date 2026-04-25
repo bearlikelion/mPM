@@ -15,6 +15,9 @@ class BacklogBoard extends Component
     #[Url(as: 'project')]
     public ?int $projectId = null;
 
+    #[Url(as: 'q')]
+    public string $search = '';
+
     public function mount(): void
     {
         $this->projectId = $this->resolvedProjectId($this->projectId);
@@ -79,6 +82,12 @@ class BacklogBoard extends Component
                 ->where('project_id', $this->projectId)
                 ->whereNull('sprint_id')
                 ->where('status', '!=', 'done')
+                ->when(trim($this->search) !== '', function ($q) {
+                    $term = '%'.str_replace(['%', '_'], ['\\%', '\\_'], trim($this->search)).'%';
+                    $q->where(fn ($w) => $w->where('title', 'ilike', $term)
+                        ->orWhere('key', 'ilike', $term)
+                        ->orWhere('description', 'ilike', $term));
+                })
                 ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)");
 
             if ($activeSprint) {

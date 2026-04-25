@@ -14,6 +14,9 @@ class EpicsIndex extends Component
     #[Url(as: 'project')]
     public ?int $projectId = null;
 
+    #[Url(as: 'q')]
+    public string $search = '';
+
     public function mount(): void
     {
         $this->projectId = $this->validProjectId($this->projectId);
@@ -46,6 +49,10 @@ class EpicsIndex extends Component
         $epics = Epic::with('project')
             ->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'done')])
             ->whereIn('project_id', $this->projectId ? [$this->projectId] : $projects->pluck('id'))
+            ->when(trim($this->search) !== '', function ($q) {
+                $term = '%'.str_replace(['%', '_'], ['\\%', '\\_'], trim($this->search)).'%';
+                $q->where(fn ($w) => $w->where('name', 'ilike', $term)->orWhere('description', 'ilike', $term));
+            })
             ->orderByDesc('id')
             ->get();
 

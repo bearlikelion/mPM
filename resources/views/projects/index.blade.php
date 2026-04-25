@@ -28,9 +28,7 @@
                 @endif
                 <span class="app-chip">{{ $projects->count() }} total</span>
                 <span class="app-chip">{{ $openTasks }} open</span>
-                <flux:modal.trigger name="create-task-modal">
-                    <button type="button" class="btn btn-sm btn-primary">+ new task</button>
-                </flux:modal.trigger>
+                <button type="button" class="btn btn-sm btn-primary" x-data x-on:click="$dispatch('open-create-task-modal')">+ new task</button>
             </x-slot:actions>
         </x-page-header>
 

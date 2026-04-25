@@ -12,9 +12,7 @@
     :is-org-admin="$siteCurrentOrganization && $siteUser->can('update', $siteCurrentOrganization)"
     :project-count="$siteCurrentOrganization?->projects()->count() ?? 0"
 >
-    <flux:main class="app-main">
-        <div class="app-main-inner">
-            {{ $slot }}
-        </div>
-    </flux:main>
+    <div class="app-main-inner">
+        {{ $slot }}
+    </div>
 </x-layouts.app.sidebar>

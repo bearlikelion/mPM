@@ -117,9 +117,7 @@
                                 <p class="mt-1 text-xs text-[color:var(--gv-fg4)]">Estimate complexity, uncertainty, and effort relative to other cards.</p>
                             </div>
 
-                            <flux:modal.trigger name="story-points-help">
-                                <flux:button size="xs" variant="subtle">What are story points?</flux:button>
-                            </flux:modal.trigger>
+                            <x-mary-button size="xs" wire:click="$set('showHelp', true)" label="What are story points?" />
                         </div>
 
                         @if($currentItem->status === \App\Models\SprintPlanningItem::STATUS_VOTING)
@@ -196,11 +194,10 @@
         @endif
     @endif
 
-    <flux:modal name="story-points-help" class="md:w-[32rem]">
+    <x-mary-modal wire:model="showHelp" title="What are story points?" class="md:w-[32rem]">
         <div class="space-y-4">
-            <flux:heading size="lg">What are story points?</flux:heading>
             <p class="text-sm leading-6 text-[color:var(--gv-fg2)]">Story points are a relative estimate of work. They combine complexity, uncertainty, and effort instead of promising exact hours.</p>
             <p class="text-sm leading-6 text-[color:var(--gv-fg2)]">Use the Fibonacci-style scale so bigger, riskier work naturally spreads out. A 5 should feel meaningfully larger than a 3, and a 13 should trigger discussion about splitting the task.</p>
         </div>
-    </flux:modal>
+    </x-mary-modal>
 </section>

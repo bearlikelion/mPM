@@ -1,13 +1,15 @@
 <div wire:poll.30s="refreshBell">
-    <flux:dropdown position="bottom" align="end">
-        <button type="button" class="relative rounded-full border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] p-2 text-[color:var(--gv-fg2)] transition hover:border-[color:var(--gv-amber)] hover:text-[color:var(--gv-amber)]">
-            <flux:icon name="bell" class="size-5" />
-            @if($unreadCount > 0)
-                <span class="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[0.65rem] font-bold text-white">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
-            @endif
-        </button>
+    <x-mary-dropdown right>
+        <x-slot:trigger>
+            <button type="button" class="relative rounded-full border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] p-2 text-[color:var(--gv-fg2)] transition hover:border-[color:var(--gv-amber)] hover:text-[color:var(--gv-amber)]">
+                <x-mary-icon name="o-bell" class="h-5 w-5" />
+                @if($unreadCount > 0)
+                    <span class="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[0.65rem] font-bold text-white">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                @endif
+            </button>
+        </x-slot:trigger>
 
-        <flux:menu class="w-80">
+        <div class="w-80">
             <div class="flex items-center justify-between px-3 py-2">
                 <div class="text-sm font-semibold">Notifications</div>
                 @if($unreadCount > 0)
@@ -15,7 +17,7 @@
                 @endif
             </div>
 
-            <flux:menu.separator />
+            <hr class="border-[color:var(--gv-border)]" />
 
             @forelse($notifications as $notification)
                 <div class="px-2 py-1">
@@ -37,6 +39,6 @@
             @empty
                 <div class="px-4 py-8 text-center text-sm text-[color:var(--gv-fg4)]">No notifications yet</div>
             @endforelse
-        </flux:menu>
-    </flux:dropdown>
+        </div>
+    </x-mary-dropdown>
 </div>

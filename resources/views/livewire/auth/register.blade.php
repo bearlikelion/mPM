@@ -130,72 +130,53 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form wire:submit="register" class="flex flex-col gap-6">
-        <!-- Name -->
-        <div class="grid gap-2">
-            <flux:input wire:model="name" id="name" label="{{ __('Name') }}" type="text" name="name" required autofocus autocomplete="name" placeholder="Full name" />
-        </div>
+        <x-mary-input wire:model="name" id="name" label="{{ __('Name') }}" type="text" name="name" required autofocus autocomplete="name" placeholder="Full name" />
+        <x-mary-input wire:model="email" id="email" label="{{ __('Email address') }}" type="email" name="email" required autocomplete="email" placeholder="email@example.com" />
 
-        <!-- Email Address -->
-        <div class="grid gap-2">
-            <flux:input wire:model="email" id="email" label="{{ __('Email address') }}" type="email" name="email" required autocomplete="email" placeholder="email@example.com" />
-        </div>
-
-        <div class="grid gap-2">
-            <label for="timezone" class="text-sm font-medium text-neutral-200">{{ __('Your timezone') }}</label>
-            <select wire:model="timezone" id="timezone" name="timezone" class="app-select w-full" required>
-                @foreach(\App\Support\Timezones::options() as $value => $label)
-                    <option value="{{ $value }}">{{ $label }}</option>
-                @endforeach
-            </select>
-        </div>
+        <x-mary-select
+            wire:model="timezone"
+            id="timezone"
+            name="timezone"
+            label="{{ __('Your timezone') }}"
+            :options="collect(\App\Support\Timezones::options())->map(fn($l, $v) => ['id' => $v, 'name' => $l])->values()->all()"
+            required
+        />
 
         @if(\App\Models\SiteSetting::current()->org_creation_enabled)
-        <div class="grid gap-2">
-            <flux:input wire:model="organization_name" id="organization_name" label="{{ __('Organization name') }}" type="text" name="organization_name" required autocomplete="organization" placeholder="Nerdibear" />
-        </div>
+            <x-mary-input wire:model="organization_name" id="organization_name" label="{{ __('Organization name') }}" type="text" name="organization_name" required autocomplete="organization" placeholder="Nerdibear" />
 
-        <div class="grid gap-2">
-            <label for="organization_timezone" class="text-sm font-medium text-neutral-200">{{ __('Organization timezone') }}</label>
-            <select wire:model="organization_timezone" id="organization_timezone" name="organization_timezone" class="app-select w-full" required>
-                @foreach(\App\Support\Timezones::options() as $value => $label)
-                    <option value="{{ $value }}">{{ $label }}</option>
-                @endforeach
-            </select>
-        </div>
+            <x-mary-select
+                wire:model="organization_timezone"
+                id="organization_timezone"
+                name="organization_timezone"
+                label="{{ __('Organization timezone') }}"
+                :options="collect(\App\Support\Timezones::options())->map(fn($l, $v) => ['id' => $v, 'name' => $l])->values()->all()"
+                required
+            />
         @endif
 
-        <!-- Password -->
-        <div class="grid gap-2">
-            <flux:input
-                wire:model="password"
-                id="password"
-                label="{{ __('Password') }}"
-                type="password"
-                name="password"
-                required
-                autocomplete="new-password"
-                placeholder="Password"
-            />
-        </div>
+        <x-mary-password
+            wire:model="password"
+            id="password"
+            label="{{ __('Password') }}"
+            name="password"
+            required
+            autocomplete="new-password"
+            placeholder="Password"
+        />
 
-        <!-- Confirm Password -->
-        <div class="grid gap-2">
-            <flux:input
-                wire:model="password_confirmation"
-                id="password_confirmation"
-                label="{{ __('Confirm password') }}"
-                type="password"
-                name="password_confirmation"
-                required
-                autocomplete="new-password"
-                placeholder="Confirm password"
-            />
-        </div>
+        <x-mary-password
+            wire:model="password_confirmation"
+            id="password_confirmation"
+            label="{{ __('Confirm password') }}"
+            name="password_confirmation"
+            required
+            autocomplete="new-password"
+            placeholder="Confirm password"
+        />
 
         <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full">
-                {{ __('Create account') }}
-            </flux:button>
+            <x-mary-button type="submit" class="btn btn-primary w-full" :label="__('Create account')" />
         </div>
     </form>
 

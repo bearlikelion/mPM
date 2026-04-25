@@ -49,6 +49,9 @@ class KanbanBoard extends Component
     #[Url(as: 'status')]
     public ?string $statusFilter = null;
 
+    #[Url(as: 'q')]
+    public string $search = '';
+
     public function mount(): void
     {
         $this->projectId = $this->validProjectId($this->projectId);
@@ -123,6 +126,12 @@ class KanbanBoard extends Component
             ->when($this->epicId, fn ($q) => $q->where('epic_id', $this->epicId))
             ->when($this->assigneeId, fn ($q) => $q->whereHas('assignees', fn ($a) => $a->whereKey($this->assigneeId)))
             ->when($this->tagId, fn ($q) => $q->whereHas('tags', fn ($t) => $t->whereKey($this->tagId)))
+            ->when(trim($this->search) !== '', function ($q) {
+                $term = '%'.str_replace(['%', '_'], ['\\%', '\\_'], trim($this->search)).'%';
+                $q->where(fn ($w) => $w->where('title', 'ilike', $term)
+                    ->orWhere('key', 'ilike', $term)
+                    ->orWhere('description', 'ilike', $term));
+            })
             ->orderByDependencyPriority()
             ->orderByRaw("array_position(array['crit','high','med','low']::text[], priority)");
 

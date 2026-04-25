@@ -13,18 +13,17 @@
             @csrf
 
             @guest
-                <flux:input label="Name" name="name" required autofocus />
-                <flux:input label="Email" type="email" value="{{ $invite->email }}" disabled />
-                <div class="grid gap-2">
-                    <label for="timezone" class="text-sm font-medium text-neutral-200">Your timezone</label>
-                    <select id="timezone" name="timezone" class="app-select w-full" required>
-                        @foreach(\App\Support\Timezones::options() as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <flux:input label="Password" type="password" name="password" required />
-                <flux:input label="Confirm password" type="password" name="password_confirmation" required />
+                <x-mary-input label="Name" name="name" required autofocus />
+                <x-mary-input label="Email" type="email" value="{{ $invite->email }}" disabled />
+                <x-mary-select
+                    id="timezone"
+                    name="timezone"
+                    label="Your timezone"
+                    :options="collect(\App\Support\Timezones::options())->map(fn($l, $v) => ['id' => $v, 'name' => $l])->values()->all()"
+                    required
+                />
+                <x-mary-password label="Password" name="password" required />
+                <x-mary-password label="Confirm password" name="password_confirmation" required />
             @else
                 <input type="hidden" name="_existing" value="1" />
                 <p class="text-sm text-zinc-600 dark:text-zinc-400">
@@ -32,9 +31,7 @@
                 </p>
             @endguest
 
-            <flux:button variant="primary" type="submit" class="w-full">
-                Accept invite
-            </flux:button>
+            <x-mary-button class="btn btn-primary w-full" type="submit" label="Accept invite" />
         </form>
     </div>
 </x-layouts.auth>

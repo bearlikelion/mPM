@@ -118,10 +118,10 @@ new #[Layout('components.layouts.app')] class extends Component {
         </div>
 
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" label="{{ __('Name') }}" type="text" name="name" required autofocus autocomplete="name" />
+            <x-mary-input wire:model="name" label="{{ __('Name') }}" type="text" name="name" required autofocus autocomplete="name" />
 
             <div>
-                <flux:input wire:model="email" label="{{ __('Email') }}" type="email" name="email" required autocomplete="email" />
+                <x-mary-input wire:model="email" label="{{ __('Email') }}" type="email" name="email" required autocomplete="email" />
 
                 @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail &&! auth()->user()->hasVerifiedEmail())
                     <div>
@@ -145,15 +145,15 @@ new #[Layout('components.layouts.app')] class extends Component {
                 @endif
             </div>
 
-            <div class="grid gap-2">
-                <label for="timezone" class="text-sm font-medium text-neutral-200">{{ __('Timezone') }}</label>
-                <select wire:model="timezone" id="timezone" name="timezone" class="app-select w-full" required>
-                    @foreach(\App\Support\Timezones::options() as $value => $label)
-                        <option value="{{ $value }}">{{ $label }}</option>
-                    @endforeach
-                </select>
-                <p class="text-sm text-neutral-400">This controls how timestamps are shown to you across the app.</p>
-            </div>
+            <x-mary-select
+                wire:model="timezone"
+                id="timezone"
+                name="timezone"
+                label="{{ __('Timezone') }}"
+                hint="This controls how timestamps are shown to you across the app."
+                :options="collect(\App\Support\Timezones::options())->map(fn($l, $v) => ['id' => $v, 'name' => $l])->values()->all()"
+                required
+            />
 
             @php
                 $currentOrg = auth()->user()->defaultOrganization;
@@ -177,7 +177,7 @@ new #[Layout('components.layouts.app')] class extends Component {
 
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
+                    <x-mary-button class="btn btn-primary w-full" type="submit" :label="__('Save')" />
                 </div>
 
                 <x-action-message class="me-3" on="profile-updated">

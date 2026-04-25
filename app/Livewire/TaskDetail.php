@@ -154,8 +154,10 @@ class TaskDetail extends Component
                 ->get(['id', 'key', 'title'])
                 ->map(fn (Task $task) => [
                     'id' => $task->id,
-                    'label' => $task->key.' · '.$task->title,
-                ]),
+                    'name' => $task->key.' · '.$task->title,
+                ])
+                ->values()
+                ->all(),
         ]);
     }
 }

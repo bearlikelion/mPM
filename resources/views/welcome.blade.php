@@ -347,6 +347,6 @@
             </footer>
         </main>
 
-        @fluxScripts
+        
     </body>
 </html>
