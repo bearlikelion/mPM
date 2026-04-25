@@ -55,6 +55,7 @@ class PublicDemoWorkspace
                 [
                     'name' => config('demo.organization_name'),
                     'timezone' => 'America/New_York',
+                    'logo_path' => 'https://picsum.photos/seed/mpm-public-demo-logo/160/160',
                     'registration_enabled' => false,
                     'settings' => [
                         'sprint_length_days' => 14,
@@ -105,6 +106,7 @@ class PublicDemoWorkspace
                     'name' => $userData['name'],
                     'timezone' => $userData['timezone'],
                     'password' => Hash::make(Str::password(32)),
+                    'avatar_path' => $userData['avatar_path'],
                     'email_verified_at' => now(),
                     'default_organization_id' => $organization->id,
                 ],
@@ -139,7 +141,7 @@ class PublicDemoWorkspace
     }
 
     /**
-     * @return array<int, array{name: string, email: string, timezone: string, role: string, joined_days_ago: int}>
+     * @return array<int, array{name: string, email: string, timezone: string, role: string, joined_days_ago: int, avatar_path: string}>
      */
     private function demoUsers(): array
     {
@@ -150,6 +152,7 @@ class PublicDemoWorkspace
                 'timezone' => 'America/New_York',
                 'role' => 'org_admin',
                 'joined_days_ago' => 90,
+                'avatar_path' => 'https://picsum.photos/seed/demo-user-admin/160/160',
             ],
             [
                 'name' => 'Casey Demo',
@@ -157,6 +160,7 @@ class PublicDemoWorkspace
                 'timezone' => 'America/Chicago',
                 'role' => 'project_admin',
                 'joined_days_ago' => 45,
+                'avatar_path' => 'https://picsum.photos/seed/demo-user-casey/160/160',
             ],
             [
                 'name' => 'Riley Demo',
@@ -164,6 +168,7 @@ class PublicDemoWorkspace
                 'timezone' => 'America/Los_Angeles',
                 'role' => 'member',
                 'joined_days_ago' => 31,
+                'avatar_path' => 'https://picsum.photos/seed/demo-user-riley/160/160',
             ],
             [
                 'name' => 'Morgan Demo',
@@ -171,6 +176,7 @@ class PublicDemoWorkspace
                 'timezone' => 'Europe/London',
                 'role' => 'member',
                 'joined_days_ago' => 22,
+                'avatar_path' => 'https://picsum.photos/seed/demo-user-morgan/160/160',
             ],
             [
                 'name' => 'Jordan Demo',
@@ -178,6 +184,7 @@ class PublicDemoWorkspace
                 'timezone' => 'America/Denver',
                 'role' => 'member',
                 'joined_days_ago' => 18,
+                'avatar_path' => 'https://picsum.photos/seed/demo-user-jordan/160/160',
             ],
         ];
     }

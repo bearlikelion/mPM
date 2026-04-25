@@ -117,6 +117,10 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasTenants
     public function avatarUrl(): string
     {
         if ($this->avatar_path) {
+            if (filter_var($this->avatar_path, FILTER_VALIDATE_URL)) {
+                return $this->avatar_path;
+            }
+
             return Storage::disk('public')->url($this->avatar_path);
         }
 

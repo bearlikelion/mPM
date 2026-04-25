@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Mark Arneman',
             'email' => 'mark@example.test',
             'timezone' => 'America/New_York',
+            'avatar_path' => $this->picsum('mark-arneman'),
         ]);
         $siteAdmin->assignRole('site_admin');
 
@@ -50,6 +51,7 @@ class DatabaseSeeder extends Seeder
                 'sprint_length_days' => 14,
                 'story_points_per_sprint' => 30,
             ],
+            'logo_path' => $this->picsum('nerdibear-logo'),
             'registration_enabled' => true,
         ]);
 
@@ -83,16 +85,19 @@ class DatabaseSeeder extends Seeder
                 'name' => 'SurfsUp Launch',
                 'key' => 'SURF',
                 'description' => 'Coordinate the playable demo, creator tooling, and public release checklist for the next SurfsUp milestone.',
+                'avatar_path' => $this->picsum('project-surfsup-launch'),
             ],
             [
                 'name' => 'Mark Makes Games Studio',
                 'key' => 'MMG',
                 'description' => 'Track studio operations, content planning, and repeatable production workflows for game projects.',
+                'avatar_path' => $this->picsum('project-mark-makes-games'),
             ],
             [
                 'name' => 'mPM Desktop',
                 'key' => 'MPM',
                 'description' => 'Improve the desktop wrapper, realtime notifications, tray workflow, and cross-platform release flow.',
+                'avatar_path' => $this->picsum('project-mpm-desktop'),
             ],
         ])->map(fn (array $projectData): Project => $this->createProjectGraph($org, $team, $tags, $projectData));
 
@@ -112,6 +117,7 @@ class DatabaseSeeder extends Seeder
             'name' => $userData['name'],
             'email' => $userData['email'],
             'timezone' => $userData['timezone'],
+            'avatar_path' => $this->picsum('user-'.$userData['email']),
         ]), function (User $user) use ($org, $userData): void {
             $org->users()->attach($user, [
                 'role' => $userData['role'],
@@ -156,10 +162,14 @@ class DatabaseSeeder extends Seeder
         ]));
 
         $epics = collect([
-            ['name' => 'Onboarding and intake', 'description' => 'Make the first-run workflow clear, fast, and resilient for new project members.'],
-            ['name' => 'Planning and execution', 'description' => 'Improve backlog hygiene, sprint planning, estimation, and blocker visibility.'],
-            ['name' => 'Release operations', 'description' => 'Tighten the final release checklist, notification copy, and support handoff.'],
-        ])->map(fn (array $epic): Epic => Epic::factory()->for($project)->create($epic));
+            ['name' => 'Onboarding and intake', 'description' => 'Make the first-run workflow clear, fast, and resilient for new project members.', 'completed_at' => now()->subWeek()],
+            ['name' => 'Planning and execution', 'description' => 'Improve backlog hygiene, sprint planning, estimation, and blocker visibility.', 'completed_at' => null],
+            ['name' => 'Release operations', 'description' => 'Tighten the final release checklist, notification copy, and support handoff.', 'completed_at' => null],
+            ['name' => 'Backlog discovery', 'description' => 'Capture early ideas, unassigned intake, and future roadmap candidates before they are ready for a sprint.', 'completed_at' => null],
+        ])->map(fn (array $epic, int $index): Epic => Epic::factory()->for($project)->create([
+            ...$epic,
+            'avatar_path' => $this->picsum('epic-'.$project->key.'-'.$index),
+        ]));
 
         $sprints = collect([
             Sprint::factory()->for($project)->create([
@@ -188,16 +198,19 @@ class DatabaseSeeder extends Seeder
             $task = Task::factory()->for($project)->create([
                 'key' => $project->key.'-'.$project->task_counter,
                 'title' => $title,
-                'epic_id' => $index < 9 ? $epics[$index % $epics->count()]->id : null,
-                'sprint_id' => $index < 8 ? $sprints[1]->id : ($index < 11 ? $sprints[2]->id : null),
+                'epic_id' => $index < 10 ? $epics[$index % $epics->count()]->id : null,
+                'sprint_id' => $index < 3 ? $sprints[0]->id : ($index < 8 ? $sprints[1]->id : ($index < 10 ? $sprints[2]->id : null)),
                 'created_by' => $team->first()->id,
                 'status' => ['todo', 'in_progress', 'review', 'done'][$index % 4],
                 'priority' => ['med', 'high', 'low', 'crit'][$index % 4],
                 'story_points' => Task::STORY_POINTS[$index % count(Task::STORY_POINTS)],
-                'due_date' => now()->addDays($index + 3)->toDateString(),
+                'due_date' => $index < 3 ? now()->subDays(12 - $index)->toDateString() : now()->addDays($index + 3)->toDateString(),
             ]);
 
-            $task->assignees()->attach($team->random(fake()->numberBetween(1, 3))->pluck('id')->all());
+            if ($index !== 10) {
+                $task->assignees()->attach($team->random(fake()->numberBetween(1, 3))->pluck('id')->all());
+            }
+
             $task->tags()->attach($tags->random(fake()->numberBetween(1, 3))->pluck('id')->all());
 
             Comment::factory(fake()->numberBetween(1, 3))->create([
@@ -221,6 +234,54 @@ class DatabaseSeeder extends Seeder
     {
         $sprint = $project->sprints()->whereNull('ended_at')->whereNotNull('started_at')->first();
         $facilitator = $team->first();
+
+        $completedSprint = $project->sprints()->whereNotNull('ended_at')->first();
+        $completedMeeting = SprintPlanningMeeting::factory()
+            ->for($project)
+            ->for($facilitator, 'facilitator')
+            ->for($completedSprint, 'sprint')
+            ->create([
+                'name' => 'Sprint planning: foundation cleanup',
+                'status' => SprintPlanningMeeting::STATUS_COMPLETED,
+                'scheduled_at' => now()->subWeeks(4),
+                'story_points_limit' => 30,
+                'started_at' => now()->subWeeks(4)->addMinutes(5),
+                'completed_at' => now()->subWeeks(4)->addHour(),
+            ]);
+
+        $team->each(fn (User $user): SprintPlanningParticipant => SprintPlanningParticipant::factory()
+            ->for($completedMeeting, 'meeting')
+            ->for($user)
+            ->create([
+                'joined_at' => now()->subWeeks(4)->addMinutes(10),
+                'last_seen_at' => now()->subWeeks(4)->addHour(),
+            ]));
+
+        $project->tasks()
+            ->whereBelongsTo($completedSprint, 'sprint')
+            ->limit(3)
+            ->get()
+            ->values()
+            ->each(function (Task $task, int $index) use ($completedMeeting, $team): void {
+                $item = SprintPlanningItem::factory()
+                    ->for($completedMeeting, 'meeting')
+                    ->for($task)
+                    ->create([
+                        'status' => SprintPlanningItem::STATUS_CLAIMED,
+                        'sort_order' => $index + 1,
+                        'assigned_user_id' => $team->random()->id,
+                        'decision_by' => $team->first()->id,
+                        'selected_story_points' => $task->story_points,
+                        'decided_at' => now()->subWeeks(4)->addMinutes(45),
+                    ]);
+
+                $team->each(fn (User $user): SprintPlanningVote => SprintPlanningVote::factory()
+                    ->for($item, 'item')
+                    ->for($user)
+                    ->create([
+                        'story_points' => $task->story_points,
+                    ]));
+            });
 
         $meeting = SprintPlanningMeeting::factory()
             ->active()
@@ -331,6 +392,13 @@ class DatabaseSeeder extends Seeder
             'Split oversized reporting dashboard task',
             'Audit timezone display in meeting history',
             'Improve task comment attachment guidance',
+            'Triage unassigned backlog feedback',
+            'Collect roadmap ideas for later discovery',
         ];
+    }
+
+    private function picsum(string $seed, int $size = 160): string
+    {
+        return "https://picsum.photos/seed/{$seed}/{$size}/{$size}";
     }
 }

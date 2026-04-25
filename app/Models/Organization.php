@@ -109,6 +109,10 @@ class Organization extends Model
     public function logoUrl(): string
     {
         if ($this->logo_path) {
+            if (filter_var($this->logo_path, FILTER_VALIDATE_URL)) {
+                return $this->logo_path;
+            }
+
             return Storage::disk('public')->url($this->logo_path);
         }
 
