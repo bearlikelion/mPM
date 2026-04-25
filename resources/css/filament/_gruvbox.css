@@ -54,8 +54,6 @@ body,
 
 /* Topbar */
 .fi-topbar > div {
-    background-color: var(--gv-bg0);
-    border-bottom: 1px solid var(--gv-border);
     padding-inline: 1rem;
 }
 
@@ -119,8 +117,6 @@ body,
 .fi-ta-ctn,
 .fi-modal-window,
 .fi-dropdown-panel {
-    background-color: var(--gv-bg0) !important;
-    border: 1px solid var(--gv-border) !important;
     border-radius: 2px !important;
     box-shadow: none !important;
 }

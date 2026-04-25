@@ -122,6 +122,7 @@ class CreateTaskModal extends Component
                 'id' => $project->id,
                 'name' => $project->name,
                 'key' => $project->key,
+                'avatar' => $project->avatarUrl(),
             ]),
             'epics' => $selectedProject
                 ? Epic::query()->where('project_id', $selectedProject->id)->orderBy('name')->get()
@@ -137,6 +138,8 @@ class CreateTaskModal extends Component
                     ->map(fn (Epic $epic) => [
                         'id' => $epic->id,
                         'name' => $epic->name,
+                        'project' => $selectedProject->name,
+                        'avatar' => $epic->avatarUrl(),
                     ])
                 : collect(),
             'sprintOptions' => $selectedProject
@@ -147,6 +150,8 @@ class CreateTaskModal extends Component
                     ->map(fn (Sprint $sprint) => [
                         'id' => $sprint->id,
                         'name' => $sprint->name,
+                        'window' => trim(($sprint->starts_at?->format('M j') ?? 'unscheduled').' - '.($sprint->ends_at?->format('M j') ?? 'open')),
+                        'avatar' => $sprint->avatarUrl(),
                     ])
                 : collect(),
             'assigneeOptions' => $selectedProject

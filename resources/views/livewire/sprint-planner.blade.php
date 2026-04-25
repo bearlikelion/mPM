@@ -9,13 +9,25 @@
     <div class="max-w-sm">
         <x-mary-choices-offline
             wire:model.live="projectId"
-            :options="$projects"
+            :options="$projectOptions"
             single
             searchable
             clearable
             placeholder="Select project"
+            option-sub-label="key"
+            option-avatar="avatar"
         />
     </div>
+
+    @if($selectedProject)
+        <div class="gv-card-muted flex items-center gap-3 px-3 py-2">
+            <img src="{{ $selectedProject->avatarUrl() }}" alt="" class="h-9 w-9 rounded-sm border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] object-cover" />
+            <div class="min-w-0">
+                <div class="truncate text-sm font-semibold text-[color:var(--gv-fg0)]">{{ $selectedProject->name }}</div>
+                <div class="font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">{{ $selectedProject->key }} sprint track</div>
+            </div>
+        </div>
+    @endif
 
     @if($selectedMeeting)
         <livewire:sprint-planning-room :meeting-id="$selectedMeeting->id" :key="'planning-room-'.$selectedMeeting->id" />

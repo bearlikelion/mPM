@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Sprint extends Model
 {
@@ -45,5 +46,12 @@ class Sprint extends Model
     public function isActive(): bool
     {
         return $this->started_at !== null && $this->ended_at === null;
+    }
+
+    public function avatarUrl(): string
+    {
+        $initials = Str::upper(Str::substr($this->name, 0, 2));
+
+        return route('avatars.default', ['initials' => $initials ?: 'SP']);
     }
 }

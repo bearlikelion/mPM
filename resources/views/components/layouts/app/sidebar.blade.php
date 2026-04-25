@@ -54,12 +54,16 @@
                         @foreach($organizations as $organization)
                             <form method="POST" action="{{ route('organizations.switch', $organization) }}" class="w-full">
                                 @csrf
-                                <x-mary-menu-item
-                                    :title="$organization->name"
-                                    :icon="$currentOrg?->is($organization) ? 'o-check' : 'o-building-office'"
-                                    type="submit"
-                                    no-wire-navigate
-                                />
+                                <li>
+                                    <button type="submit" class="my-0.5 w-full whitespace-nowrap px-4 py-1.5 text-left hover:text-inherit">
+                                        <span class="block py-0.5">
+                                            <x-mary-icon :name="$currentOrg?->is($organization) ? 'o-check' : 'o-building-office'" class="mb-0.5" />
+                                        </span>
+                                        <span class="mary-hideable truncate whitespace-nowrap">
+                                            {{ $organization->name }}
+                                        </span>
+                                    </button>
+                                </li>
                             </form>
                         @endforeach
                     </x-mary-dropdown>
@@ -126,7 +130,16 @@
                     <hr class="border-[color:var(--gv-border)]" />
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
-                        <x-mary-menu-item :title="__('Log Out')" icon="o-arrow-right-start-on-rectangle" type="submit" no-wire-navigate />
+                        <li>
+                            <button type="submit" class="my-0.5 w-full whitespace-nowrap px-4 py-1.5 text-left hover:text-inherit">
+                                <span class="block py-0.5">
+                                    <x-mary-icon name="o-arrow-right-start-on-rectangle" class="mb-0.5" />
+                                </span>
+                                <span class="mary-hideable truncate whitespace-nowrap">
+                                    {{ __('Log Out') }}
+                                </span>
+                            </button>
+                        </li>
                     </form>
                 </x-mary-dropdown>
             </aside>
@@ -164,7 +177,16 @@
                     <x-mary-menu-item icon="o-cog" title="Settings" link="/settings/profile" />
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
-                        <x-mary-menu-item :title="__('Log Out')" icon="o-arrow-right-start-on-rectangle" type="submit" no-wire-navigate />
+                        <li>
+                            <button type="submit" class="my-0.5 w-full whitespace-nowrap px-4 py-1.5 text-left hover:text-inherit">
+                                <span class="block py-0.5">
+                                    <x-mary-icon name="o-arrow-right-start-on-rectangle" class="mb-0.5" />
+                                </span>
+                                <span class="mary-hideable truncate whitespace-nowrap">
+                                    {{ __('Log Out') }}
+                                </span>
+                            </button>
+                        </li>
                     </form>
                 </x-mary-dropdown>
             </header>

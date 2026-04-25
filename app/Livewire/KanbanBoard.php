@@ -105,7 +105,7 @@ class KanbanBoard extends Component
             : collect();
 
         $epics = $this->projectId
-            ? Epic::where('project_id', $this->projectId)->orderBy('name')->get()
+            ? Epic::with('project')->where('project_id', $this->projectId)->orderBy('name')->get()
             : collect();
 
         $assignees = $this->projectId
@@ -160,14 +160,20 @@ class KanbanBoard extends Component
             'projectOptions' => $projects->map(fn (Project $project) => [
                 'id' => $project->id,
                 'name' => $project->name,
+                'key' => $project->key,
+                'avatar' => $project->avatarUrl(),
             ]),
             'sprintOptions' => $sprints->map(fn (Sprint $sprint) => [
                 'id' => $sprint->id,
                 'name' => $sprint->name,
+                'window' => trim(($sprint->starts_at?->format('M j') ?? 'unscheduled').' - '.($sprint->ends_at?->format('M j') ?? 'open')),
+                'avatar' => $sprint->avatarUrl(),
             ]),
             'epicOptions' => $epics->map(fn (Epic $epic) => [
                 'id' => $epic->id,
                 'name' => $epic->name,
+                'project' => $epic->project?->name,
+                'avatar' => $epic->avatarUrl(),
             ]),
             'assigneeOptions' => $assignees->map(fn (User $user) => [
                 'id' => $user->id,

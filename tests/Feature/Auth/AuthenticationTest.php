@@ -55,4 +55,17 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_sidebar_logout_control_submits_the_logout_form(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertOk();
+        $this->assertMatchesRegularExpression(
+            '/<form method="POST" action="'.preg_quote(route('logout'), '/').'" class="w-full">.*?<button type="submit"/s',
+            $response->getContent(),
+        );
+    }
 }

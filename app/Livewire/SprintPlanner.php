@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Organization;
+use App\Models\Project;
 use App\Models\Sprint;
 use App\Models\SprintPlanningMeeting;
 use App\Support\SiteTenant;
@@ -122,9 +123,16 @@ class SprintPlanner extends Component
 
         return view('livewire.sprint-planner', [
             'projects' => $projects,
+            'projectOptions' => $projects->map(fn (Project $project) => [
+                'id' => $project->id,
+                'name' => $project->name,
+                'key' => $project->key,
+                'avatar' => $project->avatarUrl(),
+            ]),
             'sprints' => $sprints,
             'meetings' => $meetings,
             'selectedMeeting' => $selectedMeeting,
+            'selectedProject' => $selectedProject,
             'canScheduleMeeting' => $selectedProject ? Auth::user()->can('update', $selectedProject) : false,
         ]);
     }

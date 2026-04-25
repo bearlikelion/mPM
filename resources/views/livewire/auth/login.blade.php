@@ -10,7 +10,8 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.auth')] class extends Component
+{
     #[Validate('required|string|email')]
     public string $email = '';
 
@@ -105,6 +106,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         <div class="flex items-center justify-end">
             <x-mary-button class="btn btn-primary w-full" type="submit" :label="__('Log in')" />
+        </div>
     </form>
 
     @if(config('services.google.client_id') || config('services.discord.client_id') || config('services.steam.api_key'))

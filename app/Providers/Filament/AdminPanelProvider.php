@@ -20,7 +20,6 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -32,7 +31,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('mPM')
-            ->brandLogo(fn () => Blade::render('<span class="fi-logo"><x-app-logo-icon /><span class="fi-logo-wordmark">mPM</span><span class="gv-panel-tag">site admin</span></span>'))
+            ->brandLogo(asset('mPM_logo.png'))
+            ->brandLogoHeight('2rem')
             ->colors([
                 'primary' => Color::Red,
             ])

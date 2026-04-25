@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Epic;
 use App\Models\Organization;
+use App\Models\Project;
 use App\Support\SiteTenant;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
@@ -58,6 +59,12 @@ class EpicsIndex extends Component
 
         return view('livewire.epics-index', [
             'projects' => $projects,
+            'projectOptions' => $projects->map(fn (Project $project) => [
+                'id' => $project->id,
+                'name' => $project->name,
+                'key' => $project->key,
+                'avatar' => $project->avatarUrl(),
+            ]),
             'epics' => $epics,
         ]);
     }

@@ -51,15 +51,21 @@
         >
             <x-slot:actions>
                 @if($projects->isNotEmpty())
-                    <form method="GET" action="{{ route('dashboard') }}" x-data class="min-w-52">
+                    <form method="GET" action="{{ route('dashboard') }}" x-data class="min-w-64">
+                        @if($selectedProject)
+                            <div class="mb-1 flex items-center gap-2">
+                                <img src="{{ $selectedProject->avatarUrl() }}" alt="" class="h-5 w-5 rounded-sm border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] object-cover" />
+                                <span class="truncate text-xs font-medium text-[color:var(--gv-fg2)]">{{ $selectedProject->key }} · {{ $selectedProject->name }}</span>
+                            </div>
+                        @endif
                         <select
                             name="project"
                             x-on:change="$el.form.submit()"
                             class="select select-sm w-full"
                         >
-                            <option value="">All projects</option>
+                            <option value="">◆ All projects</option>
                             @foreach($projects as $project)
-                                <option value="{{ $project->id }}" @selected($selectedProjectId === $project->id)>{{ $project->name }}</option>
+                                <option value="{{ $project->id }}" @selected($selectedProjectId === $project->id)>■ {{ $project->key }} · {{ $project->name }}</option>
                             @endforeach
                         </select>
                     </form>

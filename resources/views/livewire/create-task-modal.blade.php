@@ -45,6 +45,7 @@
                                 label="Project"
                                 placeholder="Search a project"
                                 option-sub-label="key"
+                                option-avatar="avatar"
                                 tabindex="-1"
                             />
 
@@ -114,6 +115,8 @@
                                 clearable
                                 label="Epic"
                                 placeholder="No epic"
+                                option-sub-label="project"
+                                option-avatar="avatar"
                             />
 
                             @if($activeSprint)
@@ -130,6 +133,8 @@
                                     clearable
                                     label="Sprint"
                                     placeholder="No sprint"
+                                    option-sub-label="window"
+                                    option-avatar="avatar"
                                 />
                             @endif
                         </div>

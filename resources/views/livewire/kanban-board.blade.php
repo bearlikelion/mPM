@@ -26,10 +26,10 @@
 
     <div class="app-filter-panel grid gap-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
         <x-mary-input wire:model.live.debounce.250ms="search" icon="o-magnifying-glass" placeholder="Search tasks..." clearable />
-        <x-mary-choices-offline wire:model.live="projectId" :options="$projectOptions" single searchable clearable placeholder="All projects" />
-        <x-mary-choices-offline wire:model.live="sprintId" :options="$sprintOptions" single searchable clearable placeholder="All sprints" />
+        <x-mary-choices-offline wire:model.live="projectId" :options="$projectOptions" single searchable clearable placeholder="All projects" option-sub-label="key" option-avatar="avatar" />
+        <x-mary-choices-offline wire:model.live="sprintId" :options="$sprintOptions" single searchable clearable placeholder="All sprints" option-sub-label="window" option-avatar="avatar" />
         <x-mary-choices-offline wire:model.live="assigneeId" :options="$assigneeOptions" single searchable clearable placeholder="Anyone" option-sub-label="email" option-avatar="avatar" />
-        <x-mary-choices-offline wire:model.live="epicId" :options="$epicOptions" single searchable clearable placeholder="All epics" />
+        <x-mary-choices-offline wire:model.live="epicId" :options="$epicOptions" single searchable clearable placeholder="All epics" option-sub-label="project" option-avatar="avatar" />
         <x-mary-choices-offline wire:model.live="tagId" :options="$tagOptions" single searchable clearable placeholder="All tags" />
     </div>
 

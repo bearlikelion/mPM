@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Organization;
+use App\Models\Project;
 use App\Models\Sprint;
 use App\Models\Task;
 use App\Support\SiteTenant;
@@ -105,6 +106,12 @@ class BacklogBoard extends Component
 
         return view('livewire.backlog-board', [
             'projects' => $projects,
+            'projectOptions' => $projects->map(fn (Project $project) => [
+                'id' => $project->id,
+                'name' => $project->name,
+                'key' => $project->key,
+                'avatar' => $project->avatarUrl(),
+            ]),
             'sprints' => $sprints,
             'activeSprint' => $activeSprint,
             'unassignedTasks' => $unassignedTasks,

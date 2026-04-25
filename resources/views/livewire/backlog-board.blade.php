@@ -13,11 +13,13 @@
         <x-mary-input wire:model.live.debounce.250ms="search" icon="o-magnifying-glass" placeholder="Search backlog..." clearable />
         <x-mary-choices-offline
             wire:model.live="projectId"
-            :options="$projects"
+            :options="$projectOptions"
             single
             searchable
             clearable
             placeholder="Select project"
+            option-sub-label="key"
+            option-avatar="avatar"
         />
     </div>
 
@@ -65,9 +67,9 @@
                                     class="select select-sm w-full font-mono text-xs"
                                     x-on:change="$wire.assignToSprint({{ $task->id }}, $event.target.value || null)"
                                 >
-                                    <option value="">move to sprint…</option>
+                                    <option value="">⚑ move to sprint…</option>
                                     @foreach($sprints as $sprint)
-                                        <option value="{{ $sprint->id }}">{{ $sprint->name }}</option>
+                                        <option value="{{ $sprint->id }}">⚑ {{ $sprint->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -118,9 +120,9 @@
                                 class="select select-sm w-full font-mono text-xs"
                                 x-on:change="$wire.assignToSprint({{ $task->id }}, $event.target.value || null)"
                             >
-                                <option value="">move to sprint…</option>
+                                <option value="">⚑ move to sprint…</option>
                                 @foreach($sprints as $sprint)
-                                    <option value="{{ $sprint->id }}">{{ $sprint->name }}</option>
+                                    <option value="{{ $sprint->id }}">⚑ {{ $sprint->name }}</option>
                                 @endforeach
                             </select>
                         </div>

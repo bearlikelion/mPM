@@ -10,11 +10,13 @@
         <x-mary-input wire:model.live.debounce.250ms="search" icon="o-magnifying-glass" placeholder="Search epics..." clearable />
         <x-mary-choices-offline
             wire:model.live="projectId"
-            :options="$projects"
+            :options="$projectOptions"
             single
             searchable
             clearable
             placeholder="All projects"
+            option-sub-label="key"
+            option-avatar="avatar"
         />
     </div>
 
