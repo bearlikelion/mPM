@@ -6,7 +6,9 @@ use App\Http\Controllers\AvatarController;
 use App\Http\Controllers\PublicDemoController;
 use App\Http\Controllers\SwitchOrganizationController;
 use App\Models\Comment;
+use App\Models\Epic;
 use App\Models\Project;
+use App\Models\Sprint;
 use App\Models\Task;
 use App\Models\User;
 use App\Support\SiteTenant;
@@ -61,6 +63,41 @@ Route::view('sprints', 'sprints')
 Route::view('epics', 'epics')
     ->middleware(['auth', 'verified'])
     ->name('epics');
+
+Route::get('epics/{epic}', function (Epic $epic) {
+    abort_unless(auth()->user()->can('view', $epic->project), 403);
+
+    $epic->load('project.organization');
+    $epic->loadCount([
+        'tasks',
+        'tasks as completed_tasks_count' => fn ($q) => $q->where('status', 'done'),
+    ]);
+
+    $sprints = Sprint::query()
+        ->where('project_id', $epic->project_id)
+        ->whereHas('tasks', fn ($q) => $q->where('epic_id', $epic->id))
+        ->withCount([
+            'tasks as epic_tasks_count' => fn ($q) => $q->where('epic_id', $epic->id),
+            'tasks as epic_completed_count' => fn ($q) => $q->where('epic_id', $epic->id)->where('status', 'done'),
+        ])
+        ->with(['tasks' => fn ($q) => $q->where('epic_id', $epic->id)->with('assignees')->orderBy('status')->orderBy('key')])
+        ->orderByRaw('COALESCE(started_at, starts_at) DESC NULLS LAST')
+        ->get();
+
+    $unscheduledTasks = Task::query()
+        ->where('epic_id', $epic->id)
+        ->whereNull('sprint_id')
+        ->with('assignees')
+        ->orderBy('status')
+        ->orderBy('key')
+        ->get();
+
+    return view('epics.show', [
+        'epic' => $epic,
+        'sprints' => $sprints,
+        'unscheduledTasks' => $unscheduledTasks,
+    ]);
+})->middleware(['auth', 'verified'])->name('epics.show');
 
 Route::get('tasks/{key}', fn (string $key) => view('tasks.show', ['key' => $key]))
     ->middleware(['auth', 'verified'])

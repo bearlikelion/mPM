@@ -23,9 +23,9 @@
     @else
         <div class="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
             @foreach($epics as $epic)
-                @php $pct = $epic->tasks_count > 0 ? round(($epic->completed_tasks_count / $epic->tasks_count) * 100) : 0; @endphp
+                @php($pct = $epic->tasks_count > 0 ? round(($epic->completed_tasks_count / $epic->tasks_count) * 100) : 0)
                 <a
-                    href="{{ route('kanban', ['project' => $epic->project_id, 'epic' => $epic->id]) }}"
+                    href="{{ route('epics.show', $epic) }}"
                     wire:navigate
                     class="gv-card gv-hover flex flex-col gap-3 p-4"
                 >

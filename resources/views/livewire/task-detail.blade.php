@@ -27,7 +27,7 @@
             @endif
         </div>
         @if(! $embedded)
-            <a href="{{ route('kanban', ['project' => $task->project_id, 'highlight' => $task->id, 'task' => $task->key]) }}" wire:navigate class="btn btn-sm">
+            <a href="{{ route('kanban', ['project' => $task->project_id, 'highlight' => $task->id]) }}" wire:navigate class="btn btn-sm">
                 Open in kanban
             </a>
         @endif
@@ -170,7 +170,7 @@
                     @if($task->epic)
                         <div class="flex items-center gap-2">
                             <span class="text-[color:var(--gv-fg4)]">Epic:</span>
-                            <a href="{{ route('kanban', ['project' => $task->project_id, 'epic' => $task->epic_id]) }}" wire:navigate class="flex items-center gap-1 text-[color:var(--gv-blue)] hover:underline">
+                            <a href="{{ route('epics.show', $task->epic) }}" wire:navigate class="flex items-center gap-1 text-[color:var(--gv-blue)] hover:underline">
                                 <img src="{{ $task->epic->avatarUrl() }}" alt="" class="h-4 w-4 rounded" />
                                 {{ $task->epic->name }}
                             </a>

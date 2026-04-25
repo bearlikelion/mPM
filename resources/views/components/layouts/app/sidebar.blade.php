@@ -12,13 +12,13 @@
         @include('partials.head')
     </head>
     <body>
-        <div class="app-shell">
+        <div class="app-shell lg:flex lg:items-start">
             <aside
                 x-data="{ open: false }"
                 @open-sidebar.window="open = true"
                 @close-sidebar.window="open = false"
                 :class="open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-                class="app-sidebar fixed inset-y-0 left-0 z-40 flex w-64 flex-col gap-2 overflow-y-auto p-3 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0"
+                class="app-sidebar fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col gap-2 overflow-y-auto p-3 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0"
             >
                 <button
                     type="button"
@@ -169,7 +169,7 @@
                 </x-mary-dropdown>
             </header>
 
-            <main class="app-main lg:pl-0">
+            <main class="app-main min-w-0 flex-1">
                 {{ $slot }}
             </main>
         </div>

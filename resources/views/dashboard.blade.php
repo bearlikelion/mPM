@@ -90,20 +90,21 @@
             </div>
         </div>
 
-        <div class="grid gap-3 xl:grid-cols-[1.1fr_1fr_0.9fr]">
-            <section class="gv-card overflow-hidden">
+        <div class="grid items-stretch gap-3 xl:grid-cols-[1.1fr_1fr_0.9fr]">
+            <section class="gv-card flex h-full flex-col overflow-hidden">
                 <div class="flex items-center justify-between border-b border-[color:var(--gv-border)] px-3 py-2">
                     <span class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» my open tasks</span>
                     <span class="app-chip">{{ $myTasks->count() }}</span>
                 </div>
-                <ul class="divide-y divide-[color:var(--gv-border)]">
+                <ul class="flex-1 divide-y divide-[color:var(--gv-border)]">
                     @forelse($myTasks as $task)
                         <li class="flex flex-col gap-1 px-3 py-2.5">
                             <div class="flex items-center justify-between gap-2">
                                 <div class="flex min-w-0 items-center gap-2">
-                                    <span class="font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">{{ $task->key }}</span>
+                                    <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="font-mono text-[0.68rem] text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $task->key }}</a>
                                     @if($task->sprint)
-                                        <span class="truncate font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">· {{ $task->sprint->name }}</span>
+                                        <span class="font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">·</span>
+                                        <a href="{{ route('kanban', ['project' => $task->project_id, 'sprint' => $task->sprint_id]) }}" wire:navigate class="truncate font-mono text-[0.68rem] text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $task->sprint->name }}</a>
                                     @endif
                                 </div>
                                 <span @class([
@@ -129,7 +130,7 @@
                                     @endif
                                     <a href="{{ route('tasks.show', $task->key) }}" wire:navigate class="min-w-0 truncate text-sm text-[color:var(--gv-fg1)] hover:text-[color:var(--gv-amber)]">{{ $task->title }}</a>
                                 </div>
-                                <span class="shrink-0 font-mono text-[0.68rem] text-[color:var(--gv-fg4)]">{{ $task->project->name }}</span>
+                                <a href="{{ route('kanban', ['project' => $task->project_id]) }}" wire:navigate class="shrink-0 font-mono text-[0.68rem] text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $task->project->name }}</a>
                             </div>
                         </li>
                     @empty
@@ -138,14 +139,14 @@
                 </ul>
             </section>
 
-            <section class="gv-card overflow-hidden">
+            <section class="gv-card flex h-full flex-col overflow-hidden">
                 <div class="border-b border-[color:var(--gv-border)] px-3 py-2">
                     <span class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» recent activity</span>
                 </div>
-                <ul class="divide-y divide-[color:var(--gv-border)]">
+                <ul class="flex-1 divide-y divide-[color:var(--gv-border)]">
                     @foreach($recentComments as $comment)
                         <li class="px-3 py-2.5 text-sm">
-                            <div class="text-[color:var(--gv-fg2)]">
+                            <div class="flex flex-wrap items-center gap-x-1.5 text-[color:var(--gv-fg2)]">
                                 @if($comment->user)
                                     <a href="{{ route('users.show', $comment->user) }}" wire:navigate class="font-medium text-[color:var(--gv-fg0)] hover:text-[color:var(--gv-amber)]">{{ $comment->user->name }}</a>
                                 @else
@@ -154,7 +155,7 @@
                                 <span class="text-[color:var(--gv-fg4)]">→</span>
                                 <a href="{{ route('tasks.show', $comment->task->key) }}" wire:navigate class="font-mono text-xs text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $comment->task->key }}</a>
                             </div>
-                            <div class="mt-0.5 line-clamp-2 text-xs text-[color:var(--gv-fg4)]">{{ $comment->body }}</div>
+                            <a href="{{ route('tasks.show', $comment->task->key) }}" wire:navigate class="mt-0.5 block line-clamp-2 text-xs text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $comment->body }}</a>
                         </li>
                     @endforeach
                     @foreach($recentCompleted as $task)
@@ -170,7 +171,7 @@
                 </ul>
             </section>
 
-            <section class="gv-card overflow-hidden">
+            <section class="gv-card flex h-full flex-col overflow-hidden">
                 <div class="flex items-center justify-between border-b border-[color:var(--gv-border)] px-3 py-2">
                     <span class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» active epics</span>
                     <a href="{{ route('epics') }}" wire:navigate class="app-link text-sm">all →</a>
@@ -178,11 +179,11 @@
                 @if($activeEpics->isEmpty())
                     <div class="px-3 py-6 text-center text-sm text-[color:var(--gv-fg4)]">no active epics</div>
                 @else
-                    <ul class="divide-y divide-[color:var(--gv-border)]">
+                    <ul class="flex-1 divide-y divide-[color:var(--gv-border)]">
                         @foreach($activeEpics as $epic)
-                            @php $pct = $epic->tasks_count > 0 ? round(($epic->completed_tasks_count / $epic->tasks_count) * 100) : 0; @endphp
+                            @php($pct = $epic->tasks_count > 0 ? round(($epic->completed_tasks_count / $epic->tasks_count) * 100) : 0)
                             <li>
-                                <a href="{{ route('kanban', ['project' => $epic->project_id, 'epic' => $epic->id]) }}" wire:navigate class="flex flex-col gap-1.5 px-3 py-2.5 transition hover:bg-[color:var(--gv-bg1)]">
+                                <a href="{{ route('epics.show', $epic) }}" wire:navigate class="flex flex-col gap-1.5 px-3 py-2.5 transition hover:bg-[color:var(--gv-bg1)]">
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="truncate text-sm font-medium text-[color:var(--gv-fg0)]">{{ $epic->name }}</span>
                                         @if($epic->due_date)
