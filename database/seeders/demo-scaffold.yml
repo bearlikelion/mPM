@@ -7,46 +7,88 @@ organization:
 projects:
   - key: DEMO
     name: Demo Workspace
-    description: Explore a realistic mPM project with epics, sprints, blockers, tags, and assigned work.
+    description: Explore a realistic mPM project with epics, sprints, blockers, tags, assigned work, and backlog intake.
+    avatar: https://picsum.photos/seed/mpm-demo-project/160/160
     visibility: org
   - key: OPS
     name: Operations Launch
-    description: A cross-functional project for onboarding, release readiness, and support handoff.
+    description: A cross-functional project for onboarding, release readiness, support handoff, and launch operations.
+    avatar: https://picsum.photos/seed/mpm-ops-project/160/160
     visibility: org
+  - key: RND
+    name: Product Discovery
+    description: A parking lot for unassigned intake, research spikes, and future roadmap candidates.
+    avatar: https://picsum.photos/seed/mpm-rnd-project/160/160
+    visibility: restricted
 
 epics:
   - key: onboarding
     project: DEMO
     name: Onboarding Experience
     description: Make it obvious how new team members find work, claim tasks, and understand priorities.
+    avatar: https://picsum.photos/seed/mpm-epic-onboarding/160/160
+    completed: true
   - key: planning-room
     project: DEMO
     name: Planning Room
     description: Improve sprint planning, estimation, blocker visibility, and follow-through.
+    avatar: https://picsum.photos/seed/mpm-epic-planning-room/160/160
+    completed: false
   - key: launch-readiness
     project: OPS
     name: Launch Readiness
     description: Coordinate public demo operations, documentation, and support preparation.
+    avatar: https://picsum.photos/seed/mpm-epic-launch-readiness/160/160
+    completed: false
+  - key: support-handoff
+    project: OPS
+    name: Support Handoff
+    description: Prepare support, QA, and stakeholder review paths before the public demo window.
+    avatar: https://picsum.photos/seed/mpm-epic-support-handoff/160/160
+    completed: true
+  - key: discovery-pipeline
+    project: RND
+    name: Discovery Pipeline
+    description: Capture raw ideas, unassigned backlog items, and future sprint candidates.
+    avatar: https://picsum.photos/seed/mpm-epic-discovery-pipeline/160/160
+    completed: false
 
 sprints:
+  - key: demo-completed
+    project: DEMO
+    name: Sprint 18 - Foundation Cleanup
+    starts_at: 2026-04-06
+    ends_at: 2026-04-19
+    started: true
+    ended: true
   - key: demo-current
     project: DEMO
     name: Sprint 19 - Public Demo Polish
     starts_at: 2026-04-20
     ends_at: 2026-05-03
     started: true
+    ended: false
   - key: demo-next
     project: DEMO
     name: Sprint 20 - Feedback Loop
     starts_at: 2026-05-04
     ends_at: 2026-05-17
     started: false
+    ended: false
   - key: ops-current
     project: OPS
     name: Sprint 7 - Launch Prep
     starts_at: 2026-04-20
     ends_at: 2026-05-03
     started: true
+    ended: false
+  - key: rnd-backlog
+    project: RND
+    name: Discovery Intake
+    starts_at: 2026-05-04
+    ends_at: 2026-05-17
+    started: false
+    ended: false
 
 tags:
   - name: feature
@@ -63,17 +105,19 @@ tags:
     color: "#ec4899"
   - name: tech-debt
     color: "#64748b"
+  - name: unassigned
+    color: "#94a3b8"
 
 tasks:
   - key: DEMO-1
     project: DEMO
     title: Add onboarding checklist to dashboard
     description: Show new members the first three actions they should take after entering a project.
-    status: in_progress
+    status: done
     priority: high
     story_points: 5
     epic: onboarding
-    sprint: demo-current
+    sprint: demo-completed
     tags: [feature, customer-impact]
     assignees: [demo@example.test, casey.demo@example.test]
     blockers: []
@@ -81,11 +125,11 @@ tasks:
     project: DEMO
     title: Tighten task modal validation copy
     description: Rewrite validation hints so required fields explain the next action instead of only showing an error.
-    status: review
+    status: done
     priority: med
     story_points: 3
     epic: onboarding
-    sprint: demo-current
+    sprint: demo-completed
     tags: [design]
     assignees: [riley.demo@example.test]
     blockers: []
@@ -129,13 +173,25 @@ tasks:
     project: DEMO
     title: Repair notification bell empty state
     description: Make the empty state helpful when a user has no notifications and ensure the dropdown stays aligned in the sidebar.
-    status: done
+    status: review
     priority: low
     story_points: 2
-    epic: onboarding
+    epic: planning-room
     sprint: demo-current
     tags: [bug]
     assignees: [riley.demo@example.test]
+    blockers: []
+  - key: DEMO-7
+    project: DEMO
+    title: Triage unassigned demo feedback
+    description: Review new feedback from the demo form and decide whether it belongs in the current sprint, next sprint, or backlog.
+    status: todo
+    priority: med
+    story_points: 2
+    epic: planning-room
+    sprint:
+    tags: [unassigned, customer-impact]
+    assignees: []
     blockers: []
   - key: OPS-1
     project: OPS
@@ -173,3 +229,164 @@ tasks:
     tags: [tech-debt]
     assignees: [demo@example.test, jordan.demo@example.test]
     blockers: []
+  - key: OPS-4
+    project: OPS
+    title: Confirm completed support checklist
+    description: Verify support routing, ownership, and status labels before the launch readiness epic moves forward.
+    status: done
+    priority: med
+    story_points: 2
+    epic: support-handoff
+    sprint: ops-current
+    tags: [docs]
+    assignees: [casey.demo@example.test]
+    blockers: []
+  - key: RND-1
+    project: RND
+    title: Backlog pricing-page feedback
+    description: Capture stakeholder notes about pricing copy without committing the work to a sprint.
+    status: todo
+    priority: low
+    story_points: 3
+    epic: discovery-pipeline
+    sprint:
+    tags: [unassigned]
+    assignees: []
+    blockers: []
+  - key: RND-2
+    project: RND
+    title: Investigate native desktop sync
+    description: Scope a research spike for offline task sync and decide whether it belongs in the next planning session.
+    status: in_progress
+    priority: med
+    story_points: 8
+    epic: discovery-pipeline
+    sprint: rnd-backlog
+    tags: [feature, tech-debt]
+    assignees: [casey.demo@example.test]
+    blockers: []
+  - key: RND-3
+    project: RND
+    title: Collect roadmap ideas for later discovery
+    description: Keep early ideas visible while making it clear that nobody owns them yet.
+    status: todo
+    priority: low
+    story_points: 1
+    epic:
+    sprint:
+    tags: [unassigned]
+    assignees: []
+    blockers: []
+
+comments:
+  - task: DEMO-4
+    user: demo@example.test
+    body: This blocker ordering example should stay visible on the board so visitors can see dependency behavior immediately.
+  - task: DEMO-5
+    user: casey.demo@example.test
+    body: The split-up label is intentional here. This is too large to claim as a single sprint item.
+  - task: OPS-2
+    user: jordan.demo@example.test
+    body: Support needs the source project and affected task key in every feedback handoff.
+  - task: RND-1
+    user: morgan.demo@example.test
+    body: Leaving this unassigned until product decides whether the request fits the roadmap.
+
+sprint_planning_meetings:
+  - key: demo-foundation-planning
+    project: DEMO
+    sprint: demo-completed
+    facilitator: demo@example.test
+    name: "Sprint planning: foundation cleanup"
+    status: completed
+    scheduled_at: "2026-04-06 10:00:00"
+    story_points_limit: 30
+    participants: [demo@example.test, casey.demo@example.test, riley.demo@example.test, morgan.demo@example.test, jordan.demo@example.test]
+    items:
+      - task: DEMO-1
+        status: claimed
+        sort_order: 1
+        assigned: demo@example.test
+        decision_by: demo@example.test
+        selected_story_points: 5
+        votes:
+          demo@example.test: 5
+          casey.demo@example.test: 5
+          riley.demo@example.test: 3
+      - task: DEMO-2
+        status: claimed
+        sort_order: 2
+        assigned: riley.demo@example.test
+        decision_by: demo@example.test
+        selected_story_points: 3
+        votes:
+          demo@example.test: 3
+          riley.demo@example.test: 3
+          morgan.demo@example.test: 5
+  - key: demo-active-planning
+    project: DEMO
+    sprint: demo-current
+    facilitator: demo@example.test
+    name: "Sprint planning: public demo polish"
+    status: active
+    scheduled_at: "2026-04-25 10:00:00"
+    story_points_limit: 30
+    participants: [demo@example.test, casey.demo@example.test, riley.demo@example.test, morgan.demo@example.test, jordan.demo@example.test]
+    items:
+      - task: DEMO-3
+        status: voting
+        sort_order: 1
+        selected_story_points:
+        votes:
+          demo@example.test: 3
+          casey.demo@example.test: 5
+          morgan.demo@example.test: 3
+      - task: DEMO-4
+        status: estimated
+        sort_order: 2
+        decision_by: demo@example.test
+        selected_story_points: 8
+        votes:
+          demo@example.test: 8
+          jordan.demo@example.test: 8
+          riley.demo@example.test: 5
+      - task: DEMO-5
+        status: backlog
+        sort_order: 3
+        selected_story_points: 13
+        votes:
+          demo@example.test: 13
+          casey.demo@example.test: 13
+      - task: DEMO-7
+        status: pending
+        sort_order: 4
+        selected_story_points:
+        votes: {}
+  - key: ops-active-planning
+    project: OPS
+    sprint: ops-current
+    facilitator: casey.demo@example.test
+    name: "Sprint planning: launch prep"
+    status: active
+    scheduled_at: "2026-04-24 13:00:00"
+    story_points_limit: 30
+    participants: [casey.demo@example.test, morgan.demo@example.test, jordan.demo@example.test]
+    items:
+      - task: OPS-1
+        status: claimed
+        sort_order: 1
+        assigned: morgan.demo@example.test
+        decision_by: casey.demo@example.test
+        selected_story_points: 3
+        votes:
+          casey.demo@example.test: 3
+          morgan.demo@example.test: 3
+      - task: OPS-2
+        status: delayed
+        sort_order: 2
+        assigned: jordan.demo@example.test
+        decision_by: casey.demo@example.test
+        selected_story_points: 5
+        votes:
+          casey.demo@example.test: 5
+          jordan.demo@example.test: 5

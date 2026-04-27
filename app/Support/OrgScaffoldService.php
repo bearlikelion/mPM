@@ -7,7 +7,10 @@ use App\Models\Epic;
 use App\Models\Organization;
 use App\Models\Project;
 use App\Models\Sprint;
+use App\Models\SprintPlanningItem;
 use App\Models\SprintPlanningMeeting;
+use App\Models\SprintPlanningParticipant;
+use App\Models\SprintPlanningVote;
 use App\Models\Tag;
 use App\Models\Task;
 use App\Models\User;
@@ -43,6 +46,7 @@ projects:
   - key: APP
     name: Example App
     description: Short project description.
+    avatar: https://picsum.photos/seed/mpm-app/160/160
     visibility: org # org, restricted, or public
 
 epics:
@@ -50,6 +54,7 @@ epics:
     project: APP
     name: Launch readiness
     description: Group related launch tasks.
+    avatar: https://picsum.photos/seed/mpm-launch/160/160
 
 sprints:
   - key: sprint-1
@@ -58,6 +63,7 @@ sprints:
     starts_at: {$startsAt}
     ends_at: {$endsAt}
     started: false
+    ended: false
 
 tags:
   - name: feature
@@ -78,6 +84,29 @@ tasks:
     tags: [feature]
     assignees: [person@example.com]
     blockers: []
+
+comments:
+  - task: APP-1
+    user: person@example.com
+    body: Imported scaffold comments appear in task history.
+
+sprint_planning_meetings:
+  - key: planning-1
+    project: APP
+    sprint: sprint-1
+    facilitator: person@example.com
+    name: Sprint planning
+    status: scheduled # scheduled, active, completed, or cancelled
+    scheduled_at: "{$startsAt} 10:00:00"
+    story_points_limit: {$storyPoints}
+    participants: [person@example.com]
+    items:
+      - task: APP-1
+        status: pending # pending, voting, estimated, claimed, delayed, or backlog
+        sort_order: 1
+        selected_story_points: 3
+        votes:
+          person@example.com: 3
 YAML;
     }
 
@@ -100,6 +129,7 @@ YAML;
                 'key' => $project->key,
                 'name' => $project->name,
                 'description' => $project->description,
+                'avatar' => $project->avatar_path,
                 'visibility' => $project->visibility,
             ])->values()->all(),
             'epics' => $organization->projects->flatMap(fn (Project $project) => $project->epics->map(fn (Epic $epic): array => [
@@ -107,7 +137,9 @@ YAML;
                 'project' => $project->key,
                 'name' => $epic->name,
                 'description' => $epic->description,
+                'avatar' => $epic->avatar_path,
                 'due_date' => $epic->due_date?->toDateString(),
+                'completed' => $epic->completed_at !== null,
             ]))->values()->all(),
             'sprints' => $organization->projects->flatMap(fn (Project $project) => $project->sprints->map(fn (Sprint $sprint): array => [
                 'key' => Str::slug($sprint->name),
@@ -116,6 +148,7 @@ YAML;
                 'starts_at' => $sprint->starts_at?->toDateString(),
                 'ends_at' => $sprint->ends_at?->toDateString(),
                 'started' => $sprint->started_at !== null,
+                'ended' => $sprint->ended_at !== null,
             ]))->values()->all(),
             'tags' => $organization->tags->map(fn (Tag $tag): array => [
                 'name' => $tag->name,
@@ -177,6 +210,8 @@ YAML;
                 'sprints' => count($data['sprints'] ?? []),
                 'tasks' => count($data['tasks'] ?? []),
                 'tags' => count($data['tags'] ?? []),
+                'comments' => count($data['comments'] ?? []),
+                'sprint_planning_meetings' => count($data['sprint_planning_meetings'] ?? []),
             ],
         ];
     }
@@ -196,6 +231,8 @@ YAML;
 
             $this->syncTaskTagsAndAssignees($organization, $tasks, $tags, $data['tasks'] ?? []);
             $this->syncBlockers($tasks, $data['tasks'] ?? []);
+            $this->importComments($organization, $tasks, $data['comments'] ?? []);
+            $this->importSprintPlanningMeetings($organization, $projects, $sprints, $tasks, $data['sprint_planning_meetings'] ?? []);
         });
     }
 
@@ -267,6 +304,7 @@ YAML;
                 [
                     'name' => (string) $item['name'],
                     'description' => $item['description'] ?? null,
+                    'avatar_path' => $item['avatar'] ?? $item['avatar_path'] ?? null,
                     'visibility' => $item['visibility'] ?? Project::VISIBILITY_ORG,
                 ],
             );
@@ -315,7 +353,9 @@ YAML;
                 ['project_id' => $project->id, 'name' => (string) $item['name']],
                 [
                     'description' => $item['description'] ?? null,
+                    'avatar_path' => $item['avatar'] ?? $item['avatar_path'] ?? null,
                     'due_date' => $item['due_date'] ?? null,
+                    'completed_at' => Arr::get($item, 'completed') ? now()->subDays(3) : null,
                 ],
             );
         }
@@ -346,6 +386,7 @@ YAML;
                     'starts_at' => $item['starts_at'] ?? now()->toDateString(),
                     'ends_at' => $item['ends_at'] ?? now()->addDays(13)->toDateString(),
                     'started_at' => Arr::get($item, 'started') ? now() : null,
+                    'ended_at' => Arr::get($item, 'ended') ? now()->subDays(1) : null,
                 ],
             );
         }
@@ -434,6 +475,139 @@ YAML;
 
             $task->blockers()->sync(collect($item['blockers'] ?? [])->map(fn (string $key): ?int => $tasks[$key]->id ?? null)->filter()->all());
         }
+    }
+
+    /**
+     * @param  array<string, Task>  $tasks
+     * @param  array<int, array<string, mixed>>  $items
+     */
+    private function importComments(Organization $organization, array $tasks, array $items): void
+    {
+        $commentTaskIds = collect($items)
+            ->map(fn (array $item): ?int => ($tasks[(string) ($item['task'] ?? '')] ?? null)?->id)
+            ->filter()
+            ->all();
+
+        if ($commentTaskIds !== []) {
+            Comment::query()->whereIn('task_id', $commentTaskIds)->delete();
+        }
+
+        foreach ($items as $item) {
+            $task = $tasks[(string) ($item['task'] ?? '')] ?? null;
+            $user = $this->organizationUser($organization, (string) ($item['user'] ?? ''));
+
+            if (! $task || ! $user) {
+                continue;
+            }
+
+            Comment::query()->create([
+                'task_id' => $task->id,
+                'user_id' => $user->id,
+                'body' => (string) ($item['body'] ?? ''),
+            ]);
+        }
+    }
+
+    /**
+     * @param  array<string, Project>  $projects
+     * @param  array<string, Sprint>  $sprints
+     * @param  array<string, Task>  $tasks
+     * @param  array<int, array<string, mixed>>  $items
+     */
+    private function importSprintPlanningMeetings(Organization $organization, array $projects, array $sprints, array $tasks, array $items): void
+    {
+        foreach ($items as $item) {
+            $project = $projects[Str::upper((string) ($item['project'] ?? ''))] ?? null;
+            $facilitator = $this->organizationUser($organization, (string) ($item['facilitator'] ?? ''));
+
+            if (! $project || ! $facilitator) {
+                continue;
+            }
+
+            $meeting = SprintPlanningMeeting::query()->updateOrCreate(
+                ['project_id' => $project->id, 'name' => (string) $item['name']],
+                [
+                    'facilitator_id' => $facilitator->id,
+                    'sprint_id' => isset($item['sprint']) ? ($sprints[(string) $item['sprint']]->id ?? null) : null,
+                    'status' => $item['status'] ?? SprintPlanningMeeting::STATUS_SCHEDULED,
+                    'scheduled_at' => $item['scheduled_at'] ?? now(),
+                    'story_points_limit' => $item['story_points_limit'] ?? $organization->storyPointsPerSprint(),
+                    'started_at' => in_array($item['status'] ?? null, [SprintPlanningMeeting::STATUS_ACTIVE, SprintPlanningMeeting::STATUS_COMPLETED], true) ? now()->subHours(2) : null,
+                    'completed_at' => ($item['status'] ?? null) === SprintPlanningMeeting::STATUS_COMPLETED ? now()->subHour() : null,
+                    'cancelled_at' => ($item['status'] ?? null) === SprintPlanningMeeting::STATUS_CANCELLED ? now()->subHour() : null,
+                ],
+            );
+
+            collect($item['participants'] ?? [])->each(function (string $email) use ($organization, $meeting): void {
+                $user = $this->organizationUser($organization, $email);
+
+                if (! $user) {
+                    return;
+                }
+
+                SprintPlanningParticipant::query()->updateOrCreate(
+                    ['sprint_planning_meeting_id' => $meeting->id, 'user_id' => $user->id],
+                    [
+                        'joined_at' => now()->subMinutes(90),
+                        'last_seen_at' => now()->subMinutes(5),
+                    ],
+                );
+            });
+
+            $currentItem = null;
+
+            foreach (($item['items'] ?? []) as $itemData) {
+                $task = $tasks[(string) ($itemData['task'] ?? '')] ?? null;
+
+                if (! $task) {
+                    continue;
+                }
+
+                $status = $itemData['status'] ?? SprintPlanningItem::STATUS_PENDING;
+                $planningItem = SprintPlanningItem::query()->updateOrCreate(
+                    ['sprint_planning_meeting_id' => $meeting->id, 'task_id' => $task->id],
+                    [
+                        'assigned_user_id' => $this->organizationUser($organization, (string) ($itemData['assigned'] ?? ''))?->id,
+                        'decision_by' => $this->organizationUser($organization, (string) ($itemData['decision_by'] ?? ''))?->id,
+                        'status' => $status,
+                        'sort_order' => (int) ($itemData['sort_order'] ?? 0),
+                        'selected_story_points' => $itemData['selected_story_points'] ?? null,
+                        'decided_at' => in_array($status, [SprintPlanningItem::STATUS_ESTIMATED, SprintPlanningItem::STATUS_CLAIMED, SprintPlanningItem::STATUS_DELAYED, SprintPlanningItem::STATUS_BACKLOG], true) ? now()->subMinutes(45) : null,
+                    ],
+                );
+
+                $currentItem ??= $planningItem;
+
+                foreach (($itemData['votes'] ?? []) as $email => $storyPoints) {
+                    $user = $this->organizationUser($organization, (string) $email);
+
+                    if (! $user) {
+                        continue;
+                    }
+
+                    SprintPlanningVote::query()->updateOrCreate(
+                        ['sprint_planning_item_id' => $planningItem->id, 'user_id' => $user->id],
+                        ['story_points' => (int) $storyPoints],
+                    );
+                }
+            }
+
+            if ($meeting->status === SprintPlanningMeeting::STATUS_ACTIVE && $currentItem) {
+                $meeting->update(['current_item_id' => $currentItem->id]);
+            }
+        }
+    }
+
+    private function organizationUser(Organization $organization, string $email): ?User
+    {
+        if ($email === '') {
+            return null;
+        }
+
+        return User::query()
+            ->where('email', $email)
+            ->whereHas('organizations', fn ($query) => $query->whereKey($organization->id))
+            ->first();
     }
 
     private function nextTaskKey(Project $project): string
