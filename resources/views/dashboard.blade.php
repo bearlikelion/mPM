@@ -161,7 +161,7 @@
                                 <span class="text-[color:var(--gv-fg4)]">→</span>
                                 <a href="{{ route('tasks.show', $comment->task->key) }}" wire:navigate class="font-mono text-xs text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $comment->task->key }}</a>
                             </div>
-                            <a href="{{ route('tasks.show', $comment->task->key) }}" wire:navigate class="mt-0.5 block line-clamp-2 text-xs text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ $comment->body }}</a>
+                            <a href="{{ route('tasks.show', $comment->task->key) }}" wire:navigate class="mt-0.5 block line-clamp-2 text-xs text-[color:var(--gv-fg4)] hover:text-[color:var(--gv-amber)]">{{ \Illuminate\Support\Str::limit(trim(strip_tags($comment->body)), 160) }}</a>
                         </li>
                     @endforeach
                     @foreach($recentCompleted as $task)

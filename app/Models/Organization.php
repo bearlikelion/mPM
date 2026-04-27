@@ -109,7 +109,9 @@ class Organization extends Model
     public function logoUrl(): string
     {
         if ($this->logo_path) {
-            return Storage::disk('public')->url($this->logo_path);
+            return Str::startsWith($this->logo_path, ['http://', 'https://'])
+                ? $this->logo_path
+                : Storage::disk('public')->url($this->logo_path);
         }
 
         $initials = Str::upper(Str::substr($this->name, 0, 2));

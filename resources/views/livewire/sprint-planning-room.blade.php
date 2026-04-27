@@ -103,8 +103,8 @@
 
                     <div class="px-5 py-5">
                         <div class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--gv-amber)]">Card description</div>
-                        <div class="min-h-56 whitespace-pre-wrap rounded-2xl border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] p-5 text-base leading-7 text-[color:var(--gv-fg1)]">
-                            {{ $currentItem->task->description ?: 'No description yet.' }}
+                        <div class="min-h-56 rounded-2xl border border-[color:var(--gv-border)] bg-[color:var(--gv-bg1)] p-5 text-base leading-7 text-[color:var(--gv-fg1)]">
+                            <x-tiptap-content :html="$currentItem->task->description" empty="No description yet." />
                         </div>
                     </div>
                 </article>

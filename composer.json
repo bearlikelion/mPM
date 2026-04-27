@@ -20,6 +20,7 @@
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.2",
         "livewire/volt": "^1.6.7",
+        "mews/purifier": "^3.4",
         "robsontenorio/mary": "^2.0",
         "socialiteproviders/discord": "^4.2",
         "socialiteproviders/steam": "^4.3",

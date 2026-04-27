@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\MentionSearchController;
 use App\Http\Controllers\Auth\InviteController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AvatarController;
@@ -103,6 +104,10 @@ Route::get('tasks/{key}', fn (string $key) => view('tasks.show', ['key' => $key]
     ->middleware(['auth', 'verified'])
     ->where('key', '[A-Z]+-\d+')
     ->name('tasks.show');
+
+Route::get('api/mentions/search', MentionSearchController::class)
+    ->middleware(['auth'])
+    ->name('mentions.search');
 
 Route::get('users/{user}', function (User $user) {
     $viewer = auth()->user();

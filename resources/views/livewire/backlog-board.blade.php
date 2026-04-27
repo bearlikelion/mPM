@@ -58,7 +58,7 @@
                                 </div>
                                 <div class="text-sm font-semibold leading-snug text-[color:var(--gv-fg0)]">{{ $task->title }}</div>
                                 @if($task->description)
-                                    <div class="line-clamp-2 max-w-4xl text-xs text-[color:var(--gv-fg4)]">{{ $task->description }}</div>
+                                    <div class="line-clamp-2 max-w-4xl text-xs text-[color:var(--gv-fg4)]">{{ \Illuminate\Support\Str::limit(trim(strip_tags($task->description)), 200) }}</div>
                                 @endif
                             </div>
 
@@ -111,7 +111,7 @@
                             </div>
                             <div class="text-sm font-semibold leading-snug text-[color:var(--gv-fg0)]">{{ $task->title }}</div>
                             @if($task->description)
-                                <div class="line-clamp-2 max-w-4xl text-xs text-[color:var(--gv-fg4)]">{{ $task->description }}</div>
+                                <div class="line-clamp-2 max-w-4xl text-xs text-[color:var(--gv-fg4)]">{{ \Illuminate\Support\Str::limit(trim(strip_tags($task->description)), 200) }}</div>
                             @endif
                         </div>
 

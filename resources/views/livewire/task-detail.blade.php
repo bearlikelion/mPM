@@ -37,9 +37,7 @@
         <div class="flex flex-col gap-3 lg:col-span-2">
             <div class="gv-card p-4">
                 <div class="mb-2 text-sm font-medium text-[color:var(--gv-fg2)]">Description</div>
-                <div class="prose prose-sm max-w-none whitespace-pre-wrap text-sm text-[color:var(--gv-fg1)] dark:prose-invert">
-                    {{ $task->description ?: 'No description.' }}
-                </div>
+                <x-tiptap-content :html="$task->description" empty="No description." />
             </div>
 
             @if($task->comments->isNotEmpty())
@@ -67,7 +65,7 @@
                                         <span class="text-xs text-[color:var(--gv-fg4)]">{{ auth()->user()->formatLocalTime($comment->created_at) }} · {{ $comment->created_at->diffForHumans() }}</span>
                                     </div>
                                     @if($comment->body)
-                                        <div class="mt-1 whitespace-pre-wrap">{{ $comment->body }}</div>
+                                        <x-tiptap-content :html="$comment->body" class="mt-1 prose-tiptap" />
                                     @endif
                                     @if($comment->getMedia('attachments')->isNotEmpty())
                                         <div class="mt-2 flex flex-wrap gap-2">
@@ -88,7 +86,7 @@
 
             <form wire:submit="addComment" class="gv-card p-4">
                 <div class="mb-2 text-sm font-medium text-[color:var(--gv-fg2)]">Add comment</div>
-                <x-mary-textarea wire:model="newComment" rows="3" placeholder="Write a comment..." />
+                <x-tiptap-editor wire:model="newComment" rows="3" placeholder="Write a comment..." />
 
                 <div class="mt-2 flex items-center justify-between gap-2">
                     <label class="flex cursor-pointer items-center gap-2 text-xs text-[color:var(--gv-fg4)]">

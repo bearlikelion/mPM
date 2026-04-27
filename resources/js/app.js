@@ -6,6 +6,13 @@
 
 import './echo';
 import { bootDesktopNotifications, bootDesktopTray } from './desktop-notifications';
+import { registerTiptap } from './tiptap';
+
+document.addEventListener('alpine:init', () => {
+    if (window.Alpine) {
+        registerTiptap(window.Alpine);
+    }
+});
 
 const bootDesktop = () => {
     bootDesktopNotifications();

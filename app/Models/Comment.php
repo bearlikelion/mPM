@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\RichText;
 use Database\Factories\CommentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,13 @@ class Comment extends Model implements HasMedia
         'user_id',
         'body',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'body' => RichText::class,
+        ];
+    }
 
     public function task(): BelongsTo
     {

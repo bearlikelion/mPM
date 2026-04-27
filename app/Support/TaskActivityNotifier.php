@@ -94,7 +94,16 @@ class TaskActivityNotifier
     private function mentionedUsers(Task $task, string $body): Collection
     {
         $task->loadMissing('project.organization.users');
-        $normalizedBody = Str::lower($body);
+
+        if (preg_match_all('/data-user-id="(\d+)"/i', $body, $matches) && ! empty($matches[1])) {
+            $ids = array_map('intval', $matches[1]);
+
+            return $task->project->organization->users
+                ->filter(fn (User $user): bool => in_array((int) $user->id, $ids, true))
+                ->values();
+        }
+
+        $normalizedBody = Str::lower(strip_tags($body));
 
         return $task->project->organization->users
             ->filter(function (User $user) use ($normalizedBody): bool {

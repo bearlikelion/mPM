@@ -6,7 +6,7 @@
     @endphp
 
     <div class="flex flex-col gap-4">
-        <x-page-header :title="$epic->name" :subtitle="$epic->description ?: 'Delivery arc for '.$epic->project->name.'.'">
+        <x-page-header :title="$epic->name" :subtitle="$epic->description ? \Illuminate\Support\Str::limit(trim(strip_tags($epic->description)), 200) : 'Delivery arc for '.$epic->project->name.'.'">
             <x-slot:actions>
                 <a href="{{ route('epics') }}" wire:navigate class="app-link text-sm">all epics</a>
                 <a href="{{ route('kanban', ['project' => $epic->project_id, 'epic' => $epic->id]) }}" wire:navigate class="btn btn-sm">open in kanban</a>

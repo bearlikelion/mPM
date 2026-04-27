@@ -102,7 +102,7 @@
                             </div>
 
                             @if($status !== 'done' && $task->description)
-                                <div class="mt-1 line-clamp-2 text-xs leading-relaxed text-[color:var(--gv-fg4)]">{{ $task->description }}</div>
+                                <div class="mt-1 line-clamp-2 text-xs leading-relaxed text-[color:var(--gv-fg4)]">{{ \Illuminate\Support\Str::limit(trim(strip_tags($task->description)), 200) }}</div>
                             @endif
 
                             <div class="mt-2.5 flex items-center justify-between gap-2">

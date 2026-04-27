@@ -71,7 +71,6 @@ class CreateTaskModalTest extends TestCase
             ->set('description', 'Create and assign work from any page.')
             ->set('priority', 'high')
             ->set('status', 'todo')
-            ->set('storyPoints', 5)
             ->call('toggleAssignee', $assignee->id)
             ->call('createTask')
             ->assertHasNoErrors()
@@ -84,7 +83,6 @@ class CreateTaskModalTest extends TestCase
             'title' => 'Ship global task modal',
             'priority' => 'high',
             'status' => 'todo',
-            'story_points' => 5,
         ]);
 
         $taskId = Task::query()->where('key', 'OPS-1')->value('id');

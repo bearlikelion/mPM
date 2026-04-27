@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\RichText;
 use Database\Factories\EpicFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +28,9 @@ class Epic extends Model
     public function avatarUrl(): string
     {
         if ($this->avatar_path) {
-            return Storage::disk('public')->url($this->avatar_path);
+            return Str::startsWith($this->avatar_path, ['http://', 'https://'])
+                ? $this->avatar_path
+                : Storage::disk('public')->url($this->avatar_path);
         }
 
         $initials = Str::upper(Str::substr($this->name, 0, 2));
@@ -40,6 +43,7 @@ class Epic extends Model
         return [
             'due_date' => 'date',
             'completed_at' => 'datetime',
+            'description' => RichText::class,
         ];
     }
 

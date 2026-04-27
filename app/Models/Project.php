@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\RichText;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,10 +33,19 @@ class Project extends Model
         'task_counter',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'description' => RichText::class,
+        ];
+    }
+
     public function avatarUrl(): string
     {
         if ($this->avatar_path) {
-            return Storage::disk('public')->url($this->avatar_path);
+            return Str::startsWith($this->avatar_path, ['http://', 'https://'])
+                ? $this->avatar_path
+                : Storage::disk('public')->url($this->avatar_path);
         }
 
         $initials = Str::upper(Str::substr($this->key ?: $this->name, 0, 2));

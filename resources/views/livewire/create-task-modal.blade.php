@@ -1,109 +1,98 @@
 <div
     x-data
-    x-on:focus-task-title.window="$nextTick(() => { const el = $el.querySelector('[data-title-input] input, [data-title-input]'); el?.focus(); })"
+    x-on:focus-task-title.window="
+        setTimeout(() => {
+            document.activeElement?.blur?.();
+            $el.querySelectorAll('[x-data]').forEach(node => {
+                const data = Alpine.$data(node);
+                if (data && 'focused' in data) { data.focused = false; }
+            });
+            const el = $el.querySelector('[data-title-input] input');
+            if (el) { el.focus(); el.select?.(); }
+        }, 100);
+    "
 >
-    <x-mary-modal wire:model="showModal" box-class="mary-task-modal max-w-5xl border-0 bg-transparent p-0 shadow-none">
-        <form wire:submit="createTask" class="space-y-5">
-            <section class="create-task-hero rounded-[1.65rem] px-5 py-5 sm:px-6">
+    <x-mary-modal wire:model="showModal" box-class="mary-task-modal max-w-5xl border-0 bg-transparent shadow-none">
+        <form wire:submit="createTask" class="space-y-4">
+            <section class="gv-card p-4 sm:p-5">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div class="space-y-2">
-                        <div class="app-eyebrow">Task Intake</div>
-                        <h2 class="text-3xl font-semibold tracking-tight text-neutral-50">Create new task</h2>
-                        <p class="max-w-2xl text-base leading-7 text-neutral-300">
-                            Capture work quickly, place it in the right stream, and assign owners without leaving the current page.
-                        </p>
+                    <div class="min-w-0 space-y-1.5">
+                        <div class="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--gv-fg4)]">task intake</div>
+                        <h2 class="text-xl font-semibold tracking-tight text-[color:var(--gv-fg0)]">
+                            <span class="text-[color:var(--gv-amber)]">»</span> create new task
+                        </h2>
+                        <p class="text-sm text-[color:var(--gv-fg4)]">capture work quickly, place it in the right stream, and assign owners without leaving the current page.</p>
                     </div>
 
-                    @if($selectedProject)
-                        <div class="create-task-project-badge">
-                            <img src="{{ $selectedProject->avatarUrl() }}" alt="" class="h-11 w-11 rounded-2xl border border-neutral-700/70 bg-neutral-900 object-cover" />
-                            <div class="min-w-0">
-                                <div class="app-eyebrow">Target Project</div>
-                                <div class="mt-1 truncate text-base font-semibold text-neutral-50">{{ $selectedProject->name }}</div>
-                                <div class="text-sm text-neutral-400">{{ $selectedProject->key }}</div>
-                            </div>
-                        </div>
-                    @endif
+                    <div class="lg:w-72 lg:shrink-0">
+                        <x-mary-choices-offline
+                            wire:model.live="projectId"
+                            :options="$projectOptions"
+                            single
+                            searchable
+                            clearable
+                            label="project"
+                            placeholder="search a project"
+                            option-sub-label="key"
+                            option-avatar="avatar"
+                            tabindex="-1"
+                        />
+                    </div>
                 </div>
             </section>
 
-            <div class="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
-                <div class="space-y-5">
-                    <section class="app-panel-muted rounded-[1.35rem] p-4 sm:p-5">
+            <div class="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+                <div class="space-y-4">
+                    <section class="gv-card p-4 sm:p-5">
                         <div class="mb-4">
-                            <div class="app-eyebrow">Core</div>
-                            <div class="mt-1 text-lg font-semibold text-neutral-50">Task framing</div>
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» task framing</h3>
                         </div>
 
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <x-mary-choices-offline
-                                wire:model.live="projectId"
-                                :options="$projectOptions"
-                                single
-                                searchable
-                                clearable
-                                label="Project"
-                                placeholder="Search a project"
-                                option-sub-label="key"
-                                option-avatar="avatar"
-                                tabindex="-1"
+                        <div data-title-input>
+                            <x-mary-input
+                                wire:model="title"
+                                label="title"
+                                placeholder="investigate login handoff"
                             />
-
-                            <div data-title-input>
-                                <x-mary-input
-                                    wire:model="title"
-                                    label="Title"
-                                    placeholder="Investigate login handoff"
-                                />
-                            </div>
                         </div>
 
                         <div class="mt-4">
-                            <x-mary-textarea
+                            <x-tiptap-editor
                                 wire:model="description"
-                                label="Description"
-                                placeholder="Describe the work, blockers, or expected outcome."
+                                label="description"
+                                placeholder="describe the work, blockers, or expected outcome."
                                 rows="5"
                             />
                         </div>
                     </section>
 
-                    <section class="app-panel-muted rounded-[1.35rem] p-4 sm:p-5">
+                    <section class="gv-card p-4 sm:p-5">
                         <div class="mb-4">
-                            <div class="app-eyebrow">Execution</div>
-                            <div class="mt-1 text-lg font-semibold text-neutral-50">Priority and schedule</div>
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» priority and schedule</h3>
                         </div>
 
-                        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                            <x-mary-select wire:model="priority" label="Priority" icon-right="o-chevron-up-down">
+                        <div class="grid gap-4 md:grid-cols-3">
+                            <x-mary-select wire:model="priority" label="priority" icon-right="o-chevron-up-down">
                                 @foreach(\App\Models\Task::PRIORITIES as $priority)
                                     <option value="{{ $priority }}">{{ str($priority)->upper() }}</option>
                                 @endforeach
                             </x-mary-select>
 
-                            <x-mary-select wire:model="status" label="Status" icon-right="o-chevron-up-down">
+                            <x-mary-select wire:model="status" label="status" icon-right="o-chevron-up-down">
                                 @foreach(\App\Models\Task::STATUSES as $status)
                                     <option value="{{ $status }}">{{ str($status)->replace('_', ' ')->title() }}</option>
                                 @endforeach
                             </x-mary-select>
 
-                            <x-mary-select wire:model="storyPoints" label="Story points" icon-right="o-chevron-up-down">
-                                <option value="">None</option>
-                                @foreach(\App\Models\Task::STORY_POINTS as $points)
-                                    <option value="{{ $points }}">{{ $points }}</option>
-                                @endforeach
-                            </x-mary-select>
-
-                            <x-mary-input wire:model="dueDate" type="date" label="Due date" />
+                            <x-mary-datetime wire:model="dueDate" label="due date" icon="o-calendar" />
                         </div>
                     </section>
                 </div>
 
-                <div class="space-y-5">
-                    <section class="app-panel-muted rounded-[1.35rem] p-4 sm:p-5">
+                <div class="space-y-4">
+                    <section class="gv-card p-4 sm:p-5">
                         <div class="mb-4">
-                            <div class="app-eyebrow">Placement</div>
-                            <div class="mt-1 text-lg font-semibold text-neutral-50">Epic and sprint</div>
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» epic and sprint</h3>
                         </div>
 
                         <div class="grid gap-4">
@@ -113,16 +102,16 @@
                                 single
                                 searchable
                                 clearable
-                                label="Epic"
-                                placeholder="No epic"
+                                label="epic"
+                                placeholder="no epic"
                                 option-sub-label="project"
                                 option-avatar="avatar"
                             />
 
                             @if($activeSprint)
-                                <div class="rounded-lg border border-amber-700/40 bg-amber-950/30 px-3 py-2.5">
-                                    <div class="text-xs font-semibold uppercase tracking-wide text-amber-400">Sprint active: {{ $activeSprint->name }}</div>
-                                    <div class="mt-0.5 text-xs text-neutral-400">New tasks go to the Unassigned queue for sprint planning.</div>
+                                <div class="gv-card-accent px-3 py-2.5">
+                                    <div class="text-xs font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">sprint active: {{ $activeSprint->name }}</div>
+                                    <div class="mt-0.5 text-xs text-[color:var(--gv-fg4)]">new tasks go to the unassigned queue for sprint planning.</div>
                                 </div>
                             @else
                                 <x-mary-choices-offline
@@ -131,8 +120,8 @@
                                     single
                                     searchable
                                     clearable
-                                    label="Sprint"
-                                    placeholder="No sprint"
+                                    label="sprint"
+                                    placeholder="no sprint"
                                     option-sub-label="window"
                                     option-avatar="avatar"
                                 />
@@ -140,13 +129,9 @@
                         </div>
                     </section>
 
-                    <section class="app-panel-muted rounded-[1.35rem] p-4 sm:p-5">
+                    <section class="gv-card p-4 sm:p-5">
                         <div class="mb-4 flex items-start justify-between gap-3">
-                            <div>
-                                <div class="app-eyebrow">Ownership</div>
-                                <div class="mt-1 text-lg font-semibold text-neutral-50">Assign teammates</div>
-                            </div>
-
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-[color:var(--gv-amber)]">» assign teammates</h3>
                             <span class="app-chip">{{ count($assigneeIds) }} selected</span>
                         </div>
 
@@ -155,8 +140,8 @@
                             :options="$assigneeOptions"
                             searchable
                             clearable
-                            label="Assignees"
-                            placeholder="Search by name or email"
+                            label="assignees"
+                            placeholder="search by name or email"
                             option-sub-label="email"
                             option-avatar="avatar"
                         />
@@ -169,10 +154,10 @@
             </div>
 
             <x-slot:actions>
-                <div class="flex w-full items-center justify-end gap-3">
-                    <x-mary-button label="Cancel" wire:click="closeModal" class="btn-ghost border border-neutral-700/70 text-neutral-300" />
-                    <x-mary-button label="Create & Add Another" wire:click="createTaskAndAddAnother" spinner="createTaskAndAddAnother" class="btn-ghost border border-neutral-700/70 text-neutral-300" />
-                    <x-mary-button label="Create task" spinner="createTask" type="submit" class="btn-primary" />
+                <div class="flex w-full items-center justify-end gap-2">
+                    <x-mary-button label="cancel" wire:click="closeModal" class="btn-ghost border border-[color:var(--gv-border)] text-[color:var(--gv-fg2)]" />
+                    <x-mary-button label="create & add another" wire:click="createTaskAndAddAnother" spinner="createTaskAndAddAnother" class="btn-ghost border border-[color:var(--gv-border)] text-[color:var(--gv-fg2)]" />
+                    <x-mary-button label="create task" spinner="createTask" type="submit" class="btn-primary" />
                 </div>
             </x-slot:actions>
         </form>

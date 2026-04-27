@@ -36,13 +36,26 @@ class CreateTaskModal extends Component
 
     public string $status = 'todo';
 
-    public ?int $storyPoints = null;
-
     public ?string $dueDate = null;
 
     #[On('open-create-task-modal')]
-    public function openModal(): void
+    public function openModal(?int $projectId = null): void
     {
+        $candidate = $projectId
+            ?? (int) request()->query('project')
+            ?: null;
+
+        if ($candidate) {
+            $resolved = $this->resolvedProjectId($candidate);
+
+            if ($resolved && $resolved !== $this->projectId) {
+                $this->projectId = $resolved;
+                $this->epicId = null;
+                $this->sprintId = null;
+                $this->assigneeIds = [];
+            }
+        }
+
         $this->showModal = true;
         $this->dispatch('focus-task-title');
     }
@@ -201,7 +214,6 @@ class CreateTaskModal extends Component
             'assigneeIds',
             'title',
             'description',
-            'storyPoints',
             'dueDate',
         ]);
 
@@ -230,7 +242,6 @@ class CreateTaskModal extends Component
             'description' => ['nullable', 'string'],
             'priority' => ['required', Rule::in(Task::PRIORITIES)],
             'status' => ['required', Rule::in(Task::STATUSES)],
-            'storyPoints' => ['nullable', Rule::in(Task::STORY_POINTS)],
             'epicId' => ['nullable', Rule::in($epicIds)],
             'sprintId' => ['nullable', Rule::in($sprintIds)],
             'assigneeIds' => ['array'],
@@ -256,7 +267,6 @@ class CreateTaskModal extends Component
                 'description' => $validated['description'],
                 'status' => $validated['status'],
                 'priority' => $validated['priority'],
-                'story_points' => $validated['storyPoints'],
                 'due_date' => $validated['dueDate'],
             ]);
 
@@ -267,6 +277,10 @@ class CreateTaskModal extends Component
 
         $task->load('assignees');
         $task->assignees->each(fn (User $user) => app(TaskActivityNotifier::class)->taskAssigned($task, $user, Auth::user()));
+
+        if (! empty($task->description)) {
+            app(TaskActivityNotifier::class)->mentioned($task, $task->description, Auth::user());
+        }
 
         return $task;
     }

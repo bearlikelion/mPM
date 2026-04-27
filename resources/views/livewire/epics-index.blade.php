@@ -45,7 +45,7 @@
                     </div>
 
                     @if($epic->description)
-                        <div class="line-clamp-2 text-xs text-[color:var(--gv-fg4)]">{{ $epic->description }}</div>
+                        <div class="line-clamp-2 text-xs text-[color:var(--gv-fg4)]">{{ \Illuminate\Support\Str::limit(trim(strip_tags($epic->description)), 160) }}</div>
                     @endif
 
                     <div class="mt-auto space-y-1.5">

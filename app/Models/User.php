@@ -117,7 +117,9 @@ class User extends Authenticatable implements FilamentUser, HasMedia, HasTenants
     public function avatarUrl(): string
     {
         if ($this->avatar_path) {
-            return Storage::disk('public')->url($this->avatar_path);
+            return Str::startsWith($this->avatar_path, ['http://', 'https://'])
+                ? $this->avatar_path
+                : Storage::disk('public')->url($this->avatar_path);
         }
 
         return route('avatars.default', ['initials' => $this->initials() ?: '?']);

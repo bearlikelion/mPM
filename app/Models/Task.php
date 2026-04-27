@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\RichText;
 use Database\Factories\TaskFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,6 +47,7 @@ class Task extends Model implements HasMedia
     {
         return [
             'due_date' => 'date',
+            'description' => RichText::class,
         ];
     }
 
