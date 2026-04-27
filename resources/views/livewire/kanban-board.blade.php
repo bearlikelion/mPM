@@ -144,7 +144,7 @@
 
     @if($taskKey)
         <div class="fixed inset-0 z-40 bg-black/70" x-on:click="$wire.set('taskKey', null)"></div>
-        <aside class="app-drawer fixed inset-y-0 right-0 z-50 w-full max-w-3xl">
+        <aside class="app-drawer fixed inset-y-0 right-0 z-50 w-full lg:w-1/2 lg:max-w-none">
             <div class="flex h-full flex-col" x-on:click.stop>
                 <div class="flex items-center justify-between border-b border-[color:var(--gv-border)] px-4 py-3">
                     <div class="flex items-center gap-2">
