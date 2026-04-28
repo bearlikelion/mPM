@@ -3,6 +3,29 @@ import { createRoot } from 'react-dom/client';
 import { Excalidraw, MainMenu } from '@excalidraw/excalidraw';
 import '@excalidraw/excalidraw/index.css';
 
+class WhiteboardErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { error: null };
+    }
+    static getDerivedStateFromError(error) {
+        return { error };
+    }
+    componentDidCatch(error, info) {
+        console.error('whiteboard render error', error, info);
+    }
+    render() {
+        if (this.state.error) {
+            return React.createElement(
+                'div',
+                { style: { padding: '1rem', color: '#fb4934', fontFamily: 'monospace', whiteSpace: 'pre-wrap' } },
+                'Whiteboard failed to render: ' + (this.state.error.message || String(this.state.error)),
+            );
+        }
+        return this.props.children;
+    }
+}
+
 const SAVE_DEBOUNCE_MS = 1500;
 
 const GRUVBOX_STROKE = ['#ebdbb2', '#fb4934', '#fe8019', '#fabd2f', '#b8bb26', '#8ec07c', '#83a598', '#d3869b'];
@@ -93,7 +116,8 @@ export default function whiteboard({ initial = null } = {}) {
         excalidrawApi: null,
 
         init() {
-            this.mount(this.$el);
+            const el = this.$el;
+            queueMicrotask(() => this.mount(el));
         },
 
         mount(rootEl) {
@@ -177,6 +201,7 @@ export default function whiteboard({ initial = null } = {}) {
             this.root = createRoot(target);
             target.__excalidrawRoot = this.root;
             this.root.render(
+                React.createElement(WhiteboardErrorBoundary, null,
                 React.createElement(Excalidraw, {
                     initialData,
                     theme: 'dark',
@@ -209,6 +234,7 @@ export default function whiteboard({ initial = null } = {}) {
                         React.createElement(MainMenu.DefaultItems.SaveAsImage, null),
                     ),
                 })
+                )
             );
         },
 
