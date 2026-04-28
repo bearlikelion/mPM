@@ -105,20 +105,24 @@ export default function whiteboard({ initial = null } = {}) {
             const wireEl = this.$root.closest('[wire\\:id]') || rootEl.closest('[wire\\:id]');
             const wire = wireEl ? window.Livewire.find(wireEl.getAttribute('wire:id')) : null;
 
+            const defaultAppState = {
+                theme: 'dark',
+                viewBackgroundColor: 'transparent',
+                currentItemStrokeColor: '#ebdbb2',
+                currentItemBackgroundColor: 'transparent',
+                collaborators: [],
+            };
+
             const initialData = initial && initial.elements
                 ? {
                     elements: initial.elements ?? [],
-                    appState: { ...(initial.appState ?? {}), collaborators: [] },
+                    appState: { ...defaultAppState, ...(initial.appState ?? {}), theme: 'dark', viewBackgroundColor: 'transparent', collaborators: [] },
                     files: initial.files ?? {},
                     libraryItems: initial.libraryItems ?? DEFAULT_LIBRARY_ITEMS,
                 }
                 : {
                     elements: [],
-                    appState: {
-                        viewBackgroundColor: 'transparent',
-                        currentItemStrokeColor: '#ebdbb2',
-                        currentItemBackgroundColor: 'transparent',
-                    },
+                    appState: defaultAppState,
                     files: {},
                     libraryItems: DEFAULT_LIBRARY_ITEMS,
                 };

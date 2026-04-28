@@ -21,7 +21,7 @@ export default defineConfig({
         include: ['@excalidraw/excalidraw', 'react', 'react-dom'],
     },
     define: {
-        'process.env.IS_PREACT': JSON.stringify('false'),
+        'process.env.IS_PREACT': 'false',
     },
     server: {
         cors: true,

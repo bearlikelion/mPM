@@ -759,7 +759,7 @@
         --color-primary-darkest: var(--gv-orange);
         --color-primary-light: rgba(215, 153, 33, 0.18);
         --color-primary-light-darker: rgba(215, 153, 33, 0.32);
-        --default-bg-color: var(--gv-bg0);
+        --default-bg-color: var(--gv-bg0) !important;
         --island-bg-color: var(--gv-bg0-s);
         --button-bg: var(--gv-bg1);
         --button-hover-bg: var(--gv-bg2);
@@ -772,7 +772,8 @@
         --text-primary-color: var(--gv-fg1);
         --color-border-outline: var(--gv-border);
         --color-border-outline-variant: var(--gv-border);
-        color: var(--gv-fg1);
+        color: var(--gv-fg1) !important;
+        background-color: var(--gv-bg0) !important;
     }
     .excalidraw .App-menu .dropdown-menu-item,
     .excalidraw .ToolIcon__icon,
