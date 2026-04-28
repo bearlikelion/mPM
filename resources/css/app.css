@@ -755,40 +755,41 @@
 }
 
 /* Excalidraw whiteboard - gruvbox.
-   Kept unlayered so it beats Excalidraw's own unlayered CSS in the cascade. */
+   Unlayered and !important because Excalidraw's bundled CSS is loaded after
+   this file and is also unlayered, so source order would otherwise win. */
 .excalidraw {
-    --color-primary: var(--gv-amber);
-    --color-primary-darker: var(--gv-yellow);
-    --color-primary-darkest: var(--gv-orange);
-    --color-primary-light: rgba(215, 153, 33, 0.18);
-    --color-primary-light-darker: rgba(215, 153, 33, 0.32);
-    --default-bg-color: var(--gv-bg0);
-    --island-bg-color: var(--gv-bg0-s);
-    --button-bg: var(--gv-bg1);
-    --button-hover-bg: var(--gv-bg2);
-    --color-on-primary-container: var(--gv-bg0-h);
-    --color-surface-low: var(--gv-bg0-s);
-    --color-surface-mid: var(--gv-bg1);
-    --color-surface-high: var(--gv-bg2);
-    --color-surface-primary-container: var(--gv-bg1);
-    --color-on-surface: var(--gv-fg1);
-    --text-primary-color: var(--gv-fg1);
-    --color-border-outline: var(--gv-border);
-    --color-border-outline-variant: var(--gv-border);
-    color: var(--gv-fg1);
-    background-color: var(--gv-bg0);
+    --color-primary: var(--gv-amber) !important;
+    --color-primary-darker: var(--gv-yellow) !important;
+    --color-primary-darkest: var(--gv-orange) !important;
+    --color-primary-light: rgba(215, 153, 33, 0.18) !important;
+    --color-primary-light-darker: rgba(215, 153, 33, 0.32) !important;
+    --default-bg-color: var(--gv-bg0) !important;
+    --island-bg-color: var(--gv-bg0-s) !important;
+    --button-bg: var(--gv-bg1) !important;
+    --button-hover-bg: var(--gv-bg2) !important;
+    --color-on-primary-container: var(--gv-bg0-h) !important;
+    --color-surface-low: var(--gv-bg0-s) !important;
+    --color-surface-mid: var(--gv-bg1) !important;
+    --color-surface-high: var(--gv-bg2) !important;
+    --color-surface-primary-container: var(--gv-bg1) !important;
+    --color-on-surface: var(--gv-fg1) !important;
+    --text-primary-color: var(--gv-fg1) !important;
+    --color-border-outline: var(--gv-border) !important;
+    --color-border-outline-variant: var(--gv-border) !important;
+    color: var(--gv-fg1) !important;
+    background-color: var(--gv-bg0) !important;
 }
 .excalidraw .App-menu .dropdown-menu-item,
 .excalidraw .ToolIcon__icon,
 .excalidraw button {
-    color: var(--gv-fg1);
+    color: var(--gv-fg1) !important;
 }
 .excalidraw .ToolIcon--selected,
 .excalidraw .active {
-    background: var(--gv-bg2);
-    color: var(--gv-amber);
+    background: var(--gv-bg2) !important;
+    color: var(--gv-amber) !important;
 }
 .excalidraw .Island {
-    background: var(--gv-bg0-s);
-    border: 1px solid var(--gv-border);
+    background: var(--gv-bg0-s) !important;
+    border: 1px solid var(--gv-border) !important;
 }

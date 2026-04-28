@@ -18,10 +18,20 @@ export default defineConfig({
         tailwindcss(),
     ],
     optimizeDeps: {
-        include: ['@excalidraw/excalidraw', 'react', 'react-dom'],
+        include: ['@excalidraw/excalidraw', 'react', 'react-dom', 'react/jsx-runtime'],
+    },
+    resolve: {
+        dedupe: ['react', 'react-dom'],
+    },
+    build: {
+        commonjsOptions: {
+            transformMixedEsModules: true,
+            include: [/node_modules/],
+        },
     },
     define: {
         'process.env.IS_PREACT': 'false',
+        'process.env.NODE_ENV': JSON.stringify('production'),
     },
     server: {
         cors: true,

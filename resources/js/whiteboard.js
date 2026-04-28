@@ -1,6 +1,8 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import { Excalidraw, MainMenu } from '@excalidraw/excalidraw';
+
+const createRoot = ReactDOM.createRoot;
 import '@excalidraw/excalidraw/index.css';
 
 class WhiteboardErrorBoundary extends React.Component {
@@ -198,44 +200,46 @@ export default function whiteboard({ initial = null } = {}) {
                 return false;
             };
 
-            this.root = createRoot(target);
-            target.__excalidrawRoot = this.root;
-            this.root.render(
-                React.createElement(WhiteboardErrorBoundary, null,
-                React.createElement(Excalidraw, {
-                    initialData,
-                    theme: 'dark',
-                    UIOptions: {
-                        canvasActions: {
-                            saveToActiveFile: false,
-                            loadScene: false,
+            try {
+                ReactDOM.render(
+                    React.createElement(Excalidraw, {
+                        initialData,
+                        theme: 'dark',
+                        UIOptions: {
+                            canvasActions: {
+                                saveToActiveFile: false,
+                                loadScene: false,
+                            },
                         },
-                    },
-                    onChange,
-                    onPaste: (data) => {
-                        onPasteOrDrop(data);
-                        return true;
-                    },
-                    onDrop: (event) => {
-                        const files = event?.dataTransfer?.files;
-                        if (files && files.length) {
-                            onPasteOrDrop({ files: Array.from(files) });
-                        }
-                    },
-                    excalidrawAPI: (api) => {
-                        this.excalidrawApi = api;
-                    },
-                    validateEmbeddable: true,
-                    renderTopRightUI: () => null,
-                    children: React.createElement(MainMenu, null,
-                        React.createElement(MainMenu.DefaultItems.ToggleTheme, null),
-                        React.createElement(MainMenu.DefaultItems.ChangeCanvasBackground, null),
-                        React.createElement(MainMenu.DefaultItems.Export, null),
-                        React.createElement(MainMenu.DefaultItems.SaveAsImage, null),
-                    ),
-                })
-                )
-            );
+                        onChange,
+                        onPaste: (data) => {
+                            onPasteOrDrop(data);
+                            return true;
+                        },
+                        onDrop: (event) => {
+                            const files = event?.dataTransfer?.files;
+                            if (files && files.length) {
+                                onPasteOrDrop({ files: Array.from(files) });
+                            }
+                        },
+                        excalidrawAPI: (api) => {
+                            this.excalidrawApi = api;
+                        },
+                        validateEmbeddable: true,
+                        children: React.createElement(MainMenu, null,
+                            React.createElement(MainMenu.DefaultItems.ToggleTheme, null),
+                            React.createElement(MainMenu.DefaultItems.ChangeCanvasBackground, null),
+                            React.createElement(MainMenu.DefaultItems.Export, null),
+                            React.createElement(MainMenu.DefaultItems.SaveAsImage, null),
+                        ),
+                    }),
+                    target,
+                );
+                target.__excalidrawRoot = target;
+                this.root = { unmount: () => ReactDOM.unmountComponentAtNode(target) };
+            } catch (e) {
+                console.error('whiteboard initial render threw', e);
+            }
         },
 
         async insertImage(dataUrl, name) {
