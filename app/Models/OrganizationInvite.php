@@ -52,4 +52,9 @@ class OrganizationInvite extends Model
     {
         return $this->expires_at !== null && $this->expires_at->isPast();
     }
+
+    public function url(): string
+    {
+        return route('invite.show', ['token' => $this->token]);
+    }
 }

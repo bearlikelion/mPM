@@ -16,7 +16,7 @@ class ProjectWhiteboard extends Component
 
     public Project $project;
 
-    public Whiteboard $whiteboard;
+    protected ?Whiteboard $whiteboard = null;
 
     #[Validate('nullable|image|max:10240')]
     public $pendingImage = null;
@@ -26,16 +26,23 @@ class ProjectWhiteboard extends Component
         abort_unless(Auth::user()->can('view', $project), 404);
 
         $this->project = $project;
+    }
 
-        $this->whiteboard = Whiteboard::firstOrCreate(
-            ['project_id' => $project->id],
+    protected function getWhiteboard(): Whiteboard
+    {
+        if ($this->whiteboard) {
+            return $this->whiteboard;
+        }
+
+        return $this->whiteboard = Whiteboard::firstOrCreate(
+            ['project_id' => $this->project->id],
             ['updated_by' => Auth::id()],
         );
     }
 
     public function save(array $data): void
     {
-        $this->whiteboard->forceFill([
+        $this->getWhiteboard()->forceFill([
             'data' => $data,
             'updated_by' => Auth::id(),
         ])->save();
@@ -71,6 +78,8 @@ class ProjectWhiteboard extends Component
 
     public function render()
     {
-        return view('livewire.project-whiteboard');
+        return view('livewire.project-whiteboard', [
+            'whiteboard' => $this->getWhiteboard(),
+        ]);
     }
 }

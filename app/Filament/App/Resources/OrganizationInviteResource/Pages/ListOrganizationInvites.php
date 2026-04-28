@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\App\Resources\OrganizationMemberResource\Pages;
+namespace App\Filament\App\Resources\OrganizationInviteResource\Pages;
 
 use App\Filament\App\Resources\OrganizationInviteResource;
 use App\Filament\App\Resources\OrganizationMemberResource;
@@ -17,18 +17,13 @@ use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class ListOrganizationMembers extends ListRecords
+class ListOrganizationInvites extends ListRecords
 {
-    protected static string $resource = OrganizationMemberResource::class;
+    protected static string $resource = OrganizationInviteResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('manageInvites')
-                ->label('Manage invites')
-                ->color('gray')
-                ->icon('heroicon-o-envelope-open')
-                ->url(OrganizationInviteResource::getUrl()),
             Action::make('inviteMember')
                 ->label('Invite member')
                 ->icon('heroicon-o-envelope')
