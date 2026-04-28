@@ -7,10 +7,12 @@
 import './echo';
 import { bootDesktopNotifications, bootDesktopTray } from './desktop-notifications';
 import { registerTiptap } from './tiptap';
+import { registerWhiteboard } from './whiteboard';
 
 document.addEventListener('alpine:init', () => {
     if (window.Alpine) {
         registerTiptap(window.Alpine);
+        registerWhiteboard(window.Alpine);
     }
 });
 

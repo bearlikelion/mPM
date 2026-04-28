@@ -9,13 +9,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Project extends Model
+class Project extends Model implements HasMedia
 {
     /** @use HasFactory<ProjectFactory> */
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     public const VISIBILITY_ORG = 'org';
 
@@ -83,5 +86,16 @@ class Project extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
+    }
+
+    public function whiteboard(): HasOne
+    {
+        return $this->hasOne(Whiteboard::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('whiteboard')
+            ->useDisk('public');
     }
 }

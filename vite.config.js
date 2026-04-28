@@ -17,6 +17,12 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    optimizeDeps: {
+        include: ['@excalidraw/excalidraw', 'react', 'react-dom'],
+    },
+    define: {
+        'process.env.IS_PREACT': JSON.stringify('false'),
+    },
     server: {
         cors: true,
     },

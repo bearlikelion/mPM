@@ -6,6 +6,7 @@
         "dev": "vite"
     },
     "dependencies": {
+        "@excalidraw/excalidraw": "^0.18.1",
         "@tauri-apps/api": "^2.10.1",
         "@tauri-apps/plugin-notification": "^2.3.3",
         "@tiptap/core": "^3.22.4",
@@ -22,6 +23,8 @@
         "highlight.js": "^11.11.1",
         "laravel-vite-plugin": "^1.0",
         "lowlight": "^3.3.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
         "tippy.js": "^6.3.7",
         "vite": "^6.0"
     },

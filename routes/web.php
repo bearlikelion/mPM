@@ -105,6 +105,24 @@ Route::get('tasks/{key}', fn (string $key) => view('tasks.show', ['key' => $key]
     ->where('key', '[A-Z]+-\d+')
     ->name('tasks.show');
 
+Route::get('projects/{project}/whiteboard', function (Project $project) {
+    abort_unless(auth()->user()->can('view', $project), 404);
+
+    return view('whiteboards.show', ['project' => $project]);
+})->middleware(['auth', 'verified'])->name('projects.whiteboard');
+
+Route::get('whiteboard', function (SiteTenant $siteTenant) {
+    $user = auth()->user();
+    $org = $siteTenant->currentOrganization($user);
+    $project = $org
+        ? $siteTenant->projectsQuery($user, $org)->first()
+        : null;
+
+    abort_unless($project, 404);
+
+    return redirect()->route('projects.whiteboard', $project);
+})->middleware(['auth', 'verified'])->name('whiteboard');
+
 Route::get('api/mentions/search', MentionSearchController::class)
     ->middleware(['auth'])
     ->name('mentions.search');

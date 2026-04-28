@@ -90,6 +90,7 @@
                     <x-mary-menu-item data-desktop-tray-link icon="o-queue-list" title="Backlog" :route="'backlog'" />
                     <x-mary-menu-item data-desktop-tray-link icon="o-flag" title="Epics" :route="'epics'" />
                     <x-mary-menu-item data-desktop-tray-link icon="o-rocket-launch" title="Sprints" :route="'sprints'" />
+                    <x-mary-menu-item data-desktop-tray-link icon="o-pencil-square" title="Whiteboard" :route="'whiteboard'" />
                 </x-mary-menu>
 
                 <div class="grow"></div>
