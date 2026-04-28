@@ -94,6 +94,7 @@ export default function whiteboard({ initial = null } = {}) {
 
         init() {
             this.mount(this.$el);
+            this.$cleanup(() => this.destroy());
         },
 
         mount(rootEl) {
@@ -101,6 +102,12 @@ export default function whiteboard({ initial = null } = {}) {
             if (!target) {
                 return;
             }
+
+            if (target.__excalidrawRoot) {
+                target.__excalidrawRoot.unmount();
+                target.__excalidrawRoot = null;
+            }
+            target.replaceChildren();
 
             const wireEl = this.$root.closest('[wire\\:id]') || rootEl.closest('[wire\\:id]');
             const wire = wireEl ? window.Livewire.find(wireEl.getAttribute('wire:id')) : null;
@@ -169,6 +176,7 @@ export default function whiteboard({ initial = null } = {}) {
             };
 
             this.root = createRoot(target);
+            target.__excalidrawRoot = this.root;
             this.root.render(
                 React.createElement(Excalidraw, {
                     initialData,
@@ -257,10 +265,15 @@ export default function whiteboard({ initial = null } = {}) {
         },
 
         destroy() {
+            const target = this.$el?.querySelector?.('[data-excalidraw-root]');
             if (this.root) {
                 this.root.unmount();
                 this.root = null;
             }
+            if (target) {
+                target.__excalidrawRoot = null;
+            }
+            this.excalidrawApi = null;
         },
     };
 }
