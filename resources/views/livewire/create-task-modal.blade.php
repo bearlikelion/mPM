@@ -155,9 +155,9 @@
 
             <x-slot:actions>
                 <div class="flex w-full items-center justify-end gap-2">
-                    <x-mary-button label="cancel" wire:click="closeModal" class="btn-ghost border border-[color:var(--gv-border)] text-[color:var(--gv-fg2)]" />
-                    <x-mary-button label="create & add another" wire:click="createTaskAndAddAnother" spinner="createTaskAndAddAnother" class="btn-ghost border border-[color:var(--gv-border)] text-[color:var(--gv-fg2)]" />
-                    <x-mary-button label="create task" spinner="createTask" type="submit" class="btn-primary" />
+                    <x-mary-button label="cancel" type="button" wire:click="closeModal" class="btn-ghost border border-[color:var(--gv-border)] text-[color:var(--gv-fg2)]" />
+                    <x-mary-button label="create & add another" type="button" wire:click="createTaskAndAddAnother" spinner="createTaskAndAddAnother" class="btn-ghost border border-[color:var(--gv-border)] text-[color:var(--gv-fg2)]" />
+                    <x-mary-button label="create task" type="button" wire:click="createTask" spinner="createTask" class="btn-primary" />
                 </div>
             </x-slot:actions>
         </form>

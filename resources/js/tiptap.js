@@ -144,6 +144,7 @@ const buildEditor = (element, { content, placeholder, orgIdGetter, onUpdate }) =
         extensions: [
             StarterKit.configure({
                 codeBlock: false,
+                link: false,
                 heading: { levels: [2, 3] },
             }),
             Link.configure({
