@@ -13,8 +13,10 @@
 <div
     class="tiptap-field"
     x-data="tiptap('', @js($placeholder), @js($resolvedOrgId))"
+    x-modelable="value"
+    {{ $attributes->whereStartsWith('wire:model') }}
     x-init="
-        value = $refs.source.value;
+        if ($refs.source.value !== value) $refs.source.value = value ?? '';
         $watch('value', () => {
             if ($refs.source.value === value) return;
             $refs.source.value = value;
@@ -60,7 +62,6 @@
             class="tiptap-source sr-only"
             tabindex="-1"
             aria-hidden="true"
-            {{ $attributes->whereStartsWith('wire:model') }}
         ></textarea>
     </div>
 </div>

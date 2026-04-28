@@ -206,7 +206,7 @@ export const registerTiptap = (Alpine) => {
         },
         run(name, ...args) {
             if (!this.editor) return;
-            this.editor.chain().focus()[name](...args).run();
+            this.editor.chain()[name](...args).run();
         },
         toggleLink() {
             if (!this.editor) return;
@@ -214,10 +214,10 @@ export const registerTiptap = (Alpine) => {
             const url = window.prompt('link url', previous || 'https://');
             if (url === null) return;
             if (url === '') {
-                this.editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                this.editor.chain().extendMarkRange('link').unsetLink().run();
                 return;
             }
-            this.editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+            this.editor.chain().extendMarkRange('link').setLink({ href: url }).run();
         },
         isActive(name, attrs = {}) {
             return this.editor?.isActive(name, attrs) ?? false;
