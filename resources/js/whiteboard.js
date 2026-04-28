@@ -94,7 +94,6 @@ export default function whiteboard({ initial = null } = {}) {
 
         init() {
             this.mount(this.$el);
-            this.$cleanup(() => this.destroy());
         },
 
         mount(rootEl) {
