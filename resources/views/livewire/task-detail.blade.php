@@ -18,7 +18,7 @@
                         <x-mary-icon name="o-lock-closed" class="h-5 w-5 text-[color:var(--gv-orange)]" />
                     </span>
                 @endif
-                <h1 class="text-2xl font-semibold text-[color:var(--gv-fg0)]">{{ $task->title }}</h1>
+                <h1 class="text-2xl font-semibold text-[color:var(--gv-fg0)]">{{ $title }}</h1>
             </div>
             @if($task->creator)
                 <div class="mt-1 text-xs text-[color:var(--gv-fg4)]">
@@ -36,8 +36,42 @@
     <div class="grid gap-4 lg:grid-cols-3">
         <div class="flex flex-col gap-3 lg:col-span-2">
             <div class="gv-card p-4">
-                <div class="mb-2 text-sm font-medium text-[color:var(--gv-fg2)]">Description</div>
-                <x-tiptap-content :html="$task->description" empty="No description." />
+                <div class="mb-3 flex items-center justify-between gap-3">
+                    <div class="text-sm font-medium text-[color:var(--gv-fg2)]">Task details</div>
+                    @if($editingDetails)
+                        <div class="flex items-center gap-2">
+                            <x-mary-button wire:click="cancelEditingDetails" label="Cancel" class="btn-ghost btn-sm border border-[color:var(--gv-border)] text-[color:var(--gv-fg2)]" />
+                            <x-mary-button wire:click="saveDetails" spinner="saveDetails" label="Save details" class="btn-primary btn-sm" />
+                        </div>
+                    @else
+                        <button
+                            type="button"
+                            wire:click="editDetails"
+                            class="text-xs font-medium text-[color:var(--gv-fg4)] underline-offset-4 transition hover:text-[color:var(--gv-amber)] hover:underline"
+                        >
+                            Edit details
+                        </button>
+                    @endif
+                </div>
+
+                @if($editingDetails)
+                    <div class="grid gap-3">
+                        <x-mary-input
+                            wire:model="title"
+                            label="Title"
+                            placeholder="Task title"
+                        />
+
+                        <x-tiptap-editor
+                            wire:model="description"
+                            label="Description"
+                            rows="6"
+                            placeholder="Describe the work, blockers, or expected outcome."
+                        />
+                    </div>
+                @else
+                    <x-tiptap-content :html="$task->description" empty="No description." />
+                @endif
             </div>
 
             @if($task->comments->isNotEmpty())
@@ -139,51 +173,104 @@
             </div>
 
             <div class="gv-card p-4">
-                <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-[color:var(--gv-fg4)]">Assignees</div>
-                @if($task->assignees->isEmpty())
-                    <div class="text-sm text-[color:var(--gv-fg4)]">Unassigned</div>
+                @if($editingDetails)
+                    <x-mary-choices-offline
+                        wire:model.live="assigneeIds"
+                        :options="$assigneeOptions"
+                        searchable
+                        clearable
+                        label="Assignees"
+                        placeholder="Search by name or email"
+                        option-sub-label="email"
+                        option-avatar="avatar"
+                    />
+                    @error('assigneeIds.*')<div class="mt-1 text-xs text-[color:var(--gv-red)]">{{ $message }}</div>@enderror
                 @else
-                    <ul class="flex flex-col gap-2">
-                        @foreach($task->assignees as $user)
-                            <li class="flex items-center justify-between gap-3">
-                                <a
-                                    href="{{ route('users.show', $user) }}"
-                                    wire:navigate
-                                    class="flex min-w-0 items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-[color:var(--gv-bg1)]"
-                                >
-                                    <img src="{{ $user->avatarUrl() }}" alt="" class="h-6 w-6 rounded-full" />
-                                    <span class="truncate">{{ $user->name }}</span>
-                                </a>
-                                <a href="{{ route('kanban', ['project' => $task->project_id, 'assignee' => $user->id]) }}" wire:navigate class="shrink-0 text-xs text-[color:var(--gv-fg4)] transition hover:text-[color:var(--gv-amber)]">
-                                    Filter board
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+                    <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-[color:var(--gv-fg4)]">Assignees</div>
+                    @if($task->assignees->isEmpty())
+                        <div class="text-sm text-[color:var(--gv-fg4)]">Unassigned</div>
+                    @else
+                        <ul class="flex flex-col gap-2">
+                            @foreach($task->assignees as $user)
+                                <li class="flex items-center justify-between gap-3">
+                                    <a
+                                        href="{{ route('users.show', $user) }}"
+                                        wire:navigate
+                                        class="flex min-w-0 items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-[color:var(--gv-bg1)]"
+                                    >
+                                        <img src="{{ $user->avatarUrl() }}" alt="" class="h-6 w-6 rounded-full" />
+                                        <span class="truncate">{{ $user->name }}</span>
+                                    </a>
+                                    <a href="{{ route('kanban', ['project' => $task->project_id, 'assignee' => $user->id]) }}" wire:navigate class="shrink-0 text-xs text-[color:var(--gv-fg4)] transition hover:text-[color:var(--gv-amber)]">
+                                        Filter board
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
                 @endif
             </div>
 
-            @if($task->epic || $task->sprint)
-                <div class="gv-card p-4 text-sm">
-                    @if($task->epic)
+            <div class="gv-card p-4">
+                @if($editingDetails)
+                    <div class="grid gap-3">
+                        <x-mary-datetime wire:model="dueDate" label="Due date" icon="o-calendar" />
+
+                        <x-mary-choices-offline
+                            wire:model.live="epicId"
+                            :options="$epicOptions"
+                            single
+                            searchable
+                            clearable
+                            label="Epic"
+                            placeholder="No epic"
+                            option-avatar="avatar"
+                        />
+
+                        <x-mary-choices-offline
+                            wire:model.live="sprintId"
+                            :options="$sprintOptions"
+                            single
+                            searchable
+                            clearable
+                            label="Sprint"
+                            placeholder="No sprint"
+                            option-sub-label="window"
+                            option-avatar="avatar"
+                        />
+                    </div>
+                @else
+                    <div class="flex flex-col gap-2 text-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[color:var(--gv-fg4)]">Due:</span>
+                            <span>{{ $task->due_date ? $task->due_date->format('M j, Y') : 'No due date' }}</span>
+                        </div>
+
                         <div class="flex items-center gap-2">
                             <span class="text-[color:var(--gv-fg4)]">Epic:</span>
-                            <a href="{{ route('epics.show', $task->epic) }}" wire:navigate class="flex items-center gap-1 text-[color:var(--gv-blue)] hover:underline">
-                                <img src="{{ $task->epic->avatarUrl() }}" alt="" class="h-4 w-4 rounded" />
-                                {{ $task->epic->name }}
-                            </a>
+                            @if($task->epic)
+                                <a href="{{ route('epics.show', $task->epic) }}" wire:navigate class="flex min-w-0 items-center gap-1 text-[color:var(--gv-blue)] hover:underline">
+                                    <img src="{{ $task->epic->avatarUrl() }}" alt="" class="h-4 w-4 rounded" />
+                                    <span class="truncate">{{ $task->epic->name }}</span>
+                                </a>
+                            @else
+                                <span>No epic</span>
+                            @endif
                         </div>
-                    @endif
-                    @if($task->sprint)
-                        <div class="mt-1 flex items-center gap-2">
+
+                        <div class="flex items-center gap-2">
                             <span class="text-[color:var(--gv-fg4)]">Sprint:</span>
-                            <a href="{{ route('kanban', ['project' => $task->project_id, 'sprint' => $task->sprint_id]) }}" wire:navigate class="text-[color:var(--gv-blue)] hover:underline">
-                                {{ $task->sprint->name }}
-                            </a>
+                            @if($task->sprint)
+                                <a href="{{ route('kanban', ['project' => $task->project_id, 'sprint' => $task->sprint_id]) }}" wire:navigate class="min-w-0 truncate text-[color:var(--gv-blue)] hover:underline">
+                                    {{ $task->sprint->name }}
+                                </a>
+                            @else
+                                <span>No sprint</span>
+                            @endif
                         </div>
-                    @endif
-                </div>
-            @endif
+                    </div>
+                @endif
+            </div>
 
             @if($task->tags->isNotEmpty())
                 <div class="gv-card p-4">
