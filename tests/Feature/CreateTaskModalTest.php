@@ -93,6 +93,29 @@ class CreateTaskModalTest extends TestCase
         ]);
     }
 
+    public function test_priority_and_status_options_are_rendered_in_the_modal(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = User::factory()->create([
+            'default_organization_id' => $organization->id,
+        ]);
+
+        $organization->users()->attach($user, [
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+
+        Project::factory()->create([
+            'organization_id' => $organization->id,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(CreateTaskModal::class)
+            ->assertSeeHtml('<option value="crit">CRIT</option>')
+            ->assertSeeHtml('<option value="in_progress">In Progress</option>');
+    }
+
     public function test_modal_only_offers_projects_from_the_active_organization(): void
     {
         $organizationA = Organization::factory()->create();
