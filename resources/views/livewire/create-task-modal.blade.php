@@ -72,17 +72,19 @@
                         </div>
 
                         <div class="grid gap-4 md:grid-cols-3">
-                            <x-mary-select wire:model="priority" label="priority" icon-right="o-chevron-up-down">
-                                @foreach(\App\Models\Task::PRIORITIES as $priority)
-                                    <option value="{{ $priority }}">{{ str($priority)->upper() }}</option>
-                                @endforeach
-                            </x-mary-select>
+                            <x-mary-select
+                                wire:model="priority"
+                                label="priority"
+                                icon-right="o-chevron-up-down"
+                                :options="collect(\App\Models\Task::PRIORITIES)->map(fn ($priority) => ['id' => $priority, 'name' => str($priority)->upper()->toString()])->all()"
+                            />
 
-                            <x-mary-select wire:model="status" label="status" icon-right="o-chevron-up-down">
-                                @foreach(\App\Models\Task::STATUSES as $status)
-                                    <option value="{{ $status }}">{{ str($status)->replace('_', ' ')->title() }}</option>
-                                @endforeach
-                            </x-mary-select>
+                            <x-mary-select
+                                wire:model="status"
+                                label="status"
+                                icon-right="o-chevron-up-down"
+                                :options="collect(\App\Models\Task::STATUSES)->map(fn ($status) => ['id' => $status, 'name' => str($status)->replace('_', ' ')->title()->toString()])->all()"
+                            />
 
                             <x-mary-datetime wire:model="dueDate" label="due date" icon="o-calendar" />
                         </div>
